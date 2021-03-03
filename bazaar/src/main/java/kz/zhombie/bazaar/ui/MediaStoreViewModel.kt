@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar
+package kz.zhombie.bazaar.ui
 
 import androidx.lifecycle.ViewModel
 

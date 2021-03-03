@@ -3,6 +3,10 @@ package kz.zhombie.bazaar.model
 import android.graphics.Bitmap
 import android.net.Uri
 
+/**
+ * [duration] - The duration time of the [Video]
+ * [cover] - The cover image of the [Video] (like thumbnail)
+ */
 data class Video constructor(
     override val id: Long,
     override val uri: Uri,

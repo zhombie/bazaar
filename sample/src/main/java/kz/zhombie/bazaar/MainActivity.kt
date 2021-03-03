@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         button?.setOnClickListener {
             Bazaar.Builder(supportFragmentManager)
                 .setTag(Bazaar.TAG)
+                .setImageLoader(CoilImageLoader())
                 .show()
         }
     }
