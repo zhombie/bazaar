@@ -1,0 +1,3 @@
+include ':bazaar'
+include ':sample'
+rootProject.name = "Bazaar"
