@@ -1,10 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<kz.zhombie.bazaar.ui.components.SquareImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<kz.zhombie.bazaar.ui.components.SquareFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/imageView"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:scaleType="centerCrop"
-    app:shapeAppearance="@style/ItemShapeAppearance"
-    tools:src="@tools:sample/backgrounds/scenic" />
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:shapeAppearance="@style/ItemShapeAppearance"
+        tools:src="@tools:sample/backgrounds/scenic" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/checkbox"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="5dp"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:backgroundTint="@null"
+        app:icon="@drawable/ic_checked"
+        app:iconGravity="textEnd"
+        app:iconSize="25dp"
+        app:iconTint="@null" />
+
+</kz.zhombie.bazaar.ui.components.SquareFrameLayout>
