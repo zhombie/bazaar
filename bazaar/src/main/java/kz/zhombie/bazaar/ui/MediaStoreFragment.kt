@@ -23,18 +23,18 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.core.Logger
 import kz.zhombie.bazaar.model.Image
 import kz.zhombie.bazaar.model.Media
 import kz.zhombie.bazaar.model.Video
+import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
 import kz.zhombie.bazaar.utils.readVideo
 
-class MediaStoreFragment : BottomSheetDialogFragment() {
+class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -83,6 +83,13 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
         setupSelectButton()
 
         loadImages()
+
+        viewModel.getSelectedMedia().observe(viewLifecycleOwner, {
+        })
+
+        viewModel.getAllMedia().observe(viewLifecycleOwner, {
+            mediaAdapter?.submitList(it)
+        })
     }
 
     private fun setupHeaderView() {
@@ -93,7 +100,7 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
         Logger.d(TAG, "setupRecyclerView()")
 
         headerAdapter = HeaderAdapter()
-        mediaAdapter = MediaAdapter(Settings.getImageLoader())
+        mediaAdapter = MediaAdapter(Settings.getImageLoader(), this)
         recyclerView?.adapter = ConcatAdapter(headerAdapter, mediaAdapter)
 
         val layoutManager = GridLayoutManager(
@@ -143,9 +150,7 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
                 ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
                 ?.use { cursor ->
                     val data = cursor.mapTo(Image::class.java)
-                    withContext(Dispatchers.Main) {
-                        mediaAdapter?.submitList(data)
-                    }
+                    viewModel.onMediaLoaded(data)
                 }
         }
     }
@@ -165,6 +170,14 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
                 .filterNotNull()
         )
         return array
+    }
+
+    override fun onImageCheckboxClicked(uiMedia: UIMedia) {
+        viewModel.onImageCheckboxClicked(uiMedia)
+    }
+
+    override fun onVideoCheckboxClicked(position: Int, video: Video, isSelected: Boolean) {
+
     }
 
 }
