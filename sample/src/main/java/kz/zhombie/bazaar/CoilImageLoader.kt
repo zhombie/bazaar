@@ -9,6 +9,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
+import coil.transform.RoundedCornersTransformation
 import kz.zhombie.bazaar.api.ImageLoader
 
 class CoilImageLoader : ImageLoader {
@@ -24,6 +25,15 @@ class CoilImageLoader : ImageLoader {
             .scale(Scale.FIT)
             .size(300, 300)
             .target(imageView)
+            .transformations(
+                RoundedCornersTransformation(
+//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
+//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
+//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
+//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
+                20F, 20F, 20F, 20F
+                )
+            )
             .build()
 
         Coil.enqueue(request)

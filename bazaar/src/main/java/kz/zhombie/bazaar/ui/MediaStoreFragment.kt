@@ -1,12 +1,21 @@
 package kz.zhombie.bazaar.ui
 
 import android.database.Cursor
+import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Spannable
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.TypefaceCompat
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -14,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,6 +52,7 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
     private var appBarLayout: AppBarLayout? = null
     private var toolbar: MaterialToolbar? = null
     private var recyclerView: RecyclerView? = null
+    private var selectButton: MaterialButton? = null
 
     private lateinit var viewModel: MediaStoreViewModel
 
@@ -68,8 +79,10 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
         appBarLayout = view.findViewById(R.id.appBarLayout)
         toolbar = view.findViewById(R.id.toolbar)
         recyclerView = view.findViewById(R.id.recyclerView)
+        selectButton = view.findViewById(R.id.selectButton)
 
         setupRecyclerView()
+        setupSelectButton()
 
         loadImages()
     }
@@ -77,8 +90,37 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
     private fun setupRecyclerView() {
         Logger.d(TAG, "setupRecyclerView()")
         adapter = MediaAdapter(Settings.getImageLoader())
-        recyclerView?.layoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
+        recyclerView?.layoutManager = GridLayoutManager(
+            context,
+            3,
+            GridLayoutManager.VERTICAL,
+            false
+        )
         recyclerView?.adapter = adapter
+
+        recyclerView?.addItemDecoration(
+            SpacingItemDecoration(
+                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_left),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_top),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_right),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_bottom)
+            )
+        )
+    }
+
+    private fun setupSelectButton() {
+        selectButton?.text = buildSpannedString {
+            val title = "Выбрать"
+            val subtitle = "Выбрано 5 файлов"
+
+            append(title + "\n" + subtitle)
+
+            setSpan(ForegroundColorSpan(Color.parseColor("#333333")), 0, title.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), 0, title.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            setSpan(RelativeSizeSpan(0.7F), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(Color.parseColor("#8290A0")), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
     }
 
     private fun loadImages() {

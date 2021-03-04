@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -22,13 +23,38 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/grid_margin_horizontal"
+        android:layout_marginRight="@dimen/grid_margin_horizontal"
+        android:layout_marginTop="@dimen/grid_margin_top"
         android:clipToPadding="false"
         android:orientation="vertical"
         android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="3"
-        tools:itemCount="3"
         tools:listitem="@layout/cell_image" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/selectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="11dp"
+        android:layout_marginLeft="34dp"
+        android:layout_marginRight="34dp"
+        android:layout_marginTop="11dp"
+        android:backgroundTint="@android:color/white"
+        android:elevation="5dp"
+        android:includeFontPadding="false"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.0"
+        android:lineSpacingMultiplier="1.1"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:stateListAnimator="@animator/mtrl_btn_unelevated_state_list_anim"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        app:cornerRadius="13dp"
+        tools:text="Выбрать\nВыбрано 5 файлов" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

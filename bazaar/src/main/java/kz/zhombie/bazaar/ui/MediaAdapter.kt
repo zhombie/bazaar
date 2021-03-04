@@ -15,7 +15,7 @@ import kz.zhombie.bazaar.model.Image
 import kz.zhombie.bazaar.model.Media
 import kz.zhombie.bazaar.model.Video
 
-class MediaAdapter constructor(
+internal class MediaAdapter constructor(
     private val imageLoader: ImageLoader
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

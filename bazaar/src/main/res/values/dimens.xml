@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    <dimen name="item_bottom_margin">?attr/itemBottomMargin</dimen>-->
+<!--    <dimen name="item_left_margin">?attr/itemLeftMargin</dimen>-->
+<!--    <dimen name="item_right_margin">?attr/itemRightMargin</dimen>-->
+<!--    <dimen name="item_top_margin">?attr/itemTopMargin</dimen>-->
+
+    <dimen name="grid_margin_horizontal">4.5dp</dimen>
+    <dimen name="grid_margin_top">4.5dp</dimen>
+
+    <dimen name="item_margin_bottom">5.5dp</dimen>
+    <dimen name="item_margin_left">7.5dp</dimen>
+    <dimen name="item_margin_right">7.5dp</dimen>
+    <dimen name="item_margin_top">5.5dp</dimen>
+</resources>
