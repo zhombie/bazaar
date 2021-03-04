@@ -46,14 +46,15 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private var titleButton: MaterialButton? = null
     private var recyclerView: RecyclerView? = null
     private var selectButton: MaterialButton? = null
 
     private lateinit var viewModel: MediaStoreViewModel
 
-    private var concatAdapter: ConcatAdapter? = null
     private var headerAdapter: HeaderAdapter? = null
     private var mediaAdapter: MediaAdapter? = null
+    private var concatAdapter: ConcatAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,13 +74,19 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        titleButton = view.findViewById(R.id.titleButton)
         recyclerView = view.findViewById(R.id.recyclerView)
         selectButton = view.findViewById(R.id.selectButton)
 
+        setupHeaderView()
         setupRecyclerView()
         setupSelectButton()
 
         loadImages()
+    }
+
+    private fun setupHeaderView() {
+        titleButton?.text = "Название альбома"
     }
 
     private fun setupRecyclerView() {
@@ -87,8 +94,7 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
 
         headerAdapter = HeaderAdapter()
         mediaAdapter = MediaAdapter(Settings.getImageLoader())
-        concatAdapter = ConcatAdapter(headerAdapter, mediaAdapter)
-        recyclerView?.adapter = concatAdapter
+        recyclerView?.adapter = ConcatAdapter(headerAdapter, mediaAdapter)
 
         val layoutManager = GridLayoutManager(
             context,
@@ -96,16 +102,6 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
             GridLayoutManager.VERTICAL,
             false
         )
-
-        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (position == 0) {
-                    3
-                } else {
-                    1
-                }
-            }
-        }
 
         recyclerView?.layoutManager = layoutManager
 

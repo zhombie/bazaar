@@ -10,6 +10,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.ImageLoader
 import kz.zhombie.bazaar.core.Logger
+import kz.zhombie.bazaar.core.ViewHolderException
 import kz.zhombie.bazaar.model.Entity
 import kz.zhombie.bazaar.model.Image
 import kz.zhombie.bazaar.model.Media
@@ -74,7 +75,7 @@ internal class MediaAdapter constructor(
                 )
             }
             else ->
-                throw IllegalStateException("There is no [${RecyclerView.ViewHolder::class.java.simpleName}] for this [${viewType}].")
+                throw ViewHolderException(viewType)
         }
     }
 

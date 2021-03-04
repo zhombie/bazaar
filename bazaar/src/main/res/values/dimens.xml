@@ -5,13 +5,13 @@
 <!--    <dimen name="item_right_margin">?attr/itemRightMargin</dimen>-->
 <!--    <dimen name="item_top_margin">?attr/itemTopMargin</dimen>-->
 
-    <dimen name="grid_margin_horizontal">4.5dp</dimen>
-    <dimen name="grid_margin_top">4.5dp</dimen>
+    <dimen name="grid_margin_horizontal">6.5dp</dimen>
+    <dimen name="grid_margin_top">14dp</dimen>
 
     <dimen name="item_margin_bottom">5.5dp</dimen>
-    <dimen name="item_margin_left">7.5dp</dimen>
-    <dimen name="item_margin_right">7.5dp</dimen>
+    <dimen name="item_margin_left">6.5dp</dimen>
+    <dimen name="item_margin_right">6.5dp</dimen>
     <dimen name="item_margin_top">5.5dp</dimen>
 
-    <dimen name="item_corner_radius">7.5dp</dimen>
+    <dimen name="item_corner_radius">13dp</dimen>
 </resources>

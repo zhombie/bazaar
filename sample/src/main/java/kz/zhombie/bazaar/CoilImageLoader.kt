@@ -27,14 +27,6 @@ class CoilImageLoader : ImageLoader {
             .scale(Scale.FIT)
             .size(300, 300)
             .target(imageView)
-            .transformations(
-                RoundedCornersTransformation(
-                    context.resources.getDimension(R.dimen.item_corner_radius),
-                    context.resources.getDimension(R.dimen.item_corner_radius),
-                    context.resources.getDimension(R.dimen.item_corner_radius),
-                    context.resources.getDimension(R.dimen.item_corner_radius)
-                )
-            )
             .build()
 
         Coil.enqueue(request)
