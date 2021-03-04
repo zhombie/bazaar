@@ -137,8 +137,14 @@ internal class MediaAdapter constructor(
             imageLoader.loadImage(itemView.context, imageView, uiMedia.media.uri)
 
             if (uiMedia.isSelected) {
+                imageView.scaleX = 0.9F
+                imageView.scaleY = 0.9F
+
                 checkbox.setIconResource(R.drawable.ic_checked)
             } else {
+                imageView.scaleX = 1.0F
+                imageView.scaleY = 1.0F
+
                 checkbox.setIconResource(R.drawable.ic_unchecked)
             }
 
@@ -149,9 +155,23 @@ internal class MediaAdapter constructor(
 
         fun toggleSelection(uiMedia: UIMedia) {
             if (uiMedia.isSelected) {
-                checkbox.setIconResource(R.drawable.ic_checked)
+                imageView.animate()
+                    .setDuration(100L)
+                    .scaleX(0.9F)
+                    .scaleY(0.9F)
+                    .withStartAction {
+                        checkbox.setIconResource(R.drawable.ic_checked)
+                    }
+                    .start()
             } else {
-                checkbox.setIconResource(R.drawable.ic_unchecked)
+                imageView.animate()
+                    .setDuration(100L)
+                    .scaleX(1.0F)
+                    .scaleY(1.0F)
+                    .withStartAction {
+                        checkbox.setIconResource(R.drawable.ic_unchecked)
+                    }
+                    .start()
             }
         }
     }

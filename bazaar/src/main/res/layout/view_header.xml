@@ -59,6 +59,7 @@
                 app:iconPadding="9dp"
                 app:iconSize="@null"
                 app:iconTint="#333333"
+                app:rippleColor="?colorControlHighlight"
                 tools:text="Название альбома" />
 
         </FrameLayout>
@@ -80,7 +81,8 @@
             app:icon="@drawable/ic_close"
             app:iconGravity="textEnd"
             app:iconPadding="0dp"
-            app:iconTint="@null" />
+            app:iconTint="@null"
+            app:rippleColor="?colorControlHighlight" />
 
     </LinearLayout>
 
