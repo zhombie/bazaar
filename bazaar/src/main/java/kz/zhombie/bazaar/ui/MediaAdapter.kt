@@ -12,6 +12,7 @@ import kz.zhombie.bazaar.api.ImageLoader
 import kz.zhombie.bazaar.core.Logger
 import kz.zhombie.bazaar.model.Entity
 import kz.zhombie.bazaar.model.Image
+import kz.zhombie.bazaar.model.Media
 import kz.zhombie.bazaar.model.Video
 
 class MediaAdapter constructor(
@@ -21,11 +22,11 @@ class MediaAdapter constructor(
     companion object {
         private val TAG: String = MediaAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<Entity>() {
-            override fun areItemsTheSame(oldItem: Entity, newItem: Entity): Boolean =
+        private val diffCallback = object : DiffUtil.ItemCallback<Media>() {
+            override fun areItemsTheSame(oldItem: Media, newItem: Media): Boolean =
                 oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Entity, newItem: Entity): Boolean =
+            override fun areContentsTheSame(oldItem: Media, newItem: Media): Boolean =
                 oldItem.id == newItem.id && oldItem.uri == newItem.uri
         }
     }
@@ -35,18 +36,18 @@ class MediaAdapter constructor(
         const val VIDEO = 101
     }
 
-    private val asyncListDiffer: AsyncListDiffer<Entity> by lazy {
+    private val asyncListDiffer: AsyncListDiffer<Media> by lazy {
         AsyncListDiffer(this, diffCallback)
     }
 
-    fun submitList(data: List<Entity>) {
-        Logger.d(TAG, "submitList() -> data: $data")
+    fun submitList(data: List<Media>) {
+        Logger.d(TAG, "submitList() -> ${data.size}")
         asyncListDiffer.submitList(data)
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
 
-    private fun getItem(position: Int): Entity = asyncListDiffer.currentList[position]
+    private fun getItem(position: Int): Media = asyncListDiffer.currentList[position]
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {

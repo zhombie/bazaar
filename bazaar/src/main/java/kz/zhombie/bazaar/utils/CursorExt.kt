@@ -9,7 +9,7 @@ import kz.zhombie.bazaar.model.Video
 import java.util.concurrent.TimeUnit
 
 internal fun Cursor.readImage(): Image? {
-    try {
+    return try {
         val id = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID))
         val externalContentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
         val title = getString(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.TITLE))
@@ -32,7 +32,7 @@ internal fun Cursor.readImage(): Image? {
         val width = getInt(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.WIDTH))
         val height = getInt(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.HEIGHT))
 
-        return Image(
+        Image(
             id = id,
             uri = externalContentUri,
             title = title,
@@ -47,13 +47,13 @@ internal fun Cursor.readImage(): Image? {
         )
     } catch (e: Exception) {
         e.printStackTrace()
-        return null
+        null
     }
 }
 
 
 internal fun Cursor.readVideo(): Video? {
-    try {
+    return try {
         val id = getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns._ID))
         val externalContentUri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
         val title = getString(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.TITLE))
@@ -82,7 +82,7 @@ internal fun Cursor.readVideo(): Video? {
             null
         }
 
-        return Video(
+        Video(
             id = id,
             uri = externalContentUri,
             title = title,
@@ -99,6 +99,6 @@ internal fun Cursor.readVideo(): Video? {
         )
     } catch (e: Exception) {
         e.printStackTrace()
-        return null
+        null
     }
 }

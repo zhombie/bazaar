@@ -16,12 +16,16 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.core.Logger
-import kz.zhombie.bazaar.model.Entity
+import kz.zhombie.bazaar.model.Image
+import kz.zhombie.bazaar.model.Media
+import kz.zhombie.bazaar.model.Video
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
+import kz.zhombie.bazaar.utils.readVideo
 
 class MediaStoreFragment : BottomSheetDialogFragment() {
 
@@ -88,25 +92,30 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
 
             context?.contentResolver
                 ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
-//                ?.query(uri, projection, null, null, null)
-                ?.use { cursor -> setMedia(cursor) }
+                ?.use { cursor ->
+                    val data = cursor.mapTo(Image::class.java)
+                    withContext(Dispatchers.Main) {
+                        adapter?.submitList(data)
+                    }
+                }
         }
     }
 
-    private fun setMedia(cursor: Cursor) {
-        Logger.d(TAG, "setMedia() -> cursor.count: ${cursor.count}")
-        val array = arrayListOf<Entity>()
+    private fun <T> Cursor.mapTo(clazz: Class<T>): List<Media> {
+        Logger.d(TAG, "$count items to $clazz, ${clazz == Image::class.java}")
+        val array = arrayListOf<Media>()
         array.addAll(
-            generateSequence { if (cursor.moveToNext()) cursor else null }
+            generateSequence { if (moveToNext()) this else null }
                 .map {
-                    val image = it.readImage()
-                    Logger.d(TAG, "map() -> image: $image")
-                    return@map image
+                    when (clazz) {
+                        Image::class.java -> it.readImage()
+                        Video::class.java -> it.readVideo()
+                        else -> null
+                    }
                 }
                 .filterNotNull()
-                .toList()
         )
-        adapter?.submitList(array)
+        return array
     }
 
 }
