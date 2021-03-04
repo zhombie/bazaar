@@ -22,6 +22,7 @@ class MediaStoreViewModel : ViewModel() {
     fun onImageCheckboxClicked(uiMedia: UIMedia) {
         Logger.d(TAG, "uiMedia: $uiMedia")
 
+        // Selected
         val newSelected = mutableListOf<UIMedia>()
         val currentSelectedMedia = selectedMedia.value
         if (!currentSelectedMedia.isNullOrEmpty()) {
@@ -34,13 +35,15 @@ class MediaStoreViewModel : ViewModel() {
         }
         selectedMedia.postValue(newSelected)
 
-        val currentAllMedia = allMedia.value?.toMutableList() ?: mutableListOf()
-        currentAllMedia.indexOfFirst { it.media.id == uiMedia.media.id }
-            .takeIf { index -> index > -1 }
-            ?.let { index ->
-                currentAllMedia[index] = currentAllMedia[index].copy(isSelected = !currentAllMedia[index].isSelected)
-                allMedia.postValue(currentAllMedia)
-            }
+        // All
+        with(allMedia.value?.toMutableList() ?: mutableListOf()) {
+            indexOfFirst { it.media.id == uiMedia.media.id }
+                .takeIf { index -> index > -1 }
+                ?.let { index ->
+                    this[index] = this[index].copy(isSelected = !this[index].isSelected)
+                    allMedia.postValue(this)
+                }
+        }
     }
 
     fun onMediaLoaded(data: List<Media>) {
