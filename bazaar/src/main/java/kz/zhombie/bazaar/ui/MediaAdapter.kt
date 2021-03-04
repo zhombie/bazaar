@@ -33,7 +33,7 @@ internal class MediaAdapter constructor(
 
             override fun getChangePayload(oldItem: UIMedia, newItem: UIMedia): Any? {
                 return when {
-                    oldItem.isSelected != newItem.isSelected -> "is_selected"
+                    oldItem.isSelected != newItem.isSelected -> "toggle_selected"
                     else -> null
                 }
             }
@@ -106,13 +106,27 @@ internal class MediaAdapter constructor(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        payloads.firstOrNull()?.let {
-            when (holder) {
-                is ImageViewHolder -> {
-                    holder.toggleSelection(getItem(position))
+        Logger.d(TAG, "payloads: $payloads")
+        if (payloads.isNullOrEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            var isProcessed = false
+            payloads.forEach {
+                if (it == "toggle_selected") {
+                    when (holder) {
+                        is ImageViewHolder -> {
+                            if (!isProcessed) {
+                                isProcessed = true
+                            }
+                            holder.toggleSelection(getItem(position))
+                        }
+                    }
                 }
             }
-        } ?: super.onBindViewHolder(holder, position, payloads)
+            if (!isProcessed) {
+                super.onBindViewHolder(holder, position, payloads)
+            }
+        }
     }
 
     private inner class ImageViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
