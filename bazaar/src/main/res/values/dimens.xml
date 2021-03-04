@@ -12,4 +12,6 @@
     <dimen name="item_margin_left">7.5dp</dimen>
     <dimen name="item_margin_right">7.5dp</dimen>
     <dimen name="item_margin_top">5.5dp</dimen>
+
+    <dimen name="item_corner_radius">7.5dp</dimen>
 </resources>

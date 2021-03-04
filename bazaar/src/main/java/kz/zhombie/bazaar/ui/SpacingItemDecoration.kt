@@ -17,7 +17,14 @@ internal class SpacingItemDecoration constructor(
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-        outRect.set(spacingLeft, spacingTop, spacingRight, spacingBottom)
+        when (parent.layoutManager?.getPosition(view)) {
+            0 -> {
+                // Ignored
+            }
+            else -> {
+                outRect.set(spacingLeft, spacingTop, spacingRight, spacingBottom)
+            }
+        }
     }
 
 }

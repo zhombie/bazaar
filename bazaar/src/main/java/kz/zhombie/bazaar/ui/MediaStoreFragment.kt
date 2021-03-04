@@ -13,15 +13,12 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.graphics.TypefaceCompat
-import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
@@ -49,14 +46,14 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private var appBarLayout: AppBarLayout? = null
-    private var toolbar: MaterialToolbar? = null
     private var recyclerView: RecyclerView? = null
     private var selectButton: MaterialButton? = null
 
     private lateinit var viewModel: MediaStoreViewModel
 
-    private var adapter: MediaAdapter? = null
+    private var concatAdapter: ConcatAdapter? = null
+    private var headerAdapter: HeaderAdapter? = null
+    private var mediaAdapter: MediaAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +73,6 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        appBarLayout = view.findViewById(R.id.appBarLayout)
-        toolbar = view.findViewById(R.id.toolbar)
         recyclerView = view.findViewById(R.id.recyclerView)
         selectButton = view.findViewById(R.id.selectButton)
 
@@ -89,14 +84,30 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
 
     private fun setupRecyclerView() {
         Logger.d(TAG, "setupRecyclerView()")
-        adapter = MediaAdapter(Settings.getImageLoader())
-        recyclerView?.layoutManager = GridLayoutManager(
+
+        headerAdapter = HeaderAdapter()
+        mediaAdapter = MediaAdapter(Settings.getImageLoader())
+        concatAdapter = ConcatAdapter(headerAdapter, mediaAdapter)
+        recyclerView?.adapter = concatAdapter
+
+        val layoutManager = GridLayoutManager(
             context,
             3,
             GridLayoutManager.VERTICAL,
             false
         )
-        recyclerView?.adapter = adapter
+
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position == 0) {
+                    3
+                } else {
+                    1
+                }
+            }
+        }
+
+        recyclerView?.layoutManager = layoutManager
 
         recyclerView?.addItemDecoration(
             SpacingItemDecoration(
@@ -137,7 +148,7 @@ class MediaStoreFragment : BottomSheetDialogFragment() {
                 ?.use { cursor ->
                     val data = cursor.mapTo(Image::class.java)
                     withContext(Dispatchers.Main) {
-                        adapter?.submitList(data)
+                        mediaAdapter?.submitList(data)
                     }
                 }
         }

@@ -28,9 +28,9 @@ class MainActivity : AppCompatActivity() {
         button?.setOnClickListener {
             if (checkPermissions()) {
                 Bazaar.Builder(supportFragmentManager)
-                        .setTag(Bazaar.TAG)
-                        .setImageLoader(CoilImageLoader())
-                        .show()
+                    .setTag(Bazaar.TAG)
+                    .setImageLoader(CoilImageLoader())
+                    .show()
             }
         }
     }
@@ -44,7 +44,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == RequestCode.READ_EXTERNAL_STORAGE) {

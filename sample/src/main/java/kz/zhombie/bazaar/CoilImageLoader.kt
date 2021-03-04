@@ -20,18 +20,19 @@ class CoilImageLoader : ImageLoader {
             .crossfade(true)
             .diskCachePolicy(CachePolicy.DISABLED)
             .data(uri)
+            .error(R.drawable.ic_placeholder)
             .memoryCachePolicy(CachePolicy.DISABLED)
+            .placeholder(R.drawable.ic_placeholder)
             .precision(Precision.AUTOMATIC)
             .scale(Scale.FIT)
             .size(300, 300)
             .target(imageView)
             .transformations(
                 RoundedCornersTransformation(
-//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
-//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
-//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
-//                    context.resources.getDimension(R.dimen.rounded_corner_radius),
-                20F, 20F, 20F, 20F
+                    context.resources.getDimension(R.dimen.item_corner_radius),
+                    context.resources.getDimension(R.dimen.item_corner_radius),
+                    context.resources.getDimension(R.dimen.item_corner_radius),
+                    context.resources.getDimension(R.dimen.item_corner_radius)
                 )
             )
             .build()
