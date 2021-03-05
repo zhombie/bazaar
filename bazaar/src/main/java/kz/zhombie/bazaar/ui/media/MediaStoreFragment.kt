@@ -158,18 +158,17 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         loadImages()
 
         viewModel.getSelectedMedia().observe(viewLifecycleOwner, {
+            Logger.d(TAG, "getSelectedMedia() -> it.size: ${it.size}")
+            setupSelectButton(it.size)
         })
 
         viewModel.getAllMedia().observe(viewLifecycleOwner, {
             mediaAdapter?.submitList(it)
         })
-
-        viewModel.getVisibility().observe(viewLifecycleOwner, {
-        })
     }
 
     private fun setupHeaderView() {
-        titleButton.text = "Название альбома"
+        titleButton.text = "Все медиа"
 
         closeButton.setOnClickListener { dismiss() }
     }
@@ -203,10 +202,10 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         )
     }
 
-    private fun setupSelectButton() {
+    private fun setupSelectButton(selectedMediaCount: Int = 0) {
         selectButton.text = buildSpannedString {
             val title = "Выбрать"
-            val subtitle = "Выбрано 5 файлов"
+            val subtitle = "Выбрано $selectedMediaCount файл(-ов)"
 
             append(title + "\n" + subtitle)
 

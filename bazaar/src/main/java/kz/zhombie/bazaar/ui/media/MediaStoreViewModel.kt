@@ -27,33 +27,33 @@ class MediaStoreViewModel : ViewModel() {
     private val viewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getViewPosition(): LiveData<ViewPosition> = viewPosition
 
-    private val visibility by lazy { MutableLiveData<Pair<Long, Boolean>>() }
-    fun getVisibility(): LiveData<Pair<Long, Boolean>> = visibility
-
     fun onImageCheckboxClicked(uiMedia: UIMedia) {
-        Logger.d(TAG, "uiMedia: $uiMedia")
+        Logger.d(TAG, "onImageCheckboxClicked() -> uiMedia: $uiMedia")
 
-        // Selected
-        val newSelected = mutableListOf<UIMedia>()
-        val currentSelectedMedia = selectedMedia.value
-        if (!currentSelectedMedia.isNullOrEmpty()) {
-            newSelected.addAll(currentSelectedMedia)
-        }
-        if (uiMedia.isSelected) {
-            newSelected.add(uiMedia)
-        } else {
-            newSelected.removeAll { it.media.id == uiMedia.media.id }
-        }
-        selectedMedia.postValue(newSelected)
+        viewModelScope.launch(Dispatchers.IO) {
+            // Selected
+            val newSelected = mutableListOf<UIMedia>()
+            val currentSelectedMedia = selectedMedia.value
+            if (!currentSelectedMedia.isNullOrEmpty()) {
+                newSelected.addAll(currentSelectedMedia)
+            }
+            val index = newSelected.indexOfFirst { it.media.id == uiMedia.media.id }
+            if (index > -1) {
+                newSelected.removeAll { it.media.id == uiMedia.media.id }
+            } else {
+                newSelected.add(uiMedia)
+            }
+            selectedMedia.postValue(newSelected)
 
-        // All
-        with(allMedia.value?.toMutableList() ?: mutableListOf()) {
-            indexOfFirst { it.media.id == uiMedia.media.id }
-                .takeIf { index -> index > -1 }
-                ?.let { index ->
-                    this[index] = this[index].copy(isSelected = !this[index].isSelected)
-                    allMedia.postValue(this)
-                }
+            // All
+            with(allMedia.value?.toMutableList() ?: mutableListOf()) {
+                indexOfFirst { it.media.id == uiMedia.media.id }
+                    .takeIf { index -> index > -1 }
+                    ?.let { index ->
+                        this[index] = this[index].copy(isSelected = !this[index].isSelected)
+                        allMedia.postValue(this)
+                    }
+            }
         }
     }
 
