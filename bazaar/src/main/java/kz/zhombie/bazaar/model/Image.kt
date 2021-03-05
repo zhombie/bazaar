@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.model
 
+import android.graphics.Bitmap
 import android.net.Uri
 
 data class Image constructor(
@@ -13,7 +14,8 @@ data class Image constructor(
     override val dateCreated: Long?,
     override val mimeType: String,
     override val width: Int,
-    override val height: Int
+    override val height: Int,
+    override val thumbnail: Bitmap? = null
 ) : Media(
     id = id,
     uri = uri,
@@ -25,5 +27,6 @@ data class Image constructor(
     size = size,
     mimeType = mimeType,
     width = width,
-    height = height
+    height = height,
+    thumbnail = thumbnail
 )

@@ -19,6 +19,8 @@ data class Video constructor(
     override val mimeType: String,
     override val width: Int,
     override val height: Int,
+    override val thumbnail: Bitmap? = null,
+
     val duration: Long?,
     val cover: Bitmap?,
 ) : Media(
@@ -32,5 +34,6 @@ data class Video constructor(
     size = size,
     mimeType = mimeType,
     width = width,
-    height = height
+    height = height,
+    thumbnail = thumbnail
 )

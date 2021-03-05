@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.model
 
+import android.graphics.Bitmap
 import android.net.Uri
 
 /**
@@ -16,6 +17,7 @@ open class Media constructor(
     override val dateAdded: Long,
     override val dateModified: Long,
     override val dateCreated: Long?,
+    override val thumbnail: Bitmap? = null,
 
     open val mimeType: String,
     open val width: Int,
@@ -28,5 +30,6 @@ open class Media constructor(
     size = size,
     dateAdded = dateAdded,
     dateModified = dateModified,
-    dateCreated = dateCreated
+    dateCreated = dateCreated,
+    thumbnail = thumbnail
 )

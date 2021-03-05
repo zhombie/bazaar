@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui
+package kz.zhombie.bazaar.ui.media
 
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +34,7 @@ internal class MediaAdapter constructor(
             override fun getChangePayload(oldItem: UIMedia, newItem: UIMedia): Any? {
                 return when {
                     oldItem.isSelected != newItem.isSelected -> "toggle_selected"
+                    oldItem.isVisible != newItem.isVisible -> "toggle_visibility"
                     else -> null
                 }
             }
@@ -94,9 +95,7 @@ internal class MediaAdapter constructor(
                 holder.bind(item)
             }
             is VideoViewHolder -> {
-                if (item.media is Video) {
-                    holder.bind(item.media, item.isSelected)
-                }
+                holder.bind(item)
             }
         }
     }
@@ -121,8 +120,18 @@ internal class MediaAdapter constructor(
                             holder.toggleSelection(getItem(position))
                         }
                     }
+                } else if (it == "toggle_visibility") {
+                    when (holder) {
+                        is ImageViewHolder -> {
+                            if (!isProcessed) {
+                                isProcessed = true
+                            }
+                            holder.toggleVisibility(getItem(position))
+                        }
+                    }
                 }
             }
+            Logger.d(TAG, "isProcessed: $isProcessed")
             if (!isProcessed) {
                 super.onBindViewHolder(holder, position, payloads)
             }
@@ -134,7 +143,11 @@ internal class MediaAdapter constructor(
         private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
 
         fun bind(uiMedia: UIMedia) {
-            imageLoader.loadImage(itemView.context, imageView, uiMedia.media.uri)
+            if (imageView.visibility != View.VISIBLE) {
+                imageView.visibility = View.VISIBLE
+            }
+
+            imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
 
             if (uiMedia.isSelected) {
                 imageView.scaleX = 0.9F
@@ -146,6 +159,10 @@ internal class MediaAdapter constructor(
                 imageView.scaleY = 1.0F
 
                 checkbox.setIconResource(R.drawable.ic_unchecked)
+            }
+
+            imageView.setOnClickListener {
+                callback.onImageClicked(imageView, uiMedia)
             }
 
             checkbox.setOnClickListener {
@@ -174,16 +191,24 @@ internal class MediaAdapter constructor(
                     .start()
             }
         }
+
+        fun toggleVisibility(uiMedia: UIMedia) {
+            imageView.visibility = if (uiMedia.isVisible) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+        }
     }
 
     private inner  class VideoViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
         private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
 
-        fun bind(video: Video, isSelected: Boolean) {
-            imageLoader.loadImage(itemView.context, imageView, video.uri)
+        fun bind(uiMedia: UIMedia) {
+            imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
 
-            if (isSelected) {
+            if (uiMedia.isSelected) {
                 checkbox.setIconResource(R.drawable.ic_checked)
             } else {
                 checkbox.setIconResource(R.drawable.ic_unchecked)
@@ -192,8 +217,8 @@ internal class MediaAdapter constructor(
     }
 
     interface Callback {
+        fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia)
         fun onImageCheckboxClicked(uiMedia: UIMedia)
-        fun onVideoCheckboxClicked(position: Int, video: Video, isSelected: Boolean)
     }
 
 }

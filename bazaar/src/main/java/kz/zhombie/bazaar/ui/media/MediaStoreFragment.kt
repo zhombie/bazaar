@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui
+package kz.zhombie.bazaar.ui.media
 
 import android.database.Cursor
 import android.graphics.Color
@@ -19,8 +19,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.alexvasilkov.gestures.animation.ViewPosition
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.R
@@ -30,6 +32,7 @@ import kz.zhombie.bazaar.model.Image
 import kz.zhombie.bazaar.model.Media
 import kz.zhombie.bazaar.model.Video
 import kz.zhombie.bazaar.ui.model.UIMedia
+import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
 import kz.zhombie.bazaar.utils.readVideo
@@ -46,9 +49,9 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         }
     }
 
-    private var titleButton: MaterialButton? = null
-    private var recyclerView: RecyclerView? = null
-    private var selectButton: MaterialButton? = null
+    private lateinit var titleButton: MaterialButton
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var selectButton: MaterialButton
 
     private lateinit var viewModel: MediaStoreViewModel
 
@@ -90,10 +93,13 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         viewModel.getAllMedia().observe(viewLifecycleOwner, {
             mediaAdapter?.submitList(it)
         })
+
+        viewModel.getVisibility().observe(viewLifecycleOwner, {
+        })
     }
 
     private fun setupHeaderView() {
-        titleButton?.text = "Название альбома"
+        titleButton.text = "Название альбома"
     }
 
     private fun setupRecyclerView() {
@@ -101,7 +107,8 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
 
         headerAdapter = HeaderAdapter()
         mediaAdapter = MediaAdapter(Settings.getImageLoader(), this)
-        recyclerView?.adapter = ConcatAdapter(headerAdapter, mediaAdapter)
+        concatAdapter = ConcatAdapter(headerAdapter, mediaAdapter)
+        recyclerView.adapter = concatAdapter
 
         val layoutManager = GridLayoutManager(
             context,
@@ -110,9 +117,9 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
             false
         )
 
-        recyclerView?.layoutManager = layoutManager
+        recyclerView.layoutManager = layoutManager
 
-        recyclerView?.addItemDecoration(
+        recyclerView.addItemDecoration(
             SpacingItemDecoration(
                 requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_left),
                 requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_top),
@@ -123,7 +130,7 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
     }
 
     private fun setupSelectButton() {
-        selectButton?.text = buildSpannedString {
+        selectButton.text = buildSpannedString {
             val title = "Выбрать"
             val subtitle = "Выбрано 5 файлов"
 
@@ -172,12 +179,20 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         return array
     }
 
+    override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
+        imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
+
+        MuseumDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
+            .show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
+    }
+
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
         viewModel.onImageCheckboxClicked(uiMedia)
     }
 
-    override fun onVideoCheckboxClicked(position: Int, video: Video, isSelected: Boolean) {
-
+    private fun onLayoutChange(imageView: ShapeableImageView) {
+        val position = ViewPosition.from(imageView)
+        viewModel.onLayoutChange(position)
     }
 
 }

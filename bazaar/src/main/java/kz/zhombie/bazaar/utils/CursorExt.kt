@@ -43,7 +43,8 @@ internal fun Cursor.readImage(): Image? {
             dateCreated = dateTaken,
             mimeType = mimeType,
             width = width,
-            height = height
+            height = height,
+            thumbnail = null
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -94,6 +95,7 @@ internal fun Cursor.readVideo(): Video? {
             mimeType = mimeType,
             width = width,
             height = height,
+            thumbnail = null,
             duration = duration,
             cover = null
         )

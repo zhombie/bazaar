@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui
+package kz.zhombie.bazaar.ui.media
 
 import android.view.LayoutInflater
 import android.view.View

@@ -2,7 +2,7 @@ package kz.zhombie.bazaar
 
 import androidx.fragment.app.FragmentManager
 import kz.zhombie.bazaar.api.ImageLoader
-import kz.zhombie.bazaar.ui.MediaStoreFragment
+import kz.zhombie.bazaar.ui.media.MediaStoreFragment
 
 class Bazaar {
 

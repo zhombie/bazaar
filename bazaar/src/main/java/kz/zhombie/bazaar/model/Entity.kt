@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.model
 
+import android.graphics.Bitmap
 import android.net.Uri
 
 /**
@@ -21,5 +22,6 @@ open class Entity constructor(
     open val size: Long,
     open val dateAdded: Long,
     open val dateModified: Long,
-    open val dateCreated: Long?
+    open val dateCreated: Long?,
+    open val thumbnail: Bitmap? = null
 )
