@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'com.google.firebase.appdistribution'
     id 'com.google.gms.google-services'
 }
 
@@ -20,9 +21,36 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        dev {
+            dimension "mode"
+
+            // Define constants
+            buildConfigField 'boolean', 'DEBUG', 'true'
+            buildConfigField 'boolean', 'LOG', 'true'
+
+            // Define resources
+            resValue "string", "app_name", "Bazaar DEV"
+
+            firebaseAppDistribution {
+                appId = "1:888748389223:android:f197247b3cf8313d0cf5c2"
+                groups = "q19"
+                serviceCredentialsFile = "$rootDir/sample/creds/bazaar-5974e-0a0b529742e3.json"
+                releaseNotesFile = "$rootDir/sample/src/dev/release-notes.txt"
+            }
         }
     }
 
@@ -82,7 +110,7 @@ def readVersionFromFile() {
 
         def isReleaseTask = false
         for (String taskName : gradle.startParameter.getTaskNames()) {
-            if (taskName.startsWith("appDistributionUploadDev")) {
+            if (taskName.startsWith("appDistributionUploadRelease")) {
                 isReleaseTask = true
                 break
             }

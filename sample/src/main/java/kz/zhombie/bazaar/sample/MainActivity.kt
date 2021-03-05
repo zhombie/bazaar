@@ -1,14 +1,14 @@
-package kz.zhombie.bazaar
+package kz.zhombie.bazaar.sample
 
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
-import coil.Coil
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
+import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.api.ImageLoader
 
 class MainActivity : AppCompatActivity() {

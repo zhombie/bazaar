@@ -1,5 +1,3 @@
-echo "=== start SOS DEV upload ==="
-./gradlew assembleDev appDistributionUploadDevDebug
-echo ""
-echo "=== start SOS upload ==="
-./gradlew assembleProd appDistributionUploadProdDebug
+echo "=== start Bazaar DEV upload ==="
+./gradlew assembleRelease appDistributionUploadRelease
+echo "=== end Bazaar DEV upload ==="

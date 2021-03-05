@@ -7,9 +7,38 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:888748389223:android:66876dbe99388c320cf5c2",
+        "mobilesdk_app_id": "1:888748389223:android:f197247b3cf8313d0cf5c2",
         "android_client_info": {
           "package_name": "kz.zhombie.bazaar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "888748389223-7oh3covn8htrkkgu2pk4r4pm7g3o3t26.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs2g-VeSKt4be5wRrkgvLie_H2w1PgjfI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "888748389223-7oh3covn8htrkkgu2pk4r4pm7g3o3t26.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888748389223:android:1d719e893fe5b7370cf5c2",
+        "android_client_info": {
+          "package_name": "kz.zhombie.bazaar.sample"
         }
       },
       "oauth_client": [
