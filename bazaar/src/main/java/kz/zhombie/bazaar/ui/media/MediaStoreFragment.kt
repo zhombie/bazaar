@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.ui.media
 
+import android.app.Dialog
 import android.database.Cursor
 import android.graphics.Color
 import android.graphics.Typeface
@@ -10,16 +11,22 @@ import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
+import androidx.core.view.ViewCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexvasilkov.gestures.animation.ViewPosition
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
@@ -36,6 +43,7 @@ import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
 import kz.zhombie.bazaar.utils.readVideo
+import kotlin.math.roundToInt
 
 class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
 
@@ -59,11 +67,65 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
     private var mediaAdapter: MediaAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
 
+    private var expandedHeight: Int = 0
+    private var buttonHeight: Int = 0
+    private var collapsedMargin: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(this, MediaStoreViewModelFactory())
             .get(MediaStoreViewModel::class.java)
+    }
+
+    // TODO: Try to get rid of hack, which helps to set fixed position.
+    //  Reference to: https://github.com/xyzcod2/StickyBottomSheet
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+
+        dialog.setOnShowListener {
+            if (dialog is BottomSheetDialog) {
+                val bottomSheet = dialog.findViewById<ViewGroup>(R.id.design_bottom_sheet) ?: return@setOnShowListener
+                bottomSheet.updateLayoutParams<ViewGroup.LayoutParams> {
+                    height = getBottomSheetDialogDefaultHeight()
+                }
+
+                expandedHeight = bottomSheet.layoutParams.height
+                val peekHeight = (expandedHeight / 1.3F).roundToInt()
+
+                BottomSheetBehavior.from(bottomSheet).apply {
+                    state = BottomSheetBehavior.STATE_COLLAPSED
+                    setPeekHeight(peekHeight, false)
+                    skipCollapsed = false
+                    isHideable = true
+                }
+
+                buttonHeight = selectButton.height + 0
+                collapsedMargin = peekHeight - buttonHeight
+                selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    topMargin = collapsedMargin
+                }
+            }
+        }
+
+        if (dialog is BottomSheetDialog) {
+            dialog.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topMargin = if (slideOffset > 0) {
+                            (((expandedHeight - buttonHeight) - collapsedMargin) * slideOffset + collapsedMargin).roundToInt()
+                        } else {
+                            collapsedMargin
+                        }
+                    }
+                }
+            })
+        }
+
+        return dialog
     }
 
     override fun onCreateView(
@@ -118,6 +180,8 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         )
 
         recyclerView.layoutManager = layoutManager
+
+        recyclerView.setHasFixedSize(true)
 
         recyclerView.addItemDecoration(
             SpacingItemDecoration(
@@ -193,6 +257,18 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
     private fun onLayoutChange(imageView: ShapeableImageView) {
         val position = ViewPosition.from(imageView)
         viewModel.onLayoutChange(position)
+    }
+
+    // Calculates height for 90% of fullscreen
+    private fun getBottomSheetDialogDefaultHeight(): Int {
+        return getWindowHeight() * 90 / 100
+    }
+
+    // Calculates window height for fullscreen use
+    private fun getWindowHeight(): Int {
+        val displayMetrics = DisplayMetrics()
+        ViewCompat.getDisplay(requireView())?.getRealMetrics(displayMetrics)
+        return displayMetrics.heightPixels
     }
 
 }
