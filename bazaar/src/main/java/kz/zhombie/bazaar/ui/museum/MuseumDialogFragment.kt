@@ -3,10 +3,15 @@ package kz.zhombie.bazaar.ui.museum
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.alexvasilkov.gestures.animation.ViewPosition
 import com.alexvasilkov.gestures.views.GestureImageView
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
@@ -27,8 +32,13 @@ class MuseumDialogFragment : DialogFragment() {
         }
     }
 
+    private lateinit var appBarLayout: AppBarLayout
+    private lateinit var toolbar: MaterialToolbar
     private lateinit var backgroundView: View
     private lateinit var gestureImageView: GestureImageView
+    private lateinit var footerView: LinearLayout
+    private lateinit var titleView: MaterialTextView
+    private lateinit var subtitleView: MaterialTextView
 
     private val viewModel: MediaStoreViewModel by viewModels()
 
@@ -77,23 +87,35 @@ class MuseumDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        appBarLayout = view.findViewById(R.id.appBarLayout)
+        toolbar = view.findViewById(R.id.toolbar)
         backgroundView = view.findViewById(R.id.backgroundView)
         gestureImageView = view.findViewById(R.id.gestureImageView)
+        footerView = view.findViewById(R.id.footerView)
+        titleView = view.findViewById(R.id.titleView)
+        subtitleView = view.findViewById(R.id.subtitleView)
+
+        val activity = activity
+        if (activity is AppCompatActivity) {
+            activity.setSupportActionBar(toolbar)
+            activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            activity.supportActionBar?.setDisplayShowTitleEnabled(false)
+        }
 
         gestureImageView.controller.settings
-                .setAnimationsDuration(250L)
-                .setBoundsType(com.alexvasilkov.gestures.Settings.Bounds.NORMAL)
-                .setDoubleTapEnabled(true)
-                .setExitEnabled(true)
-                .setExitType(com.alexvasilkov.gestures.Settings.ExitType.SCROLL)
-                .setFillViewport(true)
-                .setFitMethod(com.alexvasilkov.gestures.Settings.Fit.INSIDE)
-                .setFlingEnabled(true)
-                .setGravity(Gravity.CENTER)
-                .setMaxZoom(2.0F)
-                .setMinZoom(0F)
-                .setPanEnabled(true)
-                .setZoomEnabled(true)
+            .setAnimationsDuration(250L)
+            .setBoundsType(com.alexvasilkov.gestures.Settings.Bounds.NORMAL)
+            .setDoubleTapEnabled(true)
+            .setExitEnabled(true)
+            .setExitType(com.alexvasilkov.gestures.Settings.ExitType.SCROLL)
+            .setFillViewport(true)
+            .setFitMethod(com.alexvasilkov.gestures.Settings.Fit.INSIDE)
+            .setFlingEnabled(true)
+            .setGravity(Gravity.CENTER)
+            .setMaxZoom(2.0F)
+            .setMinZoom(0F)
+            .setPanEnabled(true)
+            .setZoomEnabled(true)
 
         viewModel.getViewPosition().observe(viewLifecycleOwner, { viewPosition ->
             if (gestureImageView.positionAnimator.position > 0f) {
@@ -108,11 +130,18 @@ class MuseumDialogFragment : DialogFragment() {
             gestureImageView.positionAnimator.addPositionUpdateListener { position, isLeaving ->
                 val isFinished = position == 0F && isLeaving
 
+                appBarLayout.alpha = position
                 backgroundView.alpha = position
-                backgroundView.visibility = if (isFinished) {
-                    View.INVISIBLE
+                footerView.alpha = position
+
+                if (isFinished) {
+                    appBarLayout.visibility = View.INVISIBLE
+                    backgroundView.visibility = View.INVISIBLE
+                    footerView.visibility = View.INVISIBLE
                 } else {
-                    View.VISIBLE
+                    appBarLayout.visibility = View.VISIBLE
+                    backgroundView.visibility = View.VISIBLE
+                    footerView.visibility = View.VISIBLE
                 }
 
                 gestureImageView.visibility = if (isFinished) {
@@ -129,6 +158,22 @@ class MuseumDialogFragment : DialogFragment() {
 
                     gestureImageView.postDelayed({ super.dismiss() }, 17L)
                 }
+            }
+
+            titleView.text = uiMedia.media.displayName
+
+            val createdAt: String? = null
+            try {
+//                val simpleDateFormat = SimpleDateFormat("dd-mm-yyyy", Locale.ROOT)
+//                createdAt = simpleDateFormat.format(uiMedia.media.dateCreated ?: uiMedia.media.dateAdded)
+            } catch (e: Exception) {
+            }
+
+            if (createdAt.isNullOrBlank()) {
+                subtitleView.visibility = View.GONE
+            } else {
+                subtitleView.text = createdAt
+                subtitleView.visibility = View.VISIBLE
             }
         }
 

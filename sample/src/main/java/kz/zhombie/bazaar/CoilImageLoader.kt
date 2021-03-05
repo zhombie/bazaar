@@ -2,7 +2,6 @@ package kz.zhombie.bazaar
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import coil.Coil
@@ -20,9 +19,9 @@ class CoilImageLoader : ImageLoader {
             .crossfade(true)
             .diskCachePolicy(CachePolicy.ENABLED)
             .data(uri)
-            .error(R.drawable.ic_placeholder)
+            .error(R.drawable.ic_placeholder_white)
             .memoryCachePolicy(CachePolicy.ENABLED)
-            .placeholder(R.drawable.ic_placeholder)
+            .placeholder(R.drawable.ic_placeholder_white)
             .precision(Precision.AUTOMATIC)
             .scale(Scale.FIT)
             .size(300, 300)
@@ -42,11 +41,12 @@ class CoilImageLoader : ImageLoader {
             .crossfade(false)
             .diskCachePolicy(CachePolicy.DISABLED)
             .data(uri)
-            .error(R.drawable.ic_placeholder)
+            .error(R.drawable.ic_placeholder_black)
             .memoryCachePolicy(CachePolicy.DISABLED)
-            .placeholder(R.drawable.ic_placeholder)
+            .placeholder(R.drawable.ic_placeholder_black)
             .precision(Precision.AUTOMATIC)
             .scale(Scale.FIT)
+            .size(1280, 960)
             .target(imageView)
             .build()
 
