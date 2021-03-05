@@ -58,6 +58,7 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
     }
 
     private lateinit var titleButton: MaterialButton
+    private lateinit var closeButton: MaterialButton
     private lateinit var recyclerView: RecyclerView
     private lateinit var selectButton: MaterialButton
 
@@ -71,8 +72,14 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
     private var buttonHeight: Int = 0
     private var collapsedMargin: Int = 0
 
+    override fun getTheme(): Int {
+        return R.style.BottomSheetDialog
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setStyle(STYLE_NORMAL, theme)
 
         viewModel = ViewModelProvider(this, MediaStoreViewModelFactory())
             .get(MediaStoreViewModel::class.java)
@@ -140,6 +147,7 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
         super.onViewCreated(view, savedInstanceState)
 
         titleButton = view.findViewById(R.id.titleButton)
+        closeButton = view.findViewById(R.id.closeButton)
         recyclerView = view.findViewById(R.id.recyclerView)
         selectButton = view.findViewById(R.id.selectButton)
 
@@ -162,6 +170,8 @@ class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
 
     private fun setupHeaderView() {
         titleButton.text = "Название альбома"
+
+        closeButton.setOnClickListener { dismiss() }
     }
 
     private fun setupRecyclerView() {

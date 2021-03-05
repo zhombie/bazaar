@@ -17,12 +17,13 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/checkbox"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
         android:layout_gravity="top|end"
-        android:layout_margin="5dp"
+        android:layout_margin="2dp"
         android:background="@drawable/ic_ripple"
         android:backgroundTint="@null"
+        android:includeFontPadding="false"
         android:insetBottom="0dp"
         android:insetLeft="0dp"
         android:insetRight="0dp"
@@ -32,7 +33,7 @@
         android:padding="10dp"
         app:icon="@drawable/ic_checked"
         app:iconGravity="textEnd"
-        app:iconSize="25dp"
+        app:iconSize="33dp"
         app:iconTint="@null" />
 
 </kz.zhombie.bazaar.ui.components.SquareFrameLayout>
