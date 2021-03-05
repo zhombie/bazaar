@@ -30,7 +30,7 @@ class GlideImageLoader : ImageLoader {
             .centerCrop()
             .error(R.drawable.ic_placeholder_black)
             .fallback(R.drawable.ic_placeholder_black)
-            .override(1280, 960)
+            .fitCenter()
             .placeholder(R.drawable.ic_placeholder_black)
             .into(imageView)
     }
