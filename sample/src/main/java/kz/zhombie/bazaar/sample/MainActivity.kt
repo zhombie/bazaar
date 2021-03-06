@@ -4,14 +4,18 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.ResultCallback
+import kz.zhombie.bazaar.api.model.Media
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ResultCallback {
 
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
@@ -26,8 +30,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageLoaderView: MaterialTextView
     private lateinit var imageLoaderButton: MaterialButton
     private lateinit var showButton: MaterialButton
+    private lateinit var recyclerView: RecyclerView
 
     private lateinit var imageLoader: ImageLoader
+
+    private lateinit var adapter: ResultAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +43,10 @@ class MainActivity : AppCompatActivity() {
         imageLoaderView = findViewById(R.id.imageLoaderView)
         imageLoaderButton = findViewById(R.id.imageLoaderButton)
         showButton = findViewById(R.id.showButton)
+        recyclerView = findViewById(R.id.recyclerView)
+
+        adapter = ResultAdapter()
+        recyclerView.adapter = adapter
 
         imageLoaderView.text = DEFAULT_IMAGE_LOAD.first
         imageLoader = DEFAULT_IMAGE_LOAD.second
@@ -64,10 +75,10 @@ class MainActivity : AppCompatActivity() {
 
         showButton.setOnClickListener {
             if (checkPermissions()) {
-                Bazaar.Builder(supportFragmentManager)
+                Bazaar.Builder(this)
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
-                    .show()
+                    .show(supportFragmentManager)
             }
         }
     }
@@ -91,6 +102,11 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RequestCode.READ_EXTERNAL_STORAGE) {
             checkPermissions()
         }
+    }
+
+    override fun onBagReady(media: List<Media>) {
+        Log.d(TAG, "media: $media")
+        adapter.data = media
     }
 
 }

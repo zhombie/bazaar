@@ -2,6 +2,7 @@ package kz.zhombie.bazaar
 
 import androidx.fragment.app.FragmentManager
 import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.ui.media.MediaStoreFragment
 
 class Bazaar {
@@ -10,7 +11,7 @@ class Bazaar {
         val TAG: String = Bazaar::class.java.simpleName
     }
 
-    class Builder constructor(private val fragmentManager: FragmentManager) {
+    class Builder constructor(private val resultCallback: ResultCallback? = null) {
 
         private var tag: String? = null
         private var imageLoader: ImageLoader? = null
@@ -25,10 +26,11 @@ class Bazaar {
             return this
         }
 
-        fun show(): String? {
+        fun show(fragmentManager: FragmentManager): String? {
             imageLoader?.let { Settings.setImageLoader(it) }
 
             val fragment = MediaStoreFragment.newInstance()
+            fragment.resultCallback = resultCallback
             fragment.show(fragmentManager, tag)
             return tag
         }

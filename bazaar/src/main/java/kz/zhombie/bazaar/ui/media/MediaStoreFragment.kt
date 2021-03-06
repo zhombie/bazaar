@@ -34,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
@@ -74,6 +75,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
     private var collapsedMargin: Int = 0
+
+    var resultCallback: ResultCallback? = null
 
     override fun getTheme(): Int {
         return R.style.BottomSheetDialog
@@ -258,6 +261,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
             setSpan(RelativeSizeSpan(0.7F), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(ForegroundColorSpan(Color.parseColor("#8290A0")), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        selectButton.setOnClickListener {
+            val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
+            resultCallback?.onBagReady(selectedMedia.map { it.media })
+            dismiss()
         }
     }
 
