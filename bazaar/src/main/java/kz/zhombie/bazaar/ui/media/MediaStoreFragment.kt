@@ -34,10 +34,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.core.Logger
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
+import kz.zhombie.bazaar.core.Logger
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.ContentResolverCompat
@@ -181,30 +181,35 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
             setupSelectButton(it.size)
         })
 
-        viewModel.getAllMedia().observe(viewLifecycleOwner, {
+        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, {
             mediaAdapter?.submitList(it)
+            mediaView.scrollToPosition(0)
         })
 
-        viewModel.getAllAlbums().observe(viewLifecycleOwner, {
+        viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, {
             albumsAdapter?.submitList(it)
+        })
+
+        viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
+            if (isAlbumsDisplayed) {
+                titleButton.setIconResource(R.drawable.ic_dropdown_up)
+//                selectButton.visibility = View.INVISIBLE
+                albumsView.visibility = View.VISIBLE
+
+                (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                titleButton.setIconResource(R.drawable.ic_dropdown_down)
+//                selectButton.visibility = View.VISIBLE
+                albumsView.visibility = View.GONE
+            }
         })
     }
 
     private fun setupHeaderView() {
         titleButton.text = "Все медиа"
 
-        var isAlbumsDisplayed = false
         titleButton.setOnClickListener {
-            if (isAlbumsDisplayed) {
-                titleButton.setIconResource(R.drawable.ic_dropdown_up)
-                selectButton.visibility = View.INVISIBLE
-                albumsView.visibility = View.VISIBLE
-            } else {
-                titleButton.setIconResource(R.drawable.ic_dropdown_down)
-                selectButton.visibility = View.VISIBLE
-                albumsView.visibility = View.GONE
-            }
-            isAlbumsDisplayed = !isAlbumsDisplayed
+            viewModel.onHeaderTitleClicked()
         }
 
         closeButton.setOnClickListener { dismiss() }
@@ -228,6 +233,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         mediaView.layoutManager = layoutManager
 
         mediaView.setHasFixedSize(true)
+
+        mediaView.itemAnimator = null
 
         mediaView.addItemDecoration(
             SpacingItemDecoration(
@@ -257,7 +264,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     private fun setupAlbumsView() {
         albumsView.visibility = View.GONE
 
-        albumsAdapter = AlbumsAdapter(Settings.getImageLoader())
+        albumsAdapter = AlbumsAdapter(Settings.getImageLoader()) {
+            viewModel.onAlbumClicked(it)
+        }
+
         albumsView.adapter = albumsAdapter
 
         val layoutManager = GridLayoutManager(
@@ -270,6 +280,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         albumsView.layoutManager = layoutManager
 
         albumsView.setHasFixedSize(true)
+
+        albumsView.itemAnimator = null
 
         albumsView.addItemDecoration(
             SpacingItemDecoration(

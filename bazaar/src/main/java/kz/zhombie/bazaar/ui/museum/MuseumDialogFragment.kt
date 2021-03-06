@@ -117,7 +117,7 @@ internal class MuseumDialogFragment : DialogFragment() {
             .setPanEnabled(true)
             .setZoomEnabled(true)
 
-        viewModel.getViewPosition().observe(viewLifecycleOwner, { viewPosition ->
+        viewModel.getActiveViewPosition().observe(viewLifecycleOwner, { viewPosition ->
             if (gestureImageView.positionAnimator.position > 0f) {
                 gestureImageView.positionAnimator.update(viewPosition)
             }

@@ -20,22 +20,53 @@ internal class MediaStoreViewModel : ViewModel() {
         private val TAG: String = MediaStoreViewModel::class.java.simpleName
     }
 
+    private val allMedia = mutableListOf<Media>()
+
     private val selectedMedia by lazy { MutableLiveData<List<UIMedia>>() }
     fun getSelectedMedia(): LiveData<List<UIMedia>> = selectedMedia
 
-    private val allMedia by lazy { MutableLiveData<List<UIMedia>>() }
-    fun getAllMedia(): LiveData<List<UIMedia>> = allMedia
+    private val displayedMedia by lazy { MutableLiveData<List<UIMedia>>() }
+    fun getDisplayedMedia(): LiveData<List<UIMedia>> = displayedMedia
 
-    private val allAlbums by lazy { MutableLiveData<List<UIAlbum>>() }
-    fun getAllAlbums(): LiveData<List<UIAlbum>> = allAlbums
+    private val displayedAlbums by lazy { MutableLiveData<List<UIAlbum>>() }
+    fun getDisplayedAlbums(): LiveData<List<UIAlbum>> = displayedAlbums
 
-    private val viewPosition by lazy { MutableLiveData<ViewPosition>() }
-    fun getViewPosition(): LiveData<ViewPosition> = viewPosition
+    private val isAlbumsDisplayed by lazy { MutableLiveData<Boolean>(false) }
+    fun getIsAlbumsDisplayed(): LiveData<Boolean> = isAlbumsDisplayed
+
+    private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
+    fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
+
+    fun onMediaLoaded(data: List<Media>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Logger.d(TAG, "onMediaLoaded() -> data.size: ${data.size}")
+
+            allMedia.addAll(data)
+
+            val uiMedia = data.map { UIMedia(it, isSelected = false, isVisible = true) }
+
+            displayedMedia.postValue(uiMedia)
+
+            val albums = data.mapNotNull { media ->
+                val folderId = media.folderId ?: return@mapNotNull null
+                val folderDisplayName = media.folderDisplayName ?: return@mapNotNull null
+                val items = uiMedia.mapNotNull { if (it.media.folderId == folderId) it.media else null }
+                UIAlbum(Album(folderId, folderDisplayName, items))
+            }
+                .distinctBy { it.album.id }
+                .sortedBy { it.album.displayName }
+                .toMutableList()
+
+            albums.add(0, UIAlbum(Album(0, "Все медиа", uiMedia.map { it.media })))
+
+            displayedAlbums.postValue(albums)
+        }
+    }
 
     fun onImageCheckboxClicked(uiMedia: UIMedia) {
-        Logger.d(TAG, "onImageCheckboxClicked() -> uiMedia: $uiMedia")
-
         viewModelScope.launch(Dispatchers.IO) {
+            Logger.d(TAG, "onImageCheckboxClicked() -> uiMedia: $uiMedia")
+
             // Selected
             val newSelected = mutableListOf<UIMedia>()
             val currentSelectedMedia = selectedMedia.value
@@ -51,53 +82,65 @@ internal class MediaStoreViewModel : ViewModel() {
             selectedMedia.postValue(newSelected)
 
             // All
-            with(allMedia.value?.toMutableList() ?: mutableListOf()) {
+            with(displayedMedia.value?.toMutableList() ?: mutableListOf()) {
                 indexOfFirst { it.media.id == uiMedia.media.id }
                     .takeIf { index -> index > -1 }
                     ?.let { index ->
                         this[index] = this[index].copy(isSelected = !this[index].isSelected)
-                        allMedia.postValue(this)
+                        displayedMedia.postValue(this)
                     }
             }
         }
     }
 
-    fun onMediaLoaded(data: List<Media>) {
-        val uiMedia = data.map { UIMedia(it, isSelected = false, isVisible = true) }
-
-        allMedia.postValue(uiMedia)
-
-        val albums = data.mapNotNull { media ->
-            val folderId = media.folderId ?: return@mapNotNull null
-            val folderDisplayName = media.folderDisplayName ?: return@mapNotNull null
-            val items = uiMedia.mapNotNull { if (it.media.folderId == folderId) it.media else null }
-            UIAlbum(Album(folderId, folderDisplayName, items))
-        }
-            .distinctBy { it.album.id }
-            .sortedBy { it.album.displayName }
-            .toMutableList()
-
-        albums.add(0, UIAlbum(Album(0, "Все медиа", uiMedia.map { it.media })))
-
-        allAlbums.postValue(albums)
-    }
-
     fun onLayoutChange(viewPosition: ViewPosition) {
-        this.viewPosition.postValue(viewPosition)
+        activeViewPosition.postValue(viewPosition)
     }
 
     fun onVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             delay(delayDuration)
 
-            with(allMedia.value?.toMutableList() ?: mutableListOf()) {
+            with(displayedMedia.value?.toMutableList() ?: mutableListOf()) {
                 indexOfFirst { it.media.id == id }
                     .takeIf { index -> index > -1 }
                     ?.let { index ->
                         this[index] = this[index].copy(isVisible = isVisible)
-                        allMedia.postValue(this)
+                        displayedMedia.postValue(this)
                     }
             }
+        }
+    }
+
+    fun onHeaderTitleClicked() {
+        isAlbumsDisplayed.postValue(!(isAlbumsDisplayed.value ?: false))
+    }
+
+    fun onAlbumClicked(uiAlbum: UIAlbum) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Logger.d(TAG, "onAlbumClicked() -> uiAlbum: ${uiAlbum.album.displayName}")
+
+            val albumUiMedia = allMedia
+                .filter {
+                    if (uiAlbum.album.id == 0L) {
+                        true
+                    } else {
+                        it.folderId == uiAlbum.album.id
+                    }
+                }
+                .map { UIMedia(it, isSelected = false, isVisible = true) }
+                .toMutableList()
+
+            (selectedMedia.value ?: emptyList()).forEach { selectedMedia ->
+                val index = albumUiMedia.indexOfFirst { it.media.id == selectedMedia.media.id }
+                if (index > -1) {
+                    albumUiMedia[index] = albumUiMedia[index].copy(isSelected = true)
+                }
+            }
+
+            displayedMedia.postValue(albumUiMedia)
+
+            isAlbumsDisplayed.postValue(false)
         }
     }
 

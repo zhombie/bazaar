@@ -14,7 +14,8 @@ import kz.zhombie.bazaar.ui.components.SquareImageView
 import kz.zhombie.bazaar.ui.model.UIAlbum
 
 internal class AlbumsAdapter constructor(
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
+    private val onAlbumClicked: (uiAlbum: UIAlbum) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -72,6 +73,8 @@ internal class AlbumsAdapter constructor(
             titleView.text = uiAlbum.album.displayName
 
             subtitleView.text = "Элементы: ${uiAlbum.album.size}"
+
+            itemView.setOnClickListener { onAlbumClicked(uiAlbum) }
         }
 
     }
