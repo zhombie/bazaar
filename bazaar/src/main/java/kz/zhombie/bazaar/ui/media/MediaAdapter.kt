@@ -12,8 +12,8 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.ImageLoader
 import kz.zhombie.bazaar.core.Logger
 import kz.zhombie.bazaar.core.ViewHolderException
-import kz.zhombie.bazaar.model.Image
-import kz.zhombie.bazaar.model.Video
+import kz.zhombie.bazaar.api.model.Image
+import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class MediaAdapter constructor(

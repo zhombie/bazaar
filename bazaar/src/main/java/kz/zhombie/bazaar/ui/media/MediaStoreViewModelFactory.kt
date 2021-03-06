@@ -3,7 +3,7 @@ package kz.zhombie.bazaar.ui.media
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class MediaStoreViewModelFactory : ViewModelProvider.Factory {
+internal class MediaStoreViewModelFactory : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MediaStoreViewModel::class.java)) {

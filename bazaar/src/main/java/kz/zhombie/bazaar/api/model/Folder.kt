@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.model
+package kz.zhombie.bazaar.api.model
 
 import android.net.Uri
 

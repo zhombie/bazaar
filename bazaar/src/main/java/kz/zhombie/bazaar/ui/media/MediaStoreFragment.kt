@@ -35,9 +35,9 @@ import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.core.Logger
-import kz.zhombie.bazaar.model.Image
-import kz.zhombie.bazaar.model.Media
-import kz.zhombie.bazaar.model.Video
+import kz.zhombie.bazaar.api.model.Image
+import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.ContentResolverCompat
@@ -45,7 +45,7 @@ import kz.zhombie.bazaar.utils.readImage
 import kz.zhombie.bazaar.utils.readVideo
 import kotlin.math.roundToInt
 
-class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
+internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName

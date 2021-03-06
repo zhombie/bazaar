@@ -9,10 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.core.Logger
-import kz.zhombie.bazaar.model.Media
+import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-class MediaStoreViewModel : ViewModel() {
+internal class MediaStoreViewModel : ViewModel() {
 
     companion object {
         private val TAG: String = MediaStoreViewModel::class.java.simpleName

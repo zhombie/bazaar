@@ -4,8 +4,8 @@ import android.content.ContentUris
 import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
-import kz.zhombie.bazaar.model.Image
-import kz.zhombie.bazaar.model.Video
+import kz.zhombie.bazaar.api.model.Image
+import kz.zhombie.bazaar.api.model.Video
 import java.util.concurrent.TimeUnit
 
 internal fun Cursor.readImage(): Image? {

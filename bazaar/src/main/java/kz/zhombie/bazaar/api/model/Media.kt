@@ -1,13 +1,14 @@
-package kz.zhombie.bazaar.model
+package kz.zhombie.bazaar.api.model
 
 import android.graphics.Bitmap
 import android.net.Uri
 
 /**
- * [duration] - The duration time of the [Video]
- * [cover] - The cover image of the [Video] (like thumbnail)
+ * [mimeType] - The MIME type of the [Media]
+ * [width] - The width of the [Media], in pixels.
+ * [height] - The height of the [Media], in pixels.
  */
-data class Video constructor(
+open class Media constructor(
     override val id: Long,
     override val uri: Uri,
     override val title: String,
@@ -16,24 +17,19 @@ data class Video constructor(
     override val dateAdded: Long,
     override val dateModified: Long,
     override val dateCreated: Long?,
-    override val mimeType: String,
-    override val width: Int,
-    override val height: Int,
     override val thumbnail: Bitmap? = null,
 
-    val duration: Long?,
-    val cover: Bitmap?,
-) : Media(
+    open val mimeType: String,
+    open val width: Int,
+    open val height: Int
+) : Entity(
     id = id,
     uri = uri,
     title = title,
     displayName = displayName,
+    size = size,
     dateAdded = dateAdded,
     dateModified = dateModified,
     dateCreated = dateCreated,
-    size = size,
-    mimeType = mimeType,
-    width = width,
-    height = height,
     thumbnail = thumbnail
 )

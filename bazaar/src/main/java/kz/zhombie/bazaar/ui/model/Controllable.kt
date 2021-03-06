@@ -1,6 +1,6 @@
 package kz.zhombie.bazaar.ui.model
 
-interface Controllable {
+internal interface Controllable {
     val isSelected: Boolean
     val isVisible: Boolean
 }

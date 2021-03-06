@@ -2,7 +2,7 @@ package kz.zhombie.bazaar.core
 
 import android.util.Log
 
-object Logger {
+internal object Logger {
 
     private const val TAG = "Logger"
 

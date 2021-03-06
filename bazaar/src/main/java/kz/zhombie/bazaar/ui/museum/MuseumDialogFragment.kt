@@ -17,7 +17,7 @@ import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-class MuseumDialogFragment : DialogFragment() {
+internal class MuseumDialogFragment : DialogFragment() {
 
     companion object {
         private val TAG: String = MuseumDialogFragment::class.java.simpleName
