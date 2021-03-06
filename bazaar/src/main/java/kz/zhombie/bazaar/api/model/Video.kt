@@ -20,6 +20,8 @@ data class Video constructor(
     override val width: Int,
     override val height: Int,
     override val thumbnail: Bitmap? = null,
+    override val folderId: Long? = null,
+    override val folderDisplayName: String? = null,
 
     val duration: Long?,
     val cover: Bitmap?,
@@ -35,5 +37,7 @@ data class Video constructor(
     mimeType = mimeType,
     width = width,
     height = height,
-    thumbnail = thumbnail
+    thumbnail = thumbnail,
+    folderId = folderId,
+    folderDisplayName = folderDisplayName
 )

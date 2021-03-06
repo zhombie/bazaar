@@ -22,7 +22,7 @@
 
     <style name="ItemShapeAppearance" parent="ShapeAppearance.MaterialComponents">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/item_corner_radius</item>
+        <item name="cornerSize">@dimen/media_item_corner_radius</item>
     </style>
 
     <style name="BottomSheet.ShapeAppearance" parent="ShapeAppearance.MaterialComponents">

@@ -16,12 +16,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/mediaView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:orientation="vertical"
         android:overScrollMode="never"
+        android:paddingBottom="@dimen/grid_margin_bottom"
         android:paddingLeft="@dimen/grid_margin_horizontal"
         android:paddingRight="@dimen/grid_margin_horizontal"
         android:paddingTop="@dimen/grid_margin_top"
@@ -57,10 +58,30 @@
         android:textAllCaps="false"
         android:textSize="18sp"
         app:cornerRadius="13dp"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerView"
-        app:layout_constraintStart_toStartOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/mediaView"
+        app:layout_constraintStart_toStartOf="@+id/mediaView"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_marginTop="500dp"
         tools:text="Выбрать\nВыбрано 5 файлов" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/albumsView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        android:paddingBottom="@dimen/grid_margin_bottom"
+        android:paddingLeft="@dimen/grid_margin_horizontal"
+        android:paddingRight="@dimen/grid_margin_horizontal"
+        android:paddingTop="@dimen/grid_margin_top"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerView"
+        app:spanCount="2"
+        tools:listitem="@layout/cell_album" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

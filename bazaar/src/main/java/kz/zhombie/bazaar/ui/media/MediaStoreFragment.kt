@@ -59,14 +59,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
     private lateinit var titleButton: MaterialButton
     private lateinit var closeButton: MaterialButton
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var mediaView: RecyclerView
     private lateinit var selectButton: MaterialButton
+    private lateinit var albumsView: RecyclerView
 
     private lateinit var viewModel: MediaStoreViewModel
 
-    private var headerAdapter: HeaderAdapter? = null
+    private var mediaHeaderAdapter: MediaHeaderAdapter? = null
     private var mediaAdapter: MediaAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
+
+    private var albumsAdapter: AlbumsAdapter? = null
 
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
@@ -112,6 +115,20 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                 selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
                     topMargin = collapsedMargin
                 }
+
+                mediaView.setPadding(
+                    mediaView.paddingLeft,
+                    mediaView.paddingTop,
+                    mediaView.paddingRight,
+                    mediaView.paddingBottom + buttonHeight
+                )
+
+                albumsView.setPadding(
+                    albumsView.paddingLeft,
+                    albumsView.paddingTop,
+                    albumsView.paddingRight,
+                    albumsView.paddingBottom + buttonHeight
+                )
             }
         }
 
@@ -148,12 +165,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
         titleButton = view.findViewById(R.id.titleButton)
         closeButton = view.findViewById(R.id.closeButton)
-        recyclerView = view.findViewById(R.id.recyclerView)
+        mediaView = view.findViewById(R.id.mediaView)
         selectButton = view.findViewById(R.id.selectButton)
+        albumsView = view.findViewById(R.id.albumsView)
 
         setupHeaderView()
-        setupRecyclerView()
+        setupMediaView()
         setupSelectButton()
+        setupAlbumsView()
 
         loadImages()
 
@@ -165,21 +184,39 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         viewModel.getAllMedia().observe(viewLifecycleOwner, {
             mediaAdapter?.submitList(it)
         })
+
+        viewModel.getAllAlbums().observe(viewLifecycleOwner, {
+            albumsAdapter?.submitList(it)
+        })
     }
 
     private fun setupHeaderView() {
         titleButton.text = "Все медиа"
 
+        var isAlbumsDisplayed = false
+        titleButton.setOnClickListener {
+            if (isAlbumsDisplayed) {
+                titleButton.setIconResource(R.drawable.ic_dropdown_up)
+                selectButton.visibility = View.INVISIBLE
+                albumsView.visibility = View.VISIBLE
+            } else {
+                titleButton.setIconResource(R.drawable.ic_dropdown_down)
+                selectButton.visibility = View.VISIBLE
+                albumsView.visibility = View.GONE
+            }
+            isAlbumsDisplayed = !isAlbumsDisplayed
+        }
+
         closeButton.setOnClickListener { dismiss() }
     }
 
-    private fun setupRecyclerView() {
+    private fun setupMediaView() {
         Logger.d(TAG, "setupRecyclerView()")
 
-        headerAdapter = HeaderAdapter()
+        mediaHeaderAdapter = MediaHeaderAdapter()
         mediaAdapter = MediaAdapter(Settings.getImageLoader(), this)
-        concatAdapter = ConcatAdapter(headerAdapter, mediaAdapter)
-        recyclerView.adapter = concatAdapter
+        concatAdapter = ConcatAdapter(mediaHeaderAdapter, mediaAdapter)
+        mediaView.adapter = concatAdapter
 
         val layoutManager = GridLayoutManager(
             context,
@@ -188,16 +225,16 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
             false
         )
 
-        recyclerView.layoutManager = layoutManager
+        mediaView.layoutManager = layoutManager
 
-        recyclerView.setHasFixedSize(true)
+        mediaView.setHasFixedSize(true)
 
-        recyclerView.addItemDecoration(
+        mediaView.addItemDecoration(
             SpacingItemDecoration(
-                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_left),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_top),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_right),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.item_margin_bottom)
+                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_left),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_top),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_right),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_bottom)
             )
         )
     }
@@ -217,6 +254,33 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         }
     }
 
+    private fun setupAlbumsView() {
+        albumsView.visibility = View.GONE
+
+        albumsAdapter = AlbumsAdapter(Settings.getImageLoader())
+        albumsView.adapter = albumsAdapter
+
+        val layoutManager = GridLayoutManager(
+            context,
+            2,
+            GridLayoutManager.VERTICAL,
+            false
+        )
+
+        albumsView.layoutManager = layoutManager
+
+        albumsView.setHasFixedSize(true)
+
+        albumsView.addItemDecoration(
+            SpacingItemDecoration(
+                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_left),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_top),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_right),
+                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_bottom)
+            )
+        )
+    }
+
     private fun loadImages() {
         Logger.d(TAG, "loadImages()")
         lifecycleScope.launch(Dispatchers.IO) {
@@ -224,7 +288,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
             val projection = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
             val selection: String? = null
             val selectionArgs: MutableList<String>? = null
-            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC LIMIT 3000"
 
             context?.contentResolver
                 ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
@@ -240,14 +304,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         val array = arrayListOf<Media>()
         array.addAll(
             generateSequence { if (moveToNext()) this else null }
-                .map {
+                .mapNotNull {
                     when (clazz) {
                         Image::class.java -> it.readImage()
                         Video::class.java -> it.readVideo()
                         else -> null
                     }
                 }
-                .filterNotNull()
         )
         return array
     }

@@ -23,5 +23,7 @@ open class Entity constructor(
     open val dateAdded: Long,
     open val dateModified: Long,
     open val dateCreated: Long?,
-    open val thumbnail: Bitmap? = null
+    open val thumbnail: Bitmap? = null,
+    open val folderId: Long? = null,
+    open val folderDisplayName: String? = null
 )

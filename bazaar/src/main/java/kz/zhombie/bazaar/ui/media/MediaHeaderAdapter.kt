@@ -11,10 +11,10 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.core.ViewHolderException
 
-internal class HeaderAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+internal class MediaHeaderAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        private val TAG: String = HeaderAdapter::class.java.simpleName
+        private val TAG: String = MediaHeaderAdapter::class.java.simpleName
     }
 
     private object ViewType {

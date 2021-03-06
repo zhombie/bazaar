@@ -48,17 +48,20 @@ internal class ContentResolverCompat {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 when (type) {
                     Type.IMAGE -> {
+                        projection.add(MediaStore.Images.ImageColumns.BUCKET_ID)
                         projection.add(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME)
                         projection.add(MediaStore.Images.ImageColumns.DATE_TAKEN)
                         projection.add(MediaStore.Images.ImageColumns.VOLUME_NAME)
                     }
                     Type.VIDEO -> {
+                        projection.add(MediaStore.Video.VideoColumns.BUCKET_ID)
                         projection.add(MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME)
                         projection.add(MediaStore.Video.VideoColumns.DATE_TAKEN)
                         projection.add(MediaStore.Video.VideoColumns.DURATION)
                         projection.add(MediaStore.Video.VideoColumns.VOLUME_NAME)
                     }
                     Type.FILE -> {
+                        projection.add(MediaStore.Files.FileColumns.BUCKET_ID)
                         projection.add(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME)
                         projection.add(MediaStore.Files.FileColumns.DATE_TAKEN)
                         projection.add(MediaStore.Files.FileColumns.DURATION)

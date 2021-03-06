@@ -18,6 +18,8 @@ open class Media constructor(
     override val dateModified: Long,
     override val dateCreated: Long?,
     override val thumbnail: Bitmap? = null,
+    override val folderId: Long? = null,
+    override val folderDisplayName: String? = null,
 
     open val mimeType: String,
     open val width: Int,
@@ -31,5 +33,7 @@ open class Media constructor(
     dateAdded = dateAdded,
     dateModified = dateModified,
     dateCreated = dateCreated,
-    thumbnail = thumbnail
+    thumbnail = thumbnail,
+    folderId = folderId,
+    folderDisplayName = folderDisplayName
 )

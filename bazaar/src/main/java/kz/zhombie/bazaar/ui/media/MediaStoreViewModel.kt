@@ -8,8 +8,10 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kz.zhombie.bazaar.api.model.Album
 import kz.zhombie.bazaar.core.Logger
 import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.ui.model.UIAlbum
 import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class MediaStoreViewModel : ViewModel() {
@@ -23,6 +25,9 @@ internal class MediaStoreViewModel : ViewModel() {
 
     private val allMedia by lazy { MutableLiveData<List<UIMedia>>() }
     fun getAllMedia(): LiveData<List<UIMedia>> = allMedia
+
+    private val allAlbums by lazy { MutableLiveData<List<UIAlbum>>() }
+    fun getAllAlbums(): LiveData<List<UIAlbum>> = allAlbums
 
     private val viewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getViewPosition(): LiveData<ViewPosition> = viewPosition
@@ -58,7 +63,23 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onMediaLoaded(data: List<Media>) {
-        allMedia.postValue(data.map { UIMedia(it, isSelected = false, isVisible = true) })
+        val uiMedia = data.map { UIMedia(it, isSelected = false, isVisible = true) }
+
+        allMedia.postValue(uiMedia)
+
+        val albums = data.mapNotNull { media ->
+            val folderId = media.folderId ?: return@mapNotNull null
+            val folderDisplayName = media.folderDisplayName ?: return@mapNotNull null
+            val items = uiMedia.mapNotNull { if (it.media.folderId == folderId) it.media else null }
+            UIAlbum(Album(folderId, folderDisplayName, items))
+        }
+            .distinctBy { it.album.id }
+            .sortedBy { it.album.displayName }
+            .toMutableList()
+
+        albums.add(0, UIAlbum(Album(0, "Все медиа", uiMedia.map { it.media })))
+
+        allAlbums.postValue(albums)
     }
 
     fun onLayoutChange(viewPosition: ViewPosition) {

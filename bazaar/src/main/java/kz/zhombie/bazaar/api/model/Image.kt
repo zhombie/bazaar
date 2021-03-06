@@ -15,7 +15,9 @@ data class Image constructor(
     override val mimeType: String,
     override val width: Int,
     override val height: Int,
-    override val thumbnail: Bitmap? = null
+    override val thumbnail: Bitmap? = null,
+    override val folderId: Long? = null,
+    override val folderDisplayName: String? = null,
 ) : Media(
     id = id,
     uri = uri,
@@ -28,5 +30,7 @@ data class Image constructor(
     mimeType = mimeType,
     width = width,
     height = height,
-    thumbnail = thumbnail
+    thumbnail = thumbnail,
+    folderId = folderId,
+    folderDisplayName = folderDisplayName
 )

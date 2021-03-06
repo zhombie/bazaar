@@ -54,7 +54,7 @@
                 android:textSize="17sp"
                 android:textStyle="bold"
                 app:cornerRadius="13dp"
-                app:icon="@drawable/ic_dropdown"
+                app:icon="@drawable/ic_dropdown_down"
                 app:iconGravity="textEnd"
                 app:iconPadding="9dp"
                 app:iconSize="@null"

@@ -32,6 +32,13 @@ internal fun Cursor.readImage(): Image? {
         val width = getInt(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.WIDTH))
         val height = getInt(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.HEIGHT))
 
+        var bucketId: Long? = null
+        var bucketDisplayName: String? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            bucketId = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_ID))
+            bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
+        }
+
         Image(
             id = id,
             uri = externalContentUri,
@@ -44,7 +51,9 @@ internal fun Cursor.readImage(): Image? {
             mimeType = mimeType,
             width = width,
             height = height,
-            thumbnail = null
+            thumbnail = null,
+            folderId = bucketId,
+            folderDisplayName = bucketDisplayName
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -77,6 +86,13 @@ internal fun Cursor.readVideo(): Video? {
         val width = getInt(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.WIDTH))
         val height = getInt(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.HEIGHT))
 
+        var bucketId: Long? = null
+        var bucketDisplayName: String? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            bucketId = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_ID))
+            bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
+        }
+
         val duration = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DURATION))
         } else {
@@ -96,6 +112,8 @@ internal fun Cursor.readVideo(): Video? {
             width = width,
             height = height,
             thumbnail = null,
+            folderId = bucketId,
+            folderDisplayName = bucketDisplayName,
             duration = duration,
             cover = null
         )
