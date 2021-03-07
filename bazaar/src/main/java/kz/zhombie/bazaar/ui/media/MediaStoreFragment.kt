@@ -69,7 +69,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     private var buttonHeight: Int = 0
     private var collapsedMargin: Int = 0
 
-    var resultCallback: ResultCallback? = null
+    private var resultCallback: ResultCallback? = null
+
+    fun setResultCallback(resultCallback: ResultCallback) {
+        this.resultCallback = resultCallback
+    }
 
     override fun getTheme(): Int {
         return R.style.BottomSheetDialog

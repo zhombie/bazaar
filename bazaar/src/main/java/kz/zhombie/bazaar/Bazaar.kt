@@ -30,7 +30,9 @@ class Bazaar {
             imageLoader?.let { Settings.setImageLoader(it) }
 
             val fragment = MediaStoreFragment.newInstance()
-            fragment.resultCallback = resultCallback
+            if (resultCallback != null) {
+                fragment.setResultCallback(resultCallback)
+            }
             fragment.show(fragmentManager, tag)
             return tag
         }
