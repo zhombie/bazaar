@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.core
+package kz.zhombie.bazaar.core.exception
 
 import androidx.recyclerview.widget.RecyclerView
 

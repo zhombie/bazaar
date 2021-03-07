@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.core
+package kz.zhombie.bazaar.core.logging
 
 import android.util.Log
 

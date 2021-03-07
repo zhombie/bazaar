@@ -9,12 +9,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.api.model.Album
-import kz.zhombie.bazaar.core.Logger
+import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.ui.model.UIAlbum
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MediaStoreViewModel : ViewModel() {
+internal class MediaStoreViewModel constructor(
+    private val mediaScanManager: MediaScanManager
+) : ViewModel() {
 
     companion object {
         private val TAG: String = MediaStoreViewModel::class.java.simpleName
@@ -40,7 +43,15 @@ internal class MediaStoreViewModel : ViewModel() {
     private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
 
-    fun onMediaLoaded(data: List<Media>) {
+    init {
+        viewModelScope.launch {
+            mediaScanManager.loadImages(Dispatchers.IO) {
+                onMediaLoaded(it)
+            }
+        }
+    }
+
+    private fun onMediaLoaded(data: List<Media>) {
         viewModelScope.launch(Dispatchers.IO) {
             Logger.d(TAG, "onMediaLoaded() -> data.size: ${data.size}")
 

@@ -1,12 +1,9 @@
 package kz.zhombie.bazaar.ui.media
 
 import android.app.Dialog
-import android.database.Cursor
 import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
@@ -21,7 +18,6 @@ import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,20 +28,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.ResultCallback
-import kz.zhombie.bazaar.api.model.Image
-import kz.zhombie.bazaar.api.model.Media
-import kz.zhombie.bazaar.api.model.Video
-import kz.zhombie.bazaar.core.Logger
+import kz.zhombie.bazaar.core.MediaScanManager
+import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
-import kz.zhombie.bazaar.utils.ContentResolverCompat
-import kz.zhombie.bazaar.utils.readImage
-import kz.zhombie.bazaar.utils.readVideo
 import kotlin.math.roundToInt
 
 internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
@@ -91,7 +80,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
         setStyle(STYLE_NORMAL, theme)
 
-        viewModel = ViewModelProvider(this, MediaStoreViewModelFactory())
+        val mediaScanManager = MediaScanManager(requireContext())
+
+        viewModel = ViewModelProvider(this, MediaStoreViewModelFactory(mediaScanManager))
             .get(MediaStoreViewModel::class.java)
     }
 
@@ -182,8 +173,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         setupMediaView()
         setupSelectButton()
         setupAlbumsView()
-
-        loadImages()
 
         viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
             Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
@@ -312,40 +301,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                 requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_bottom)
             )
         )
-    }
-
-    private fun loadImages() {
-        Logger.d(TAG, "loadImages()")
-        lifecycleScope.launch(Dispatchers.IO) {
-            val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val projection = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
-            val selection: String? = null
-            val selectionArgs: MutableList<String>? = null
-            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC LIMIT 3000"
-
-            context?.contentResolver
-                ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
-                ?.use { cursor ->
-                    val data = cursor.mapTo(Image::class.java)
-                    viewModel.onMediaLoaded(data)
-                }
-        }
-    }
-
-    private fun <T> Cursor.mapTo(clazz: Class<T>): List<Media> {
-        Logger.d(TAG, "$count items to $clazz, ${clazz == Image::class.java}")
-        val array = arrayListOf<Media>()
-        array.addAll(
-            generateSequence { if (moveToNext()) this else null }
-                .mapNotNull {
-                    when (clazz) {
-                        Image::class.java -> it.readImage()
-                        Video::class.java -> it.readVideo()
-                        else -> null
-                    }
-                }
-        )
-        return array
     }
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {

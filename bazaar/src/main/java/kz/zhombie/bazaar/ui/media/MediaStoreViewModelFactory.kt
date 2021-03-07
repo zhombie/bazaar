@@ -2,15 +2,19 @@ package kz.zhombie.bazaar.ui.media
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kz.zhombie.bazaar.core.MediaScanManager
+import kz.zhombie.bazaar.core.exception.ViewModelException
 
-internal class MediaStoreViewModelFactory : ViewModelProvider.Factory {
+internal class MediaStoreViewModelFactory constructor(
+    private val mediaScanManager: MediaScanManager
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MediaStoreViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MediaStoreViewModel() as T
+            return MediaStoreViewModel(mediaScanManager) as T
         }
-        throw IllegalStateException("Cannot create ${modelClass.simpleName} with [${MediaStoreViewModelFactory::class.java.simpleName}]")
+        throw ViewModelException(this, modelClass)
     }
 
 }

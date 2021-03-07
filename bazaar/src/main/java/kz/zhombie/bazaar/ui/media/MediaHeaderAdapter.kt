@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.core.ViewHolderException
+import kz.zhombie.bazaar.core.exception.ViewHolderException
 
 internal class MediaHeaderAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

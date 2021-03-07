@@ -10,8 +10,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.ImageLoader
-import kz.zhombie.bazaar.core.Logger
-import kz.zhombie.bazaar.core.ViewHolderException
+import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.ui.model.UIMedia
