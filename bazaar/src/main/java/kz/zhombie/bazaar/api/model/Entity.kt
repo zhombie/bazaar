@@ -13,6 +13,8 @@ import android.net.Uri
  * [dateAdded] - The time the [Entity] was first added (milliseconds)
  * [dateModified] - The time the [Entity] was last modified (milliseconds)
  * [dateCreated] - The time the [Entity] was created. If image or video, it is as same as date taken (milliseconds)
+ * [folderId] - The primary folder ID of this [Entity]
+ * [folderDisplayName] - The primary folder display name of this [Entity]
  */
 open class Entity constructor(
     open val id: Long,

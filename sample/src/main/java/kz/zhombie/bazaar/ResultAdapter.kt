@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.sample
+package kz.zhombie.bazaar
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +11,13 @@ import kz.zhombie.bazaar.api.model.Media
 
 class ResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var data: List<Media> = emptyList()
+    var media: List<Media> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int = media.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ViewHolder(
@@ -28,7 +28,7 @@ class ResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ViewHolder) {
-            holder.bind(data[position])
+            holder.bind(media[position])
         }
     }
 

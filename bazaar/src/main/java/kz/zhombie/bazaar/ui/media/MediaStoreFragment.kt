@@ -265,7 +265,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
         selectButton.setOnClickListener {
             val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
-            resultCallback?.onBagReady(selectedMedia.map { it.media })
+            resultCallback?.onMediaSelected(selectedMedia.map { it.media })
             dismiss()
         }
     }

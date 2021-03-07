@@ -1,11 +1,10 @@
-package kz.zhombie.bazaar.sample
+package kz.zhombie.bazaar
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.ImageLoader
 
 class GlideImageLoader : ImageLoader {

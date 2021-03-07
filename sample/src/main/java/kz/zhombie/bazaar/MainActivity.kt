@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.sample
+package kz.zhombie.bazaar
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
-import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.api.ImageLoader
 import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.api.model.Media
@@ -104,9 +103,9 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         }
     }
 
-    override fun onBagReady(media: List<Media>) {
+    override fun onMediaSelected(media: List<Media>) {
         Log.d(TAG, "media: $media")
-        adapter.data = media
+        adapter.media = media
     }
 
 }

@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.sample
+package kz.zhombie.bazaar
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,7 +9,6 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
-import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.ImageLoader
 
 class CoilImageLoader : ImageLoader {
