@@ -9,8 +9,6 @@ import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexvasilkov.gestures.animation.ViewPosition
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -26,12 +24,14 @@ import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
+import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapter
+import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapterManager
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.windowHeight
 import kotlin.math.roundToInt
 
-internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
+internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -47,16 +47,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     private lateinit var titleView: MaterialTextView
     private lateinit var iconView: ShapeableImageView
     private lateinit var closeButton: MaterialButton
-    private lateinit var mediaView: RecyclerView
     private lateinit var selectButton: SelectButton
 
     private lateinit var viewModel: MediaStoreViewModel
 
     private var albumsAdapterManager: AlbumsAdapterManager? = null
-
-    private var mediaHeaderAdapter: MediaHeaderAdapter? = null
-    private var mediaAdapter: MediaAdapter? = null
-    private var concatAdapter: ConcatAdapter? = null
+    private var galleryAdapterManager: GalleryAdapterManager? = null
 
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
@@ -111,12 +107,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                     topMargin = collapsedMargin
                 }
 
-                mediaView.setPadding(
-                    mediaView.paddingLeft,
-                    mediaView.paddingTop,
-                    mediaView.paddingRight,
-                    mediaView.paddingBottom + buttonHeight
-                )
+                galleryAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
 
                 albumsAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
@@ -157,12 +148,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         titleView = view.findViewById(R.id.titleView)
         iconView = view.findViewById(R.id.iconView)
         closeButton = view.findViewById(R.id.closeButton)
-        mediaView = view.findViewById(R.id.mediaView)
+        val galleryView = view.findViewById<RecyclerView>(R.id.galleryView)
         selectButton = view.findViewById(R.id.selectButton)
         val albumsView = view.findViewById<RecyclerView>(R.id.albumsView)
 
         setupHeaderView()
-        setupMediaView()
+        setupGalleryView(galleryView)
         setupSelectButton()
         setupAlbumsView(albumsView)
 
@@ -172,7 +163,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         })
 
         viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { media ->
-            mediaAdapter?.submitList(media)
+            galleryAdapterManager?.submitList(media)
         })
 
         viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, { albums ->
@@ -191,7 +182,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 //                selectButton.visibility = View.VISIBLE
                 albumsAdapterManager?.hide()
 
-                mediaView.scrollToPosition(0)
+                galleryAdapterManager?.scrollToTop()
             }
         })
 
@@ -203,6 +194,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     override fun onDestroy() {
         albumsAdapterManager?.destroy()
         albumsAdapterManager = null
+
+        galleryAdapterManager?.destroy()
+        galleryAdapterManager = null
 
         selectButton.setOnClickListener(null)
 
@@ -219,35 +213,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         closeButton.setOnClickListener { dismiss() }
     }
 
-    private fun setupMediaView() {
-        Logger.d(TAG, "setupRecyclerView()")
-
-        mediaHeaderAdapter = MediaHeaderAdapter()
-        mediaAdapter = MediaAdapter(Settings.getImageLoader(), this)
-        concatAdapter = ConcatAdapter(mediaHeaderAdapter, mediaAdapter)
-        mediaView.adapter = concatAdapter
-
-        val layoutManager = GridLayoutManager(
-            context,
-            3,
-            GridLayoutManager.VERTICAL,
-            false
-        )
-
-        mediaView.layoutManager = layoutManager
-
-        mediaView.setHasFixedSize(true)
-
-        mediaView.itemAnimator = null
-
-        mediaView.addItemDecoration(
-            SpacingItemDecoration(
-                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_left),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_top),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_right),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.media_item_margin_bottom)
-            )
-        )
+    private fun setupGalleryView(recyclerView: RecyclerView) {
+        galleryAdapterManager = GalleryAdapterManager(requireContext(), recyclerView)
+        galleryAdapterManager?.create(Settings.getImageLoader(), this)
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {

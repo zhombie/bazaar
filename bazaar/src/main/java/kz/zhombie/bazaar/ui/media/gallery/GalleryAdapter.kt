@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media
+package kz.zhombie.bazaar.ui.media.gallery
 
 import android.view.LayoutInflater
 import android.view.View
@@ -16,13 +16,13 @@ import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MediaAdapter constructor(
+internal class GalleryAdapter constructor(
     private val imageLoader: ImageLoader,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        private val TAG: String = MediaAdapter::class.java.simpleName
+        private val TAG: String = GalleryAdapter::class.java.simpleName
 
         private val diffCallback = object : DiffUtil.ItemCallback<UIMedia>() {
             override fun areItemsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =
