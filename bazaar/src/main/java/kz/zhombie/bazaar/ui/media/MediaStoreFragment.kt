@@ -8,14 +8,12 @@ import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
-import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ConcatAdapter
@@ -33,8 +31,10 @@ import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
+import kz.zhombie.bazaar.utils.windowHeight
 import kotlin.math.roundToInt
 
 internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Callback {
@@ -55,15 +55,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     private lateinit var closeButton: MaterialButton
     private lateinit var mediaView: RecyclerView
     private lateinit var selectButton: MaterialButton
-    private lateinit var albumsView: RecyclerView
 
     private lateinit var viewModel: MediaStoreViewModel
+
+    private var albumsAdapterManager: AlbumsAdapterManager? = null
 
     private var mediaHeaderAdapter: MediaHeaderAdapter? = null
     private var mediaAdapter: MediaAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
-
-    private var albumsAdapter: AlbumsAdapter? = null
 
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
@@ -125,12 +124,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                     mediaView.paddingBottom + buttonHeight
                 )
 
-                albumsView.setPadding(
-                    albumsView.paddingLeft,
-                    albumsView.paddingTop,
-                    albumsView.paddingRight,
-                    albumsView.paddingBottom + buttonHeight
-                )
+                albumsAdapterManager?.setPadding(buttonHeight)
             }
         }
 
@@ -171,12 +165,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         closeButton = view.findViewById(R.id.closeButton)
         mediaView = view.findViewById(R.id.mediaView)
         selectButton = view.findViewById(R.id.selectButton)
-        albumsView = view.findViewById(R.id.albumsView)
+        val albumsView = view.findViewById<RecyclerView>(R.id.albumsView)
 
         setupHeaderView()
         setupMediaView()
         setupSelectButton()
-        setupAlbumsView()
+        setupAlbumsView(albumsView)
 
         viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
             Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
@@ -188,20 +182,20 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         })
 
         viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, { albums ->
-            albumsAdapter?.submitList(albums)
+            albumsAdapterManager?.submitList(albums)
         })
 
         viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
             if (isAlbumsDisplayed) {
                 iconView.setImageResource(R.drawable.ic_dropdown_up)
 //                selectButton.visibility = View.INVISIBLE
-                albumsView.visibility = View.VISIBLE
+                albumsAdapterManager?.show()
 
                 (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
                 iconView.setImageResource(R.drawable.ic_dropdown_down)
 //                selectButton.visibility = View.VISIBLE
-                albumsView.visibility = View.GONE
+                albumsAdapterManager?.hide()
 
                 mediaView.scrollToPosition(0)
             }
@@ -210,6 +204,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         viewModel.getActiveAlbum().observe(viewLifecycleOwner, { album ->
             titleView.text = album.album.displayName
         })
+    }
+
+    override fun onDestroy() {
+        albumsAdapterManager?.destroy()
+        albumsAdapterManager = null
+
+        super.onDestroy()
     }
 
     private fun setupHeaderView() {
@@ -275,36 +276,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         }
     }
 
-    private fun setupAlbumsView() {
-        albumsView.visibility = View.GONE
-
-        albumsAdapter = AlbumsAdapter(Settings.getImageLoader()) {
+    private fun setupAlbumsView(recyclerView: RecyclerView) {
+        albumsAdapterManager = AlbumsAdapterManager(requireContext(), recyclerView)
+        albumsAdapterManager?.hide()
+        albumsAdapterManager?.create {
             viewModel.onAlbumClicked(it)
         }
-
-        albumsView.adapter = albumsAdapter
-
-        val layoutManager = GridLayoutManager(
-            context,
-            2,
-            GridLayoutManager.VERTICAL,
-            false
-        )
-
-        albumsView.layoutManager = layoutManager
-
-        albumsView.setHasFixedSize(true)
-
-        albumsView.itemAnimator = null
-
-        albumsView.addItemDecoration(
-            SpacingItemDecoration(
-                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_left),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_top),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_right),
-                requireContext().resources.getDimensionPixelOffset(R.dimen.album_item_margin_bottom)
-            )
-        )
     }
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
@@ -325,14 +302,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
     // Calculates height for 90% of fullscreen
     private fun getBottomSheetDialogDefaultHeight(): Int {
-        return getWindowHeight() * 90 / 100
-    }
-
-    // Calculates window height for fullscreen use
-    private fun getWindowHeight(): Int {
-        val displayMetrics = DisplayMetrics()
-        ViewCompat.getDisplay(requireView())?.getRealMetrics(displayMetrics)
-        return displayMetrics.heightPixels
+        return requireView().windowHeight * 90 / 100
     }
 
 }
