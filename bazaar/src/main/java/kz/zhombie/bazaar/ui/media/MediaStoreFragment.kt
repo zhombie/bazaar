@@ -186,7 +186,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
         viewModel.getDisplayedMedia().observe(viewLifecycleOwner, {
             mediaAdapter?.submitList(it)
-            mediaView.scrollToPosition(0)
         })
 
         viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, {
@@ -204,6 +203,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                 titleButton.setIconResource(R.drawable.ic_dropdown_down)
 //                selectButton.visibility = View.VISIBLE
                 albumsView.visibility = View.GONE
+
+                mediaView.scrollToPosition(0)
             }
         })
     }
