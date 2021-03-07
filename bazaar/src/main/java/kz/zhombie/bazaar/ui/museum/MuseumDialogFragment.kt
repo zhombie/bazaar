@@ -6,7 +6,7 @@ import android.view.*
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.alexvasilkov.gestures.animation.ViewPosition
 import com.alexvasilkov.gestures.views.GestureImageView
 import com.google.android.material.appbar.AppBarLayout
@@ -14,7 +14,9 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
+import kz.zhombie.bazaar.ui.media.MediaStoreViewModelFactory
 import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class MuseumDialogFragment : DialogFragment() {
@@ -40,7 +42,9 @@ internal class MuseumDialogFragment : DialogFragment() {
     private lateinit var titleView: MaterialTextView
     private lateinit var subtitleView: MaterialTextView
 
-    private val viewModel: MediaStoreViewModel by viewModels()
+    private val viewModel: MediaStoreViewModel by activityViewModels {
+        MediaStoreViewModelFactory(MediaScanManager(requireContext()))
+    }
 
     private var uiMedia: UIMedia? = null
     private var startViewPosition: ViewPosition? = null
@@ -95,27 +99,8 @@ internal class MuseumDialogFragment : DialogFragment() {
         titleView = view.findViewById(R.id.titleView)
         subtitleView = view.findViewById(R.id.subtitleView)
 
-        val activity = activity
-        if (activity is AppCompatActivity) {
-            activity.setSupportActionBar(toolbar)
-            activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            activity.supportActionBar?.setDisplayShowTitleEnabled(false)
-        }
-
-        gestureImageView.controller.settings
-            .setAnimationsDuration(250L)
-            .setBoundsType(com.alexvasilkov.gestures.Settings.Bounds.NORMAL)
-            .setDoubleTapEnabled(true)
-            .setExitEnabled(true)
-            .setExitType(com.alexvasilkov.gestures.Settings.ExitType.SCROLL)
-            .setFillViewport(true)
-            .setFitMethod(com.alexvasilkov.gestures.Settings.Fit.INSIDE)
-            .setFlingEnabled(true)
-            .setGravity(Gravity.CENTER)
-            .setMaxZoom(2.0F)
-            .setMinZoom(0F)
-            .setPanEnabled(true)
-            .setZoomEnabled(true)
+        setupActionBar()
+        setupGestureImageView()
 
         viewModel.getActiveViewPosition().observe(viewLifecycleOwner, { viewPosition ->
             if (gestureImageView.positionAnimator.position > 0f) {
@@ -192,6 +177,32 @@ internal class MuseumDialogFragment : DialogFragment() {
             })
             gestureImageView.invalidate()
         }
+    }
+
+    private fun setupActionBar() {
+        val activity = activity
+        if (activity is AppCompatActivity) {
+            activity.setSupportActionBar(toolbar)
+            activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            activity.supportActionBar?.setDisplayShowTitleEnabled(false)
+        }
+    }
+
+    private fun setupGestureImageView() {
+        gestureImageView.controller.settings
+            .setAnimationsDuration(250L)
+            .setBoundsType(com.alexvasilkov.gestures.Settings.Bounds.NORMAL)
+            .setDoubleTapEnabled(true)
+            .setExitEnabled(true)
+            .setExitType(com.alexvasilkov.gestures.Settings.ExitType.SCROLL)
+            .setFillViewport(true)
+            .setFitMethod(com.alexvasilkov.gestures.Settings.Fit.INSIDE)
+            .setFlingEnabled(true)
+            .setGravity(Gravity.CENTER)
+            .setMaxZoom(2.0F)
+            .setMinZoom(0F)
+            .setPanEnabled(true)
+            .setZoomEnabled(true)
     }
 
 }

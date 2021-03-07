@@ -15,7 +15,7 @@ import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
 import kz.zhombie.bazaar.utils.readVideo
 
-class MediaScanManager constructor(private val context: Context) {
+internal class MediaScanManager constructor(private val context: Context) {
 
     companion object {
         private val TAG: String = MediaScanManager::class.java.simpleName

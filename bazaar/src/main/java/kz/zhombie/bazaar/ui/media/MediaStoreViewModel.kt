@@ -44,9 +44,13 @@ internal class MediaStoreViewModel constructor(
     fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
 
     init {
-        viewModelScope.launch {
-            mediaScanManager.loadImages(Dispatchers.IO) {
-                onMediaLoaded(it)
+        Logger.d(TAG, "created")
+
+        if (allMedia.isEmpty()) {
+            viewModelScope.launch {
+                mediaScanManager.loadImages(Dispatchers.IO) {
+                    onMediaLoaded(it)
+                }
             }
         }
     }
