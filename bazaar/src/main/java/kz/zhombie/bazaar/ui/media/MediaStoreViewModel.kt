@@ -34,6 +34,9 @@ internal class MediaStoreViewModel : ViewModel() {
     private val isAlbumsDisplayed by lazy { MutableLiveData<Boolean>(false) }
     fun getIsAlbumsDisplayed(): LiveData<Boolean> = isAlbumsDisplayed
 
+    private val activeAlbum by lazy { MutableLiveData<UIAlbum>() }
+    fun getActiveAlbum(): LiveData<UIAlbum> = activeAlbum
+
     private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
 
@@ -45,6 +48,9 @@ internal class MediaStoreViewModel : ViewModel() {
 
             val uiMedia = data.map { UIMedia(it, isSelected = false, isVisible = true) }
 
+            val defaultAlbum = UIAlbum(Album(0, "Все медиа", uiMedia.map { it.media }))
+
+            activeAlbum.postValue(defaultAlbum)
             displayedMedia.postValue(uiMedia)
 
             val albums = data.mapNotNull { media ->
@@ -57,7 +63,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 .sortedBy { it.album.displayName }
                 .toMutableList()
 
-            albums.add(0, UIAlbum(Album(0, "Все медиа", uiMedia.map { it.media })))
+            albums.add(0, defaultAlbum)
 
             displayedAlbums.postValue(albums)
         }
@@ -112,7 +118,7 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onHeaderTitleClicked() {
+    fun onHeaderViewTitleClicked() {
         isAlbumsDisplayed.postValue(!(isAlbumsDisplayed.value ?: false))
     }
 
@@ -138,6 +144,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 }
             }
 
+            activeAlbum.postValue(uiAlbum)
             displayedMedia.postValue(albumUiMedia)
 
             isAlbumsDisplayed.postValue(false)

@@ -15,6 +15,7 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
@@ -30,6 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.R
@@ -58,7 +60,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         }
     }
 
-    private lateinit var titleButton: MaterialButton
+    private lateinit var titleButton: LinearLayout
+    private lateinit var titleView: MaterialTextView
+    private lateinit var iconView: ShapeableImageView
     private lateinit var closeButton: MaterialButton
     private lateinit var mediaView: RecyclerView
     private lateinit var selectButton: MaterialButton
@@ -167,6 +171,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         super.onViewCreated(view, savedInstanceState)
 
         titleButton = view.findViewById(R.id.titleButton)
+        titleView = view.findViewById(R.id.titleView)
+        iconView = view.findViewById(R.id.iconView)
         closeButton = view.findViewById(R.id.closeButton)
         mediaView = view.findViewById(R.id.mediaView)
         selectButton = view.findViewById(R.id.selectButton)
@@ -179,41 +185,45 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
         loadImages()
 
-        viewModel.getSelectedMedia().observe(viewLifecycleOwner, {
-            Logger.d(TAG, "getSelectedMedia() -> it.size: ${it.size}")
-            setupSelectButton(it.size)
+        viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
+            Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
+            setupSelectButton(media.size)
         })
 
-        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, {
-            mediaAdapter?.submitList(it)
+        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { media ->
+            mediaAdapter?.submitList(media)
         })
 
-        viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, {
-            albumsAdapter?.submitList(it)
+        viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, { albums ->
+            albumsAdapter?.submitList(albums)
         })
 
         viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
             if (isAlbumsDisplayed) {
-                titleButton.setIconResource(R.drawable.ic_dropdown_up)
+                iconView.setImageResource(R.drawable.ic_dropdown_up)
 //                selectButton.visibility = View.INVISIBLE
                 albumsView.visibility = View.VISIBLE
 
                 (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
-                titleButton.setIconResource(R.drawable.ic_dropdown_down)
+                iconView.setImageResource(R.drawable.ic_dropdown_down)
 //                selectButton.visibility = View.VISIBLE
                 albumsView.visibility = View.GONE
 
                 mediaView.scrollToPosition(0)
             }
         })
+
+        viewModel.getActiveAlbum().observe(viewLifecycleOwner, { album ->
+            titleView.text = album.album.displayName
+        })
     }
 
     private fun setupHeaderView() {
-        titleButton.text = "Все медиа"
+        titleView.text = "Все медиа"
 
         titleButton.setOnClickListener {
-            viewModel.onHeaderTitleClicked()
+            viewModel.onHeaderViewTitleClicked()
         }
 
         closeButton.setOnClickListener { dismiss() }
@@ -262,6 +272,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
 
             setSpan(RelativeSizeSpan(0.7F), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(ForegroundColorSpan(Color.parseColor("#8290A0")), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.NORMAL), title.length, subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         selectButton.setOnClickListener {
