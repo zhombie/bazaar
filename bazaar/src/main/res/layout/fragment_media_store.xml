@@ -6,9 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <include
+    <kz.zhombie.bazaar.ui.components.HeaderView
         android:id="@+id/headerView"
-        layout="@layout/view_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"

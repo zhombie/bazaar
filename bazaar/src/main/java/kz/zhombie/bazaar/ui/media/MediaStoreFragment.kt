@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
@@ -14,14 +13,13 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.ui.components.HeaderView
 import kz.zhombie.bazaar.ui.components.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
 import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapter
@@ -43,10 +41,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         }
     }
 
-    private lateinit var titleButton: LinearLayout
-    private lateinit var titleView: MaterialTextView
-    private lateinit var iconView: ShapeableImageView
-    private lateinit var closeButton: MaterialButton
+    private lateinit var headerView: HeaderView
     private lateinit var selectButton: SelectButton
 
     private lateinit var viewModel: MediaStoreViewModel
@@ -144,10 +139,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        titleButton = view.findViewById(R.id.titleButton)
-        titleView = view.findViewById(R.id.titleView)
-        iconView = view.findViewById(R.id.iconView)
-        closeButton = view.findViewById(R.id.closeButton)
+        headerView = view.findViewById(R.id.headerView)
         val galleryView = view.findViewById<RecyclerView>(R.id.galleryView)
         selectButton = view.findViewById(R.id.selectButton)
         val albumsView = view.findViewById<RecyclerView>(R.id.albumsView)
@@ -172,14 +164,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
         viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
             if (isAlbumsDisplayed) {
-                iconView.setImageResource(R.drawable.ic_dropdown_up)
-//                selectButton.visibility = View.INVISIBLE
+                headerView.toggleIcon(true)
                 albumsAdapterManager?.show()
 
                 (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
-                iconView.setImageResource(R.drawable.ic_dropdown_down)
-//                selectButton.visibility = View.VISIBLE
+                headerView.toggleIcon(false)
                 albumsAdapterManager?.hide()
 
                 galleryAdapterManager?.scrollToTop()
@@ -187,7 +177,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         })
 
         viewModel.getActiveAlbum().observe(viewLifecycleOwner, { album ->
-            titleView.text = album.album.displayName
+            headerView.setTitle(album.album.displayName)
         })
     }
 
@@ -204,13 +194,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     }
 
     private fun setupHeaderView() {
-        titleView.text = "Все медиа"
+        headerView.setTitle("Все медиа")
 
-        titleButton.setOnClickListener {
+        headerView.setOnTitleButtonClickListener {
             viewModel.onHeaderViewTitleClicked()
         }
 
-        closeButton.setOnClickListener { dismiss() }
+        headerView.setOnCloseButtonClickListener { dismiss() }
     }
 
     private fun setupGalleryView(recyclerView: RecyclerView) {
@@ -238,7 +228,16 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         }
     }
 
+    /**
+     * [GalleryAdapter.Callback] implementation
+     */
+
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
+        fun onLayoutChange(imageView: ShapeableImageView) {
+            val position = ViewPosition.from(imageView)
+            viewModel.onLayoutChange(position)
+        }
+
         imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
 
         MuseumDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
@@ -247,11 +246,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
         viewModel.onImageCheckboxClicked(uiMedia)
-    }
-
-    private fun onLayoutChange(imageView: ShapeableImageView) {
-        val position = ViewPosition.from(imageView)
-        viewModel.onLayoutChange(position)
     }
 
     // Calculates height for 90% of fullscreen
