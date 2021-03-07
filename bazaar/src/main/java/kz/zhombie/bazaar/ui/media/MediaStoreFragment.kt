@@ -1,19 +1,12 @@
 package kz.zhombie.bazaar.ui.media
 
 import android.app.Dialog
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Spannable
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.text.buildSpannedString
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ConcatAdapter
@@ -31,6 +24,7 @@ import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.ui.components.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
@@ -54,7 +48,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     private lateinit var iconView: ShapeableImageView
     private lateinit var closeButton: MaterialButton
     private lateinit var mediaView: RecyclerView
-    private lateinit var selectButton: MaterialButton
+    private lateinit var selectButton: SelectButton
 
     private lateinit var viewModel: MediaStoreViewModel
 
@@ -111,7 +105,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                     isHideable = true
                 }
 
-                buttonHeight = selectButton.height + 0
+                buttonHeight = selectButton.height
                 collapsedMargin = peekHeight - buttonHeight
                 selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
                     topMargin = collapsedMargin
@@ -124,7 +118,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
                     mediaView.paddingBottom + buttonHeight
                 )
 
-                albumsAdapterManager?.setPadding(buttonHeight)
+                albumsAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
         }
 
@@ -210,6 +204,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
         albumsAdapterManager?.destroy()
         albumsAdapterManager = null
 
+        selectButton.setOnClickListener(null)
+
         super.onDestroy()
     }
 
@@ -255,24 +251,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaAdapter.Ca
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
-        selectButton.text = buildSpannedString {
-            val title = "Выбрать"
-            val subtitle = "Выбрано $selectedMediaCount файл(-ов)"
+        selectButton.setText(title = "Выбрать", subtitle = "Выбрано $selectedMediaCount файл(-ов)")
 
-            append(title + "\n" + subtitle)
-
-            setSpan(ForegroundColorSpan(Color.parseColor("#333333")), 0, title.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(StyleSpan(Typeface.BOLD), 0, title.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-            setSpan(RelativeSizeSpan(0.7F), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(ForegroundColorSpan(Color.parseColor("#8290A0")), title.length, title.length + subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(StyleSpan(Typeface.NORMAL), title.length, subtitle.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-
-        selectButton.setOnClickListener {
-            val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
-            resultCallback?.onMediaSelected(selectedMedia.map { it.media })
-            dismiss()
+        if (!selectButton.hasOnClickListeners()) {
+            selectButton.setOnClickListener {
+                val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
+                resultCallback?.onMediaSelected(selectedMedia.map { it.media })
+                dismiss()
+            }
         }
     }
 

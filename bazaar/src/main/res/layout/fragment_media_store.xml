@@ -65,7 +65,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/selectButton" />
 
-    <com.google.android.material.button.MaterialButton
+    <kz.zhombie.bazaar.ui.components.SelectButton
         android:id="@+id/selectButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

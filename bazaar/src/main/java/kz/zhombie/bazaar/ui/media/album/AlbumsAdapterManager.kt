@@ -56,11 +56,16 @@ internal class AlbumsAdapterManager constructor(
         recyclerView.visibility = View.GONE
     }
 
-    fun setPadding(extraPaddingBottom: Int) {
+    fun setPadding(
+        extraPaddingLeft: Int = 0,
+        extraPaddingTop: Int = 0,
+        extraPaddingRight: Int = 0,
+        extraPaddingBottom: Int = 0
+    ) {
         recyclerView.setPadding(
-            recyclerView.paddingLeft,
-            recyclerView.paddingTop,
-            recyclerView.paddingRight,
+            recyclerView.paddingLeft + extraPaddingLeft,
+            recyclerView.paddingTop + extraPaddingTop,
+            recyclerView.paddingRight + extraPaddingRight,
             recyclerView.paddingBottom + extraPaddingBottom
         )
     }
