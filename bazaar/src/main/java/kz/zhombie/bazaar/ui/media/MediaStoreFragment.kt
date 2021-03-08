@@ -17,7 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.api.ResultCallback
+import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.HeaderView
@@ -37,17 +37,25 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
 
-        fun newInstance(): MediaStoreFragment {
+        fun newInstance(settings: MediaStoreScreen.Settings): MediaStoreFragment {
             val fragment = MediaStoreFragment()
-            fragment.arguments = Bundle()
+            val bundle = Bundle()
+            bundle.putSerializable(BundleKey.SETTINGS, settings)
+            fragment.arguments = bundle
             return fragment
         }
+    }
+
+    private object BundleKey {
+        const val SETTINGS = "settings"
     }
 
     private lateinit var headerView: HeaderView
     private lateinit var selectButton: SelectButton
 
     private lateinit var viewModel: MediaStoreViewModel
+
+    private lateinit var settings: MediaStoreScreen.Settings
 
     private var albumsAdapterManager: AlbumsAdapterManager? = null
     private var galleryAdapterManager: GalleryAdapterManager? = null
@@ -70,6 +78,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         super.onCreate(savedInstanceState)
 
         setStyle(STYLE_NORMAL, theme)
+
+        settings = arguments?.getSerializable(BundleKey.SETTINGS) as MediaStoreScreen.Settings
+
+        Logger.d(TAG, "settings: $settings")
 
         val mediaScanManager = MediaScanManager(requireContext())
 

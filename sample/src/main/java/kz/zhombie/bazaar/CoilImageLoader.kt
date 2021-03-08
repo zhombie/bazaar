@@ -9,7 +9,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
-import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.core.ImageLoader
 
 class CoilImageLoader : ImageLoader {
 

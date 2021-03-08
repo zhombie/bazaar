@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.core.ImageLoader
 
 class GlideImageLoader : ImageLoader {
 

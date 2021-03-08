@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.api
+package kz.zhombie.bazaar.api.result
 
 import kz.zhombie.bazaar.api.model.Media
 

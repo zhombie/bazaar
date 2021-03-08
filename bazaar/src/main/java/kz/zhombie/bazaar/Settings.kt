@@ -1,15 +1,14 @@
 package kz.zhombie.bazaar
 
-import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
 
 internal object Settings {
 
     private var imageLoader: ImageLoader? = null
 
     fun getImageLoader(): ImageLoader {
-        return requireNotNull(imageLoader) {
-            "${ImageLoader::class.java.simpleName} not initialized at ${Settings::class.java.simpleName}"
-        }
+        return requireNotNull(imageLoader) { ImageLoaderNullException() }
     }
 
     fun setImageLoader(imageLoader: ImageLoader) {

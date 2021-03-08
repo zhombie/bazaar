@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.api.model.Image

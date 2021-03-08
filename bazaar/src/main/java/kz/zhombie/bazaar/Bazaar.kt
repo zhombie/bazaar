@@ -1,20 +1,32 @@
 package kz.zhombie.bazaar
 
 import androidx.fragment.app.FragmentManager
-import kz.zhombie.bazaar.api.ImageLoader
-import kz.zhombie.bazaar.api.ResultCallback
+import kz.zhombie.bazaar.api.core.settings.CameraSettings
+import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
+import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.ui.media.MediaStoreFragment
+import kz.zhombie.bazaar.ui.media.MediaStoreScreen
 
-class Bazaar {
+class Bazaar private constructor() {
 
     companion object {
         val TAG: String = Bazaar::class.java.simpleName
     }
 
-    class Builder constructor(private val resultCallback: ResultCallback? = null) {
+    class Builder constructor(private var resultCallback: ResultCallback? = null) {
 
         private var tag: String? = null
         private var imageLoader: ImageLoader? = null
+
+        private var mode: Mode = Mode.IMAGE
+        private var maxSelectionCount: Int = 1
+        private var cameraSettings: CameraSettings = CameraSettings(
+            isPhotoShootEnabled = false,
+            isVideoCaptureEnabled = false
+        )
+        private var isAlbumBasedInterfaceEnabled: Boolean = false
 
         fun setTag(tag: String): Builder {
             this.tag = tag
@@ -26,13 +38,45 @@ class Bazaar {
             return this
         }
 
-        fun show(fragmentManager: FragmentManager): String? {
-            imageLoader?.let { Settings.setImageLoader(it) }
+        fun setMode(mode: Mode): Builder {
+            this.mode = mode
+            return this
+        }
 
-            val fragment = MediaStoreFragment.newInstance()
-            if (resultCallback != null) {
-                fragment.setResultCallback(resultCallback)
-            }
+        fun setMaxSelectionCount(count: Int): Builder {
+            this.maxSelectionCount = count
+            return this
+        }
+
+        fun setCameraSettings(settings: CameraSettings): Builder {
+            this.cameraSettings = settings
+            return this
+        }
+
+        fun setAlbumBasedInterfaceEnabled(isEnabled: Boolean): Builder {
+            this.isAlbumBasedInterfaceEnabled = isEnabled
+            return this
+        }
+
+        fun setResultCallback(callback: ResultCallback): Builder {
+            this.resultCallback = callback
+            return this
+        }
+
+        fun show(fragmentManager: FragmentManager): String? {
+            Settings.setImageLoader(requireNotNull(imageLoader) { ImageLoaderNullException() })
+
+            require(maxSelectionCount in 1..10) { "Max selection count MUST be between 1 & 10" }
+
+            val fragment = MediaStoreFragment.newInstance(
+                MediaStoreScreen.Settings(
+                    mode = mode,
+                    maxSelectionCount = maxSelectionCount,
+                    cameraSettings = cameraSettings,
+                    isAlbumBasedInterfaceEnabled = isAlbumBasedInterfaceEnabled
+                )
+            )
+            fragment.setResultCallback(requireNotNull(resultCallback) { "It makes no sense without a resultant callback." })
             fragment.show(fragmentManager, tag)
             return tag
         }

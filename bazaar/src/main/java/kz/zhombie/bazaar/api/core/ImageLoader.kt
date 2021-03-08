@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.api
+package kz.zhombie.bazaar.api.core
 
 import android.content.Context
 import android.graphics.Bitmap

@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
-import kz.zhombie.bazaar.api.ImageLoader
-import kz.zhombie.bazaar.api.ResultCallback
+import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.core.settings.CameraSettings
+import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.api.model.Media
 
 class MainActivity : AppCompatActivity(), ResultCallback {
@@ -77,6 +79,10 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 Bazaar.Builder(this)
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
+                    .setMode(Mode.IMAGE_AND_VIDEO)
+                    .setMaxSelectionCount(5)
+                    .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
+                    .setAlbumBasedInterfaceEnabled(true)
                     .show(supportFragmentManager)
             }
         }

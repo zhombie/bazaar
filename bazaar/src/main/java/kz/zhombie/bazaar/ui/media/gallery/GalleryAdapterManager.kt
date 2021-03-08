@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.ImageLoader
+import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIMedia
 
