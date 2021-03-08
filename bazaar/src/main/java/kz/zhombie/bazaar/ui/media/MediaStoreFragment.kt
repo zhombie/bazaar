@@ -146,7 +146,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
         setupHeaderView()
         setupGalleryView(galleryView)
-        setupSelectButton()
+        setupSelectButton(selectedMediaCount = 0)
         setupAlbumsView(albumsView)
 
         viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->

@@ -14,10 +14,10 @@ internal val View.windowHeight: Int
     }
 
 
-fun Int.dp2Px(): Float = toFloat().dp2Px()
+internal fun Int.dp2Px(): Float = toFloat().dp2Px()
 
-fun Float.dp2Px(): Float = this * Resources.getSystem().displayMetrics.density
+internal fun Float.dp2Px(): Float = this * Resources.getSystem().displayMetrics.density
 
-fun Int.px2Dp(): Float = toFloat().px2Dp()
+internal fun Int.px2Dp(): Float = toFloat().px2Dp()
 
-fun Float.px2Dp(): Float = this / Resources.getSystem().displayMetrics.density
+internal fun Float.px2Dp(): Float = this / Resources.getSystem().displayMetrics.density
