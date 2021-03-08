@@ -51,11 +51,14 @@ internal class HeaderView @JvmOverloads constructor(
 
     private object Id {
         const val SCROLL_INDICATOR_VIEW = 1
+
         const val TITLE_BUTTON = 2
         const val TITLE_TEXT_VIEW = 3
         const val SUBTITLE_TEXT_VIEW = 4
         const val ICON_VIEW = 5
+
         const val CLOSE_BUTTON = 6
+
         const val DIVIDER = 7
     }
 
@@ -76,7 +79,6 @@ internal class HeaderView @JvmOverloads constructor(
 
     private fun createTitleButton(): LinearLayout {
         val titleButton = LinearLayout(context)
-//        titleButton.id = ViewCompat.generateViewId()
         titleButton.id = Id.TITLE_BUTTON
         val titleButtonsLayoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT)
         titleButtonsLayoutParams.setMargins(10F.dp2Px().roundToInt(), 5F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt(), 0)
@@ -97,47 +99,13 @@ internal class HeaderView @JvmOverloads constructor(
         titleViewContainer.layoutParams = titleViewContainerLayoutParams
         titleViewContainer.orientation = LinearLayout.VERTICAL
 
-        titleTextView = MaterialTextView(context)
-//        titleTextView.id = ViewCompat.generateViewId()
-        titleTextView.id = Id.TITLE_TEXT_VIEW
-        val titleViewLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        titleTextView.layoutParams = titleViewLayoutParams
-        titleTextView.letterSpacing = 0F
-        titleTextView.maxLines = 1
-        titleTextView.filters = arrayOf(InputFilter.LengthFilter(18))
-        titleTextView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-        titleTextView.setSingleLine()
-        titleTextView.isAllCaps = false
-        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17F)
-        titleTextView.setTextColor(Color.parseColor("#333333"))
-
-        subtitleTextView = MaterialTextView(context)
-//        subtitleTextView.id = ViewCompat.generateViewId()
-        subtitleTextView.id = Id.SUBTITLE_TEXT_VIEW
-        val subtitleViewLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        subtitleViewLayoutParams.setMargins(0, 1F.dp2Px().roundToInt(), 0, 0)
-        subtitleTextView.layoutParams = subtitleViewLayoutParams
-        subtitleTextView.letterSpacing = 0F
-        subtitleTextView.maxLines = 1
-        subtitleTextView.filters = arrayOf(InputFilter.LengthFilter(18))
-        subtitleTextView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
-        subtitleTextView.setSingleLine()
-        subtitleTextView.isAllCaps = false
-        subtitleTextView.includeFontPadding = false
-        subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11F)
-        subtitleTextView.text = "Текущий альбом"
-        subtitleTextView.setTextColor(Color.parseColor("#8290A0"))
+        titleTextView = createTitleTextView()
+        subtitleTextView = createSubtitleTextView()
 
         titleViewContainer.addView(titleTextView)
         titleViewContainer.addView(subtitleTextView)
 
-        iconView = ShapeableImageView(context)
-//        iconView.id = ViewCompat.generateViewId()
-        iconView.id = Id.ICON_VIEW
-        val iconViewLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        iconViewLayoutParams.setMargins(15F.dp2Px().roundToInt(), 0, 15F.dp2Px().roundToInt(), 0)
-        iconView.layoutParams = iconViewLayoutParams
-        iconView.setImageResource(R.drawable.ic_dropdown_down)
+        iconView = createIconView()
 
         titleButton.addView(titleViewContainer)
         titleButton.addView(iconView)
@@ -145,9 +113,53 @@ internal class HeaderView @JvmOverloads constructor(
         return titleButton
     }
 
+    private fun createTitleTextView(): MaterialTextView {
+        val textView = MaterialTextView(context)
+        textView.id = Id.TITLE_TEXT_VIEW
+        val layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        textView.layoutParams = layoutParams
+        textView.letterSpacing = 0F
+        textView.maxLines = 1
+        textView.filters = arrayOf(InputFilter.LengthFilter(18))
+        textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
+        textView.setSingleLine()
+        textView.isAllCaps = false
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17F)
+        textView.setTextColor(Color.parseColor("#333333"))
+        return textView
+    }
+
+    private fun createSubtitleTextView(): MaterialTextView {
+        val textView = MaterialTextView(context)
+        textView.id = Id.SUBTITLE_TEXT_VIEW
+        val viewLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        viewLayoutParams.setMargins(0, 1F.dp2Px().roundToInt(), 0, 0)
+        textView.layoutParams = viewLayoutParams
+        textView.letterSpacing = 0F
+        textView.maxLines = 1
+        textView.filters = arrayOf(InputFilter.LengthFilter(18))
+        textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
+        textView.setSingleLine()
+        textView.isAllCaps = false
+        textView.includeFontPadding = false
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11F)
+        textView.text = "Текущий альбом"
+        textView.setTextColor(Color.parseColor("#8290A0"))
+        return textView
+    }
+
+    private fun createIconView(): ShapeableImageView {
+        val imageView = ShapeableImageView(context)
+        imageView.id = Id.ICON_VIEW
+        val layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        layoutParams.setMargins(15F.dp2Px().roundToInt(), 0, 15F.dp2Px().roundToInt(), 0)
+        imageView.layoutParams = layoutParams
+        imageView.setImageResource(R.drawable.ic_dropdown_down)
+        return imageView
+    }
+
     private fun createCloseButton(): MaterialButton {
         val closeButton = MaterialButton(context, null, R.style.Widget_MaterialComponents_Button_TextButton_Icon)
-//        closeButton.id = ViewCompat.generateViewId()
         closeButton.id = Id.CLOSE_BUTTON
         val closeButtonLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         closeButtonLayoutParams.setMargins(5F.dp2Px().roundToInt(), 0, 5F.dp2Px().roundToInt(), 0)
