@@ -7,6 +7,7 @@ import android.text.InputFilter
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -43,6 +44,9 @@ internal class HeaderView @JvmOverloads constructor(
 
         closeButton = createCloseButton()
         addView(closeButton)
+
+        val divider = createDivider()
+        addView(divider)
     }
 
     private object Id {
@@ -52,6 +56,7 @@ internal class HeaderView @JvmOverloads constructor(
         const val SUBTITLE_TEXT_VIEW = 4
         const val ICON_VIEW = 5
         const val CLOSE_BUTTON = 6
+        const val DIVIDER = 7
     }
 
     private fun createScrollIndicatorView(): ShapeableImageView {
@@ -163,6 +168,19 @@ internal class HeaderView @JvmOverloads constructor(
         closeButton.iconTint = null
 //        closeButton.setRippleColorResource(R.attr.colorControlHighlight)
         return closeButton
+    }
+
+    private fun createDivider(): View {
+        val view = View(context)
+        view.id = Id.DIVIDER
+        val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 0.75F.dp2Px().roundToInt())
+        layoutParams.setMargins(0, 5F.dp2Px().roundToInt(), 0, 0)
+        layoutParams.leftToLeft = ConstraintSet.PARENT_ID
+        layoutParams.topToBottom = Id.TITLE_BUTTON
+        layoutParams.rightToRight = ConstraintSet.PARENT_ID
+        view.layoutParams = layoutParams
+        view.setBackgroundColor(Color.parseColor("#B6BDC6"))
+        return view
     }
 
     fun setTitle(title: String) {
