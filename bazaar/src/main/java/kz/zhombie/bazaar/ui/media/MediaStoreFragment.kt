@@ -161,6 +161,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
                     resultCallback?.onCameraResult(action.image)
                     dismiss()
                 }
+                is MediaStoreScreen.Action.SelectGalleryImage -> {
+                    getGalleryImage.launch("image/*")
+                }
+                is MediaStoreScreen.Action.SelectedGalleryImageResult -> {
+                    resultCallback?.onGalleryResult(action.image)
+                    dismiss()
+                }
                 else -> {
                 }
             }
@@ -231,7 +238,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         if (!selectButton.hasOnClickListeners()) {
             selectButton.setOnClickListener {
                 val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
-                resultCallback?.onMediaSelected(selectedMedia.map { it.media })
+                resultCallback?.onMediaSelectResult(selectedMedia.map { it.media })
                 dismiss()
             }
         }
@@ -285,6 +292,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
         Logger.d(TAG, "isSuccess: $isSuccess")
         viewModel.onPictureTaken(isSuccess)
+    }
+
+    private val getGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        Logger.d(TAG, "uri: $uri")
+        viewModel.onGalleryImageSelected(uri)
     }
 
 }

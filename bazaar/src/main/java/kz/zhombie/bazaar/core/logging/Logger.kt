@@ -10,4 +10,8 @@ internal object Logger {
         Log.d(tag, message)
     }
 
+    fun w(tag: String = TAG, message: String) {
+        Log.w(tag, message)
+    }
+
 }

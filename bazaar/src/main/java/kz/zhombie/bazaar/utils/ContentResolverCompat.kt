@@ -2,6 +2,7 @@ package kz.zhombie.bazaar.utils
 
 import android.os.Build
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 
 internal class ContentResolverCompat {
 
@@ -70,6 +71,13 @@ internal class ContentResolverCompat {
                 }
             }
             return projection.toTypedArray()
+        }
+
+        fun getOpenableContentProjection(): Array<String> {
+            return arrayOf(
+                OpenableColumns.DISPLAY_NAME,
+                OpenableColumns.SIZE
+            )
         }
     }
 

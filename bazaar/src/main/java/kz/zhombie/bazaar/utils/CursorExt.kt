@@ -2,10 +2,13 @@ package kz.zhombie.bazaar.utils
 
 import android.content.ContentUris
 import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Video
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 internal fun Cursor.readImage(): Image? {
@@ -116,6 +119,36 @@ internal fun Cursor.readVideo(): Video? {
             folderDisplayName = bucketDisplayName,
             duration = duration,
             cover = null
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
+    return try {
+        var displayName = file.name
+        var size: Long = 0
+        if (moveToFirst()) {
+            displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
+            size = getLong(getColumnIndex(OpenableColumns.SIZE))
+        }
+        Image(
+            id = -1,
+            uri = uri,
+            title = displayName,
+            displayName = displayName,
+            size = size,
+            dateAdded = 0,
+            dateModified = file.lastModified(),
+            dateCreated = 0,
+            mimeType = "",
+            width = 0,
+            height = 0,
+            thumbnail = null,
+            folderId = null,
+            folderDisplayName = null
         )
     } catch (e: Exception) {
         e.printStackTrace()

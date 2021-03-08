@@ -1,7 +1,10 @@
 package kz.zhombie.bazaar.core
 
+import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
@@ -14,23 +17,31 @@ import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
+import kz.zhombie.bazaar.utils.readOpenableImage
 import kz.zhombie.bazaar.utils.readVideo
-import java.io.File
+import java.io.*
 import java.util.*
 
 internal class MediaScanManager constructor(private val context: Context) {
 
     companion object {
         private val TAG: String = MediaScanManager::class.java.simpleName
+
+        private const val DEFAULT_LOCAL_LOAD_LIMIT = 3000
     }
 
     fun createCameraInputTempFile(): Image? = try {
-        val timestamp = System.currentTimeMillis()
+        // Must be same as <cache-path name="*" path="*" />
         val folder = "camera"
         val directory = File(context.cacheDir, folder).apply { mkdirs() }
-        val file = File.createTempFile("IMG_${timestamp}_", ".jpg", directory)
+
+        val filename = createFilename()
+        val file = File.createTempFile("${filename}_", ".jpg", directory)
         file.deleteOnExit()
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+
+        val timestamp = System.currentTimeMillis()
+
         Image(
             id = timestamp,
             uri = uri,
@@ -40,7 +51,7 @@ internal class MediaScanManager constructor(private val context: Context) {
             dateAdded = timestamp,
             dateModified = timestamp,
             dateCreated = timestamp,
-            mimeType = context.contentResolver.getType(uri) ?: "image/jpeg",
+            mimeType = context.contentResolver?.getType(uri) ?: "image/jpeg",
             width = 0,
             height = 0,
             thumbnail = null,
@@ -52,7 +63,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         null
     }
 
-    suspend fun loadImages(
+    suspend fun loadLocalImages(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         callback: (media: List<Media>) -> Unit
     ) = withContext(dispatcher) {
@@ -60,7 +71,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         val projection = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
         val selection: String? = null
         val selectionArgs: MutableList<String>? = null
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC LIMIT 3000"
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
         context.contentResolver
             ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
@@ -87,6 +98,82 @@ internal class MediaScanManager constructor(private val context: Context) {
                 }
         )
         return@withContext array
+    }
+
+    fun loadSelectedGalleryImage(uri: Uri, callback: (image: Image) -> Unit) = try {
+        if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+            var image: Image? = null
+
+            // Create new file from uri (content://...)
+            val file = uri.transformGalleryImageToLocalFile()
+
+            // Retrieve local info from MediaStore
+            val projection = ContentResolverCompat.getOpenableContentProjection()
+
+            context.contentResolver
+                ?.query(uri, projection, null, null, null)
+                ?.use { cursor ->
+                    image = cursor.readOpenableImage(uri, file)
+                }
+
+            // Set MimeType
+            image = image?.copy(mimeType = context.contentResolver?.getType(uri) ?: "image/jpeg")
+
+            // Retrieve additional metadata from bitmap
+            context.contentResolver
+                ?.openFileDescriptor(uri, "r")
+                ?.use {
+                    val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
+                    if (bitmap != null) {
+                        image = image?.copy(width = bitmap.width, height = bitmap.height)
+                    }
+                }
+
+            image?.let {
+                callback(it)
+            }
+        } else {
+            throw UnsupportedOperationException("Unsupported uri.scheme!")
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    private fun Uri.transformGalleryImageToLocalFile(): File {
+        val filename = createFilename()
+        val file = File(context.cacheDir, filename)
+        if (!file.exists()) {
+            file.createNewFile()
+        }
+
+        try {
+            val outputStream = FileOutputStream(file)
+            val inputStream = context.contentResolver?.openInputStream(this)
+
+            inputStream?.use {
+                copy(inputStream, outputStream)
+            }
+
+            outputStream.flush()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return file
+    }
+
+    @Throws(IOException::class)
+    private fun copy(source: InputStream, target: OutputStream) {
+        val buffer = ByteArray(8192)
+        var length: Int
+        while (source.read(buffer).also { length = it } > 0) {
+            target.write(buffer, 0, length)
+        }
+    }
+
+    private fun createFilename(): String {
+        val timestamp = System.currentTimeMillis()
+        return "IMG_${timestamp}"
     }
 
 }

@@ -13,6 +13,9 @@ object MediaStoreScreen {
     sealed class Action {
         data class TakePicture constructor(val input: Uri) : Action()
         data class TakenPictureResult constructor(val image: Image): Action()
+
+        object SelectGalleryImage : Action()
+        data class SelectedGalleryImageResult constructor(val image: Image) : Action()
     }
 
 }

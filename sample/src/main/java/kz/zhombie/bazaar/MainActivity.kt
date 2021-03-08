@@ -108,7 +108,12 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         adapter.media = listOf(media)
     }
 
-    override fun onMediaSelected(media: List<Media>) {
+    override fun onGalleryResult(media: Media) {
+        Log.d(TAG, "media: $media")
+        adapter.media = listOf(media)
+    }
+
+    override fun onMediaSelectResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
         adapter.media = media
     }

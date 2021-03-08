@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.ui.media
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -57,7 +58,7 @@ internal class MediaStoreViewModel constructor(
 
         if (allMedia.isEmpty()) {
             viewModelScope.launch {
-                mediaScanManager.loadImages(Dispatchers.IO) {
+                mediaScanManager.loadLocalImages(Dispatchers.IO) {
                     onMediaLoaded(it)
                 }
             }
@@ -188,17 +189,31 @@ internal class MediaStoreViewModel constructor(
     }
 
     fun onSelectFromExplorerRequested() {
+        Logger.d(TAG, "onSelectFromExplorerRequested()")
+        viewModelScope.launch(Dispatchers.IO) {
+            action.postValue(MediaStoreScreen.Action.SelectGalleryImage)
+        }
     }
 
     fun onPictureTaken(isSuccess: Boolean) {
+        if (!isSuccess) return
         Logger.d(TAG, "onPictureTaken() -> isSuccess: $isSuccess")
         viewModelScope.launch(Dispatchers.IO) {
-            if (isSuccess) {
-                val takenPictureInput = takenPictureInput
-                Logger.d(TAG, "takenPictureInput: $takenPictureInput")
-                if (takenPictureInput != null) {
-                    action.postValue(MediaStoreScreen.Action.TakenPictureResult(takenPictureInput))
-                }
+            val takenPictureInput = takenPictureInput
+            Logger.d(TAG, "takenPictureInput: $takenPictureInput")
+            if (takenPictureInput != null) {
+                action.postValue(MediaStoreScreen.Action.TakenPictureResult(takenPictureInput))
+            }
+        }
+    }
+
+    fun onGalleryImageSelected(uri: Uri?) {
+        if (uri == null) return
+        Logger.d(TAG, "onGalleryImageSelected() -> uri: $uri")
+        viewModelScope.launch(Dispatchers.IO) {
+            mediaScanManager.loadSelectedGalleryImage(uri) { image ->
+                Logger.d(TAG, "loadSelectedGalleryBitmap() -> image: $image")
+                action.postValue(MediaStoreScreen.Action.SelectedGalleryImageResult(image))
             }
         }
     }
