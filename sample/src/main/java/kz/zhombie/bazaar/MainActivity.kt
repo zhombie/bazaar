@@ -103,6 +103,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         }
     }
 
+    override fun onCameraResult(media: Media) {
+        Log.d(TAG, "media: $media")
+        adapter.media = listOf(media)
+    }
+
     override fun onMediaSelected(media: List<Media>) {
         Log.d(TAG, "media: $media")
         adapter.media = media

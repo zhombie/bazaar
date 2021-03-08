@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
@@ -24,12 +25,14 @@ import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
 import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapter
 import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapterManager
+import kz.zhombie.bazaar.ui.media.gallery.GalleryHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.windowHeight
+import java.util.*
 import kotlin.math.roundToInt
 
-internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.Callback {
+internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.Callback, GalleryHeaderAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -149,6 +152,20 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         setupSelectButton(selectedMediaCount = 0)
         setupAlbumsView(albumsView)
 
+        viewModel.getAction().observe(viewLifecycleOwner, { action ->
+            when (action) {
+                is MediaStoreScreen.Action.TakePicture -> {
+                    takePicture.launch(action.input)
+                }
+                is MediaStoreScreen.Action.TakenPictureResult -> {
+                    resultCallback?.onCameraResult(action.image)
+                    dismiss()
+                }
+                else -> {
+                }
+            }
+        })
+
         viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
             Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
             setupSelectButton(media.size)
@@ -205,7 +222,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
     private fun setupGalleryView(recyclerView: RecyclerView) {
         galleryAdapterManager = GalleryAdapterManager(requireContext(), recyclerView)
-        galleryAdapterManager?.create(Settings.getImageLoader(), this)
+        galleryAdapterManager?.create(Settings.getImageLoader(), this, this)
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
@@ -226,6 +243,18 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         albumsAdapterManager?.create {
             viewModel.onAlbumClicked(it)
         }
+    }
+
+    /**
+     * [GalleryHeaderAdapter.Callback] implementation
+     */
+
+    override fun onCameraClicked() {
+        viewModel.onCameraShotRequested()
+    }
+
+    override fun onExplorerClicked() {
+        viewModel.onSelectFromExplorerRequested()
     }
 
     /**
@@ -251,6 +280,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     // Calculates height for 90% of fullscreen
     private fun getBottomSheetDialogDefaultHeight(): Int {
         return requireView().windowHeight * 90 / 100
+    }
+
+    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+        Logger.d(TAG, "isSuccess: $isSuccess")
+        viewModel.onPictureTaken(isSuccess)
     }
 
 }

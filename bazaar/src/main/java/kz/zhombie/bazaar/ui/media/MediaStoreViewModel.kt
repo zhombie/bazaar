@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.api.model.Album
+import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.core.MediaScanManager
@@ -24,6 +25,12 @@ internal class MediaStoreViewModel constructor(
     }
 
     private val allMedia = mutableListOf<Media>()
+
+    private val screenState by lazy { MutableLiveData<MediaStoreScreen.State>() }
+    fun getScreenState(): LiveData<MediaStoreScreen.State> = screenState
+
+    private val action by lazy { MutableLiveData<MediaStoreScreen.Action>() }
+    fun getAction(): LiveData<MediaStoreScreen.Action> = action
 
     private val selectedMedia by lazy { MutableLiveData<List<UIMedia>>() }
     fun getSelectedMedia(): LiveData<List<UIMedia>> = selectedMedia
@@ -42,6 +49,8 @@ internal class MediaStoreViewModel constructor(
 
     private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
+
+    private var takenPictureInput: Image? = null
 
     init {
         Logger.d(TAG, "created")
@@ -163,6 +172,34 @@ internal class MediaStoreViewModel constructor(
             displayedMedia.postValue(albumUiMedia)
 
             isAlbumsDisplayed.postValue(false)
+        }
+    }
+
+    fun onCameraShotRequested() {
+        Logger.d(TAG, "onCameraShotRequested()")
+        viewModelScope.launch(Dispatchers.IO) {
+            val takenPictureInput = mediaScanManager.createCameraInputTempFile()
+            this@MediaStoreViewModel.takenPictureInput = takenPictureInput
+            Logger.d(TAG, "takenPictureInput: $takenPictureInput")
+            if (takenPictureInput != null) {
+                action.postValue(MediaStoreScreen.Action.TakePicture(takenPictureInput.uri))
+            }
+        }
+    }
+
+    fun onSelectFromExplorerRequested() {
+    }
+
+    fun onPictureTaken(isSuccess: Boolean) {
+        Logger.d(TAG, "onPictureTaken() -> isSuccess: $isSuccess")
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isSuccess) {
+                val takenPictureInput = takenPictureInput
+                Logger.d(TAG, "takenPictureInput: $takenPictureInput")
+                if (takenPictureInput != null) {
+                    action.postValue(MediaStoreScreen.Action.TakenPictureResult(takenPictureInput))
+                }
+            }
         }
     }
 

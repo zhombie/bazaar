@@ -11,7 +11,9 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 
-internal class GalleryHeaderAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+internal class GalleryHeaderAdapter constructor(
+    private val callback: Callback
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private val TAG: String = GalleryHeaderAdapter::class.java.simpleName
@@ -22,18 +24,37 @@ internal class GalleryHeaderAdapter : RecyclerView.Adapter<RecyclerView.ViewHold
         const val EXPLORER = 101
     }
 
-    data class FunctionalButton constructor(
+    class FunctionalButton private constructor(
+        val type: Type,
+
         @DrawableRes
         val icon: Int,
 
         @StringRes
         val title: Int
-    )
+    ) {
+
+        companion object {
+            fun camera(): FunctionalButton {
+                return FunctionalButton(Type.CAMERA, R.drawable.ic_camera, R.string.camera)
+            }
+
+            fun explorer(): FunctionalButton {
+                return FunctionalButton(Type.EXPLORER, R.drawable.ic_folder, R.string.explorer)
+            }
+        }
+
+        enum class Type {
+            CAMERA,
+            EXPLORER
+        }
+
+    }
 
     private fun getItem(position: Int): FunctionalButton? {
         return when (position) {
-            0 -> FunctionalButton(R.drawable.ic_camera, R.string.camera)
-            1 -> FunctionalButton(R.drawable.ic_folder, R.string.explorer)
+            0 -> FunctionalButton.camera()
+            1 -> FunctionalButton.explorer()
             else -> null
         }
     }
@@ -86,7 +107,20 @@ internal class GalleryHeaderAdapter : RecyclerView.Adapter<RecyclerView.ViewHold
         fun bind(functionalButton: FunctionalButton) {
             imageView.setImageResource(functionalButton.icon)
             titleView.setText(functionalButton.title)
+
+            itemView.setOnClickListener {
+                if (functionalButton.type == FunctionalButton.Type.CAMERA) {
+                    callback.onCameraClicked()
+                } else if (functionalButton.type == FunctionalButton.Type.EXPLORER) {
+                    callback.onExplorerClicked()
+                }
+            }
         }
+    }
+
+    interface Callback {
+        fun onCameraClicked()
+        fun onExplorerClicked()
     }
 
 }

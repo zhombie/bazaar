@@ -19,9 +19,13 @@ internal class GalleryAdapterManager constructor(
     private var galleryAdapter: GalleryAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
 
-    fun create(imageLoader: ImageLoader, callback: GalleryAdapter.Callback) {
-        galleryHeaderAdapter = GalleryHeaderAdapter()
-        galleryAdapter = GalleryAdapter(imageLoader, callback)
+    fun create(
+        imageLoader: ImageLoader,
+        galleryHeaderAdapterCallback: GalleryHeaderAdapter.Callback,
+        galleryAdapterCallback: GalleryAdapter.Callback
+    ) {
+        galleryHeaderAdapter = GalleryHeaderAdapter(galleryHeaderAdapterCallback)
+        galleryAdapter = GalleryAdapter(imageLoader, galleryAdapterCallback)
         concatAdapter = ConcatAdapter(galleryHeaderAdapter, galleryAdapter)
         recyclerView.adapter = concatAdapter
 
