@@ -1,15 +1,15 @@
-package kz.zhombie.bazaar.ui.components
+package kz.zhombie.bazaar.ui.components.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.FrameLayout
+import android.widget.LinearLayout
 
-internal class SquareFrameLayout @JvmOverloads constructor(
+internal class SquareLinearLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
+) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (widthMeasureSpec > heightMeasureSpec) {

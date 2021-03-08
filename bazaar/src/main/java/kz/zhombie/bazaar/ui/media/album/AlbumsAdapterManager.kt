@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.ui.media.SpacingItemDecoration
+import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIAlbum
 
 internal class AlbumsAdapterManager constructor(

@@ -10,7 +10,7 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.ImageLoader
 import kz.zhombie.bazaar.core.logging.Logger
-import kz.zhombie.bazaar.ui.components.SquareImageView
+import kz.zhombie.bazaar.ui.components.view.SquareImageView
 import kz.zhombie.bazaar.ui.model.UIAlbum
 
 internal class AlbumsAdapter constructor(

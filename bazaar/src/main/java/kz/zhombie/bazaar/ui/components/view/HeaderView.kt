@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.components
+package kz.zhombie.bazaar.ui.components.view
 
 import android.content.Context
 import android.graphics.Color

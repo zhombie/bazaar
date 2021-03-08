@@ -19,7 +19,7 @@ import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModelFactory
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MuseumDialogFragment : DialogFragment() {
+internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_museum) {
 
     companion object {
         private val TAG: String = MuseumDialogFragment::class.java.simpleName
@@ -27,11 +27,16 @@ internal class MuseumDialogFragment : DialogFragment() {
         fun newInstance(uiMedia: UIMedia, startViewPosition: ViewPosition): MuseumDialogFragment {
             val fragment = MuseumDialogFragment()
             fragment.arguments = Bundle().apply {
-                putSerializable("ui_media", uiMedia)
-                putString("start_view_position", startViewPosition.pack())
+                putSerializable(BundleKey.UI_MEDIA, uiMedia)
+                putString(BundleKey.START_VIEW_POSITION, startViewPosition.pack())
             }
             return fragment
         }
+    }
+
+    private object BundleKey {
+        const val UI_MEDIA = "ui_media"
+        const val START_VIEW_POSITION = "start_view_position"
     }
 
     private lateinit var appBarLayout: AppBarLayout
@@ -58,8 +63,10 @@ internal class MuseumDialogFragment : DialogFragment() {
 
         setStyle(STYLE_NORMAL, theme)
 
-        uiMedia = arguments?.getSerializable("ui_media") as UIMedia
-        startViewPosition = ViewPosition.unpack(arguments?.getString("start_view_position"))
+        val arguments = arguments
+        require(arguments != null) { "Provide arguments!" }
+        uiMedia = arguments.getSerializable(BundleKey.UI_MEDIA) as UIMedia
+        startViewPosition = ViewPosition.unpack(arguments.getString(BundleKey.START_VIEW_POSITION))
     }
 
     override fun onResume() {
@@ -78,14 +85,6 @@ internal class MuseumDialogFragment : DialogFragment() {
         if (!gestureImageView.positionAnimator.isLeaving) {
             gestureImageView.positionAnimator.exit(true)
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_dialog_museum, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

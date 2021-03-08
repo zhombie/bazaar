@@ -11,7 +11,7 @@
     android:orientation="vertical"
     android:paddingBottom="5dp">
 
-    <kz.zhombie.bazaar.ui.components.SquareImageView
+    <kz.zhombie.bazaar.ui.components.view.SquareImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

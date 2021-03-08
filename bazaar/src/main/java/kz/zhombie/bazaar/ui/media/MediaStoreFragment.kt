@@ -19,8 +19,8 @@ import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.ResultCallback
 import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
-import kz.zhombie.bazaar.ui.components.HeaderView
-import kz.zhombie.bazaar.ui.components.SelectButton
+import kz.zhombie.bazaar.ui.components.view.HeaderView
+import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
 import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapter
 import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapterManager

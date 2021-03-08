@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <kz.zhombie.bazaar.ui.components.HeaderView
+    <kz.zhombie.bazaar.ui.components.view.HeaderView
         android:id="@+id/headerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/selectButton" />
 
-    <kz.zhombie.bazaar.ui.components.SelectButton
+    <kz.zhombie.bazaar.ui.components.view.SelectButton
         android:id="@+id/selectButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

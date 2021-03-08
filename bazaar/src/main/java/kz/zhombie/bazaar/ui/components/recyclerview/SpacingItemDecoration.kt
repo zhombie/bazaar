@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media
+package kz.zhombie.bazaar.ui.components.recyclerview
 
 import android.graphics.Rect
 import android.view.View
