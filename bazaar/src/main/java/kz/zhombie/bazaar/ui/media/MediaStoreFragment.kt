@@ -195,7 +195,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
     private fun setupMediaGalleryView(recyclerView: RecyclerView) {
         mediaGalleryAdapterManager = MediaGalleryAdapterManager(requireContext(), recyclerView)
-        mediaGalleryAdapterManager?.create(Settings.getImageLoader(), this, this)
+        mediaGalleryAdapterManager?.create(
+            imageLoader = Settings.getImageLoader(),
+            isCameraEnabled = viewModel.getSettings().cameraSettings.isAnyCameraActionEnabled,
+            isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+            mediaGalleryHeaderAdapterCallback = this,
+            mediaGalleryAdapterCallback = this
+        )
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
@@ -271,7 +277,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 }
                 // Media gallery image or video selection
                 is MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo -> {
-                    getLocalMediaGalleryImageOrVideo.launch("image/*, video/*")
+                    // TODO: Filter image/* and video/* mime types only (now it shows only data for first mime type)
+                    getLocalMediaGalleryImageOrVideo.launch("*/*")
+//                    getLocalMediaGalleryImageOrVideo.launch("image/*, video/*")
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaGalleryImageOrVideoResult -> {
                     resultCallback?.onLocalMediaGalleryResult(action.media)
@@ -279,7 +287,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 }
                 // Multiple media gallery images or videos selection
                 is MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos -> {
-                    getLocalMediaGalleryImagesOrVideos.launch("image/*, video/*")
+                    // TODO: Filter image/* and video/* mime types only (now it shows only data for first mime type)
+                    getLocalMediaGalleryImagesOrVideos.launch("*/*")
+//                    getLocalMediaGalleryImagesOrVideos.launch("image/*, video/*")
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesOrVideosResult -> {
                     resultCallback?.onLocalMediaGalleryResult(action.media)
@@ -410,10 +420,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
     private val getLocalMediaGalleryImageOrVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         Logger.d(TAG, "uri: $uri")
+        viewModel.onLocalMediaGalleryImageOrVideoSelected(uri)
     }
 
     private val getLocalMediaGalleryImagesOrVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
         Logger.d(TAG, "uris: $uris")
+        viewModel.onLocalMediaGalleryImagesOrVideosSelected(uris)
     }
 
 }

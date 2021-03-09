@@ -21,11 +21,19 @@ internal class MediaGalleryAdapterManager constructor(
 
     fun create(
         imageLoader: ImageLoader,
+        isCameraEnabled: Boolean,
+        isExplorerEnabled: Boolean,
         mediaGalleryHeaderAdapterCallback: MediaGalleryHeaderAdapter.Callback,
         mediaGalleryAdapterCallback: MediaGalleryAdapter.Callback
     ) {
-        mediaGalleryHeaderAdapter = MediaGalleryHeaderAdapter(mediaGalleryHeaderAdapterCallback)
+        mediaGalleryHeaderAdapter = MediaGalleryHeaderAdapter(
+            isCameraEnabled = isCameraEnabled,
+            isExplorerEnabled = isExplorerEnabled,
+            callback = mediaGalleryHeaderAdapterCallback
+        )
+
         mediaGalleryAdapter = MediaGalleryAdapter(imageLoader, mediaGalleryAdapterCallback)
+
         concatAdapter = ConcatAdapter(mediaGalleryHeaderAdapter, mediaGalleryAdapter)
         recyclerView.adapter = concatAdapter
 
@@ -50,6 +58,14 @@ internal class MediaGalleryAdapterManager constructor(
                 context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_bottom)
             )
         )
+    }
+
+    fun setCameraEnabled(isEnabled: Boolean) {
+        mediaGalleryHeaderAdapter?.isCameraEnabled = isEnabled
+    }
+
+    fun setExplorerEnabled(isEnabled: Boolean) {
+        mediaGalleryHeaderAdapter?.isExplorerEnabled = isEnabled
     }
 
     fun show() {

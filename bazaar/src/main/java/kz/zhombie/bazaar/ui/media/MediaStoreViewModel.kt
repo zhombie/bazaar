@@ -62,6 +62,10 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "created")
     }
 
+    fun getSettings(): MediaStoreScreen.Settings {
+        return settings
+    }
+
     fun setSettings(settings: MediaStoreScreen.Settings) {
         this.settings = settings
     }
@@ -383,6 +387,24 @@ internal class MediaStoreViewModel : ViewModel() {
                     Logger.d(TAG, "loadLocalSelectedMediaGalleryVideos() -> images: $videos")
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryVideosResult(videos))
                 }
+            }
+        }
+    }
+
+    fun onLocalMediaGalleryImageOrVideoSelected(uri: Uri?) {
+        Logger.d(TAG, "onLocalMediaGalleryImageOrVideoSelected() -> uri: $uri")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uri == null) return
+            viewModelScope.launch(Dispatchers.IO) {
+            }
+        }
+    }
+
+    fun onLocalMediaGalleryImagesOrVideosSelected(uris: List<Uri>?) {
+        Logger.d(TAG, "onLocalMediaGalleryImagesOrVideosSelected() -> uris: $uris")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uris.isNullOrEmpty()) return
+            viewModelScope.launch(Dispatchers.IO) {
             }
         }
     }

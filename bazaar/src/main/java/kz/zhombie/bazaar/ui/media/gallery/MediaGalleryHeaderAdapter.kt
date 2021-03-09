@@ -12,6 +12,8 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 
 internal class MediaGalleryHeaderAdapter constructor(
+    isCameraEnabled: Boolean,
+    isExplorerEnabled: Boolean,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -51,23 +53,48 @@ internal class MediaGalleryHeaderAdapter constructor(
 
     }
 
+    var isCameraEnabled: Boolean = isCameraEnabled
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    var isExplorerEnabled: Boolean = isExplorerEnabled
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     private fun getItem(position: Int): FunctionalButton? {
-        return when (position) {
-            0 -> FunctionalButton.camera()
-            1 -> FunctionalButton.explorer()
-            else -> null
+        return if (isCameraEnabled && isExplorerEnabled) {
+            when (position) {
+                0 -> FunctionalButton.camera()
+                1 -> FunctionalButton.explorer()
+                else -> null
+            }
+        } else {
+            when {
+                isCameraEnabled -> FunctionalButton.camera()
+                isExplorerEnabled -> FunctionalButton.explorer()
+                else -> null
+            }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> ViewType.CAMERA
-            1 -> ViewType.EXPLORER
+        val item = getItem(position)
+        return when (item?.type) {
+            FunctionalButton.Type.CAMERA -> ViewType.CAMERA
+            FunctionalButton.Type.EXPLORER -> ViewType.EXPLORER
             else -> super.getItemViewType(position)
         }
     }
 
-    override fun getItemCount(): Int = 2
+    override fun getItemCount(): Int = if (isCameraEnabled && isExplorerEnabled) {
+        2
+    } else {
+        if (isCameraEnabled || isExplorerEnabled) 1 else 0
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
