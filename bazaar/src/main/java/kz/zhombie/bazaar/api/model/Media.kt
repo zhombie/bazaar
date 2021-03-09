@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 
 /**
- * [mimeType] - The MIME type of the [Media]
  * [width] - The width of the [Media], in pixels.
  * [height] - The height of the [Media], in pixels.
  */
@@ -13,6 +12,8 @@ open class Media constructor(
     override val uri: Uri,
     override val title: String,
     override val displayName: String,
+    override val mimeType: String? = null,
+    override val extension: String? = null,
     override val size: Long,
     override val dateAdded: Long,
     override val dateModified: Long,
@@ -21,7 +22,6 @@ open class Media constructor(
     override val folderId: Long? = null,
     override val folderDisplayName: String? = null,
 
-    open val mimeType: String,
     open val width: Int,
     open val height: Int
 ) : Entity(
@@ -29,6 +29,8 @@ open class Media constructor(
     uri = uri,
     title = title,
     displayName = displayName,
+    mimeType = mimeType,
+    extension = extension,
     size = size,
     dateAdded = dateAdded,
     dateModified = dateModified,

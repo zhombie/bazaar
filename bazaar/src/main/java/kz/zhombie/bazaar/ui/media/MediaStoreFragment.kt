@@ -269,6 +269,22 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                     resultCallback?.onLocalMediaGalleryResult(action.videos)
                     dismiss()
                 }
+                // Media gallery image or video selection
+                is MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo -> {
+                    getLocalMediaGalleryImageOrVideo.launch("image/*, video/*")
+                }
+                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImageOrVideoResult -> {
+                    resultCallback?.onLocalMediaGalleryResult(action.media)
+                    dismiss()
+                }
+                // Multiple media gallery images or videos selection
+                is MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos -> {
+                    getLocalMediaGalleryImagesOrVideos.launch("image/*, video/*")
+                }
+                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesOrVideosResult -> {
+                    resultCallback?.onLocalMediaGalleryResult(action.media)
+                    dismiss()
+                }
                 else -> {
                 }
             }
@@ -390,6 +406,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
     private val getLocalMediaGalleryVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
         Logger.d(TAG, "uris: $uris")
         viewModel.onLocalMediaGalleryVideosSelected(uris)
+    }
+
+    private val getLocalMediaGalleryImageOrVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        Logger.d(TAG, "uri: $uri")
+    }
+
+    private val getLocalMediaGalleryImagesOrVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+        Logger.d(TAG, "uris: $uris")
     }
 
 }

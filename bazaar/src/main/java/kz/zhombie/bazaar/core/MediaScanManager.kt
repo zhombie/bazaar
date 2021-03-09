@@ -20,9 +20,6 @@ import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.utils.*
 import kz.zhombie.bazaar.utils.ContentResolverCompat
-import kz.zhombie.bazaar.utils.readImage
-import kz.zhombie.bazaar.utils.readOpenableImage
-import kz.zhombie.bazaar.utils.readVideo
 import java.io.*
 import java.util.*
 
@@ -43,7 +40,8 @@ internal class MediaScanManager constructor(private val context: Context) {
         val directory = File(context.cacheDir, folder).apply { mkdirs() }
 
         val filename = createImageFilename()
-        val file = File.createTempFile("${filename}_", ".jpg", directory)
+        val extension = "jpg"
+        val file = File.createTempFile("${filename}_", ".$extension", directory)
         file.deleteOnExit()
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
@@ -54,16 +52,17 @@ internal class MediaScanManager constructor(private val context: Context) {
             uri = uri,
             title = file.name,
             displayName = file.name,
+            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
+            extension = extension,
             size = file.length(),
             dateAdded = timestamp,
             dateModified = timestamp,
             dateCreated = timestamp,
-            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
-            width = 0,
-            height = 0,
             thumbnail = null,
             folderId = null,
-            folderDisplayName = folder
+            folderDisplayName = folder,
+            width = 0,
+            height = 0
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -76,7 +75,8 @@ internal class MediaScanManager constructor(private val context: Context) {
         val directory = File(context.cacheDir, folder).apply { mkdirs() }
 
         val filename = createVideoFilename()
-        val file = File.createTempFile("${filename}_", ".mp4", directory)
+        val extension = "mp4"
+        val file = File.createTempFile("${filename}_", ".$extension", directory)
         file.deleteOnExit()
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
@@ -87,18 +87,18 @@ internal class MediaScanManager constructor(private val context: Context) {
             uri = uri,
             title = file.name,
             displayName = file.name,
+            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
+            extension = extension,
             size = file.length(),
             dateAdded = timestamp,
             dateModified = timestamp,
             dateCreated = timestamp,
-            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
-            width = 0,
-            height = 0,
             thumbnail = null,
             folderId = null,
             folderDisplayName = folder,
-            duration = null,
-            cover = null
+            width = 0,
+            height = 0,
+            duration = null
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -228,6 +228,12 @@ internal class MediaScanManager constructor(private val context: Context) {
                 // Set MimeType
                 image = image?.copy(mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE))
 
+                // Set extension
+                val extension = file.getExtension(mimeType = image?.mimeType)
+                if (!extension.isNullOrBlank()) {
+                    image = image?.copy(extension = extension)
+                }
+
                 // Retrieve additional metadata from bitmap
                 try {
                     context.contentResolver
@@ -235,7 +241,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                         ?.use {
                             val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
                             if (bitmap != null) {
-                                image = image?.copy(width = bitmap.width, height = bitmap.height)
+                                image = image?.copy(width = bitmap.width, height = bitmap.height, thumbnail = bitmap)
                             }
                         }
                 } catch (e: Exception) {
@@ -298,6 +304,12 @@ internal class MediaScanManager constructor(private val context: Context) {
                 // Set MimeType
                 video = video?.copy(mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_VIDEO))
 
+                // Set extension
+                val extension = file.getExtension(mimeType = video?.mimeType)
+                if (!extension.isNullOrBlank()) {
+                    video = video?.copy(extension = extension)
+                }
+
                 // Retrieve additional metadata from bitmap
                 try {
                     context.contentResolver
@@ -305,7 +317,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                         ?.use {
                             val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
                             if (bitmap != null) {
-                                video = video?.copy(width = bitmap.width, height = bitmap.height)
+                                video = video?.copy(width = bitmap.width, height = bitmap.height, thumbnail = bitmap)
                             }
                         }
                 } catch (e: Exception) {

@@ -48,16 +48,17 @@ internal fun Cursor.readImage(): Image? {
             uri = externalContentUri,
             title = title,
             displayName = displayName,
+            mimeType = mimeType,
+            extension = getExtension(filename = displayName, mimeType = mimeType),
             size = size,
             dateAdded = dateAdded,
             dateModified = dateModified,
             dateCreated = dateTaken,
-            mimeType = mimeType,
-            width = width,
-            height = height,
             thumbnail = null,
             folderId = bucketId,
-            folderDisplayName = bucketDisplayName
+            folderDisplayName = bucketDisplayName,
+            width = width,
+            height = height
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -108,18 +109,18 @@ internal fun Cursor.readVideo(): Video? {
             uri = externalContentUri,
             title = title,
             displayName = displayName,
+            mimeType = mimeType,
+            extension = getExtension(filename = displayName, mimeType = mimeType),
             size = size,
             dateAdded = dateAdded,
             dateModified = dateModified,
             dateCreated = dateTaken,
-            mimeType = mimeType,
-            width = width,
-            height = height,
             thumbnail = null,
             folderId = bucketId,
             folderDisplayName = bucketDisplayName,
-            duration = duration,
-            cover = null
+            width = width,
+            height = height,
+            duration = duration
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -150,16 +151,17 @@ internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
             uri = uri,
             title = displayName,
             displayName = displayName,
+            mimeType = null,
+            extension = file.getExtension(),
             size = size,
             dateAdded = 0,
             dateModified = file.lastModified(),
             dateCreated = 0,
-            mimeType = "",
-            width = 0,
-            height = 0,
             thumbnail = null,
             folderId = null,
-            folderDisplayName = null
+            folderDisplayName = null,
+            width = 0,
+            height = 0
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -181,18 +183,18 @@ internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
             uri = uri,
             title = displayName,
             displayName = displayName,
+            mimeType = null,
+            extension = null,
             size = size,
             dateAdded = 0,
             dateModified = file.lastModified(),
             dateCreated = 0,
-            mimeType = "",
-            width = 0,
-            height = 0,
             thumbnail = null,
             folderId = null,
             folderDisplayName = null,
-            duration = null,
-            cover = null
+            width = 0,
+            height = 0,
+            duration = null
         )
     } catch (e: Exception) {
         e.printStackTrace()

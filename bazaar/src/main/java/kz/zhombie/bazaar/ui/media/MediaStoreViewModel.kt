@@ -294,6 +294,12 @@ internal class MediaStoreViewModel : ViewModel() {
                     } else {
                         action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideos)
                     }
+                } else if (settings.mode == Mode.IMAGE_AND_VIDEO) {
+                    if (settings.maxSelectionCount == 1) {
+                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo)
+                    } else {
+                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos)
+                    }
                 }
             }
         }

@@ -9,10 +9,13 @@ import android.net.Uri
  * [title] - The title of the [Entity]
  * [displayName] - The display name of the [Entity]. For example, an [Entity] stored at
  * {@code /storage/0000-0000/DCIM/Vacation/IMG1024.JPG} would have a display name of {@code IMG1024.JPG}.
+ * [mimeType] - The MIME type of the [Entity]
+ * [extension] - The extension of [Entity]
  * [size] - The size of the [Entity]
  * [dateAdded] - The time the [Entity] was first added (milliseconds)
  * [dateModified] - The time the [Entity] was last modified (milliseconds)
  * [dateCreated] - The time the [Entity] was created. If image or video, it is as same as date taken (milliseconds)
+ * [thumbnail] - The thumbnail/cover image of the [Entity]
  * [folderId] - The primary folder ID of this [Entity]
  * [folderDisplayName] - The primary folder display name of this [Entity]
  */
@@ -21,6 +24,8 @@ open class Entity constructor(
     open val uri: Uri,
     open val title: String,
     open val displayName: String,
+    open val mimeType: String? = null,
+    open val extension: String? = null,
     open val size: Long,
     open val dateAdded: Long,
     open val dateModified: Long,

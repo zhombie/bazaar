@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private object RequestCode {
-        const val READ_EXTERNAL_STORAGE = 100
+        const val EXTERNAL_STORAGE_ACCESS = 100
     }
 
     private lateinit var imageLoaderView: MaterialTextView
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 Bazaar.Builder(AbstractResultCallback { adapter.media = it })
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
-                    .setMode(Mode.VIDEO)
+                    .setMode(Mode.IMAGE_AND_VIDEO)
                     .setMaxSelectionCount(5)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
                     .setLocalMediaSearchAndSelectEnabled(true)
@@ -92,11 +92,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun checkPermissions(): Boolean {
-        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         return if (permissions.all { ActivityCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED}) {
             true
         } else {
-            ActivityCompat.requestPermissions(this, permissions, RequestCode.READ_EXTERNAL_STORAGE)
+            ActivityCompat.requestPermissions(this, permissions, RequestCode.EXTERNAL_STORAGE_ACCESS)
             false
         }
     }
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == RequestCode.READ_EXTERNAL_STORAGE) {
+        if (requestCode == RequestCode.EXTERNAL_STORAGE_ACCESS) {
             checkPermissions()
         }
     }
