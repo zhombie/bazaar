@@ -22,7 +22,9 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
 
-        private val DEFAULT_IMAGE_LOAD = "Glide" to GlideImageLoader()
+        private val IMAGE_LOADER_GLIDE = "Glide" to GlideImageLoader()
+        private val IMAGE_LOADER_COIL = "Coil" to CoilImageLoader()
+        private val DEFAULT_IMAGE_LOADER = IMAGE_LOADER_GLIDE
     }
 
     private object RequestCode {
@@ -31,10 +33,16 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     private lateinit var imageLoaderView: MaterialTextView
     private lateinit var imageLoaderButton: MaterialButton
+    private lateinit var modeView: MaterialTextView
+    private lateinit var modeButton: MaterialButton
+    private lateinit var maxSelectionCountView: MaterialTextView
+    private lateinit var maxSelectionCountButton: MaterialButton
     private lateinit var showButton: MaterialButton
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var imageLoader: ImageLoader
+    private lateinit var mode: Mode
+    private var maxSelectionCount: Int = 3
 
     private lateinit var adapter: MediaResultAdapter
 
@@ -44,34 +52,66 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
         imageLoaderView = findViewById(R.id.imageLoaderView)
         imageLoaderButton = findViewById(R.id.imageLoaderButton)
+        modeView = findViewById(R.id.modeView)
+        modeButton = findViewById(R.id.modeButton)
+        maxSelectionCountView = findViewById(R.id.maxSelectionCountView)
+        maxSelectionCountButton = findViewById(R.id.maxSelectionCountButton)
         showButton = findViewById(R.id.showButton)
         recyclerView = findViewById(R.id.recyclerView)
 
-        imageLoaderView.text = DEFAULT_IMAGE_LOAD.first
-        imageLoader = DEFAULT_IMAGE_LOAD.second
+        imageLoader = DEFAULT_IMAGE_LOADER.second
+        imageLoaderView.text = DEFAULT_IMAGE_LOADER.first
+
+        mode = Mode.IMAGE_AND_VIDEO
+        modeView.text = mode.toString()
+
+        maxSelectionCount = 3
+        maxSelectionCountView.text = maxSelectionCount.toString()
 
         adapter = MediaResultAdapter(imageLoader)
         recyclerView.adapter = adapter
 
         imageLoaderButton.setOnClickListener {
             MaterialAlertDialogBuilder(this)
-                .setSingleChoiceItems(arrayOf("Coil", "Glide"), -1) { dialog, which ->
+                .setTitle("Image loader")
+                .setSingleChoiceItems(arrayOf(IMAGE_LOADER_COIL.first, IMAGE_LOADER_GLIDE.first), -1) { dialog, which ->
                     dialog.dismiss()
-                    when (which) {
-                        0 -> {
-                            imageLoader = CoilImageLoader()
-                            imageLoaderView.text = "Coil"
-                        }
-                        1 -> {
-                            imageLoader = GlideImageLoader()
-                            imageLoaderView.text = "Glide"
-                        }
-                        else -> {
-                            imageLoader = DEFAULT_IMAGE_LOAD.second
-                            imageLoaderView.text = DEFAULT_IMAGE_LOAD.first
-                        }
+                    val selectedImageLoader = when (which) {
+                        0 -> IMAGE_LOADER_COIL
+                        1 -> IMAGE_LOADER_GLIDE
+                        else -> IMAGE_LOADER_GLIDE
                     }
-                    adapter.imageLoader = imageLoader
+
+                    imageLoader = selectedImageLoader.second
+                    imageLoaderView.text = selectedImageLoader.first
+                    adapter.imageLoader = selectedImageLoader.second
+                }
+                .show()
+        }
+
+        modeButton.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Mode")
+                .setSingleChoiceItems(arrayOf(Mode.IMAGE.toString(), Mode.VIDEO.toString(), Mode.IMAGE_AND_VIDEO.toString()), -1) { dialog, which ->
+                    dialog.dismiss()
+                    mode = when (which) {
+                        0 -> Mode.IMAGE
+                        1 -> Mode.VIDEO
+                        2 -> Mode.IMAGE_AND_VIDEO
+                        else -> Mode.IMAGE_AND_VIDEO
+                    }
+                    modeView.text = mode.toString()
+                }
+                .show()
+        }
+
+        maxSelectionCountButton.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Max selection count")
+                .setSingleChoiceItems(arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), -1) { dialog, which ->
+                    dialog.dismiss()
+                    maxSelectionCount = which + 1
+                    maxSelectionCountView.text = maxSelectionCount.toString()
                 }
                 .show()
         }
@@ -81,8 +121,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 Bazaar.Builder(AbstractResultCallback { adapter.media = it })
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
-                    .setMode(Mode.IMAGE_AND_VIDEO)
-                    .setMaxSelectionCount(5)
+                    .setMode(mode)
+                    .setMaxSelectionCount(maxSelectionCount)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
                     .setLocalMediaSearchAndSelectEnabled(true)
                     .setAlbumBasedInterfaceEnabled(true)
