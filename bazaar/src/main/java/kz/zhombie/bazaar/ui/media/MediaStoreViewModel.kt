@@ -86,7 +86,7 @@ internal class MediaStoreViewModel : ViewModel() {
 
             allMedia.addAll(media)
 
-            val uiMedia = media.map { UIMedia(it, isSelected = false, isVisible = true) }
+            val uiMedia = media.map { UIMedia(it, isSelectable = true, isSelected = false, isVisible = true) }
 
             val defaultAlbum = UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
 
@@ -133,6 +133,23 @@ internal class MediaStoreViewModel : ViewModel() {
                     .takeIf { index -> index > -1 }
                     ?.let { index ->
                         this[index] = this[index].copy(isSelected = !this[index].isSelected)
+
+                        if (newSelected.size >= settings.maxSelectionCount) {
+                            forEachIndexed { eachIndex, eachUIMedia ->
+                                if (eachUIMedia.isSelected) {
+                                    // Ignored
+                                } else {
+                                    this[eachIndex] = this[eachIndex].copy(isSelectable = false)
+                                }
+                            }
+                        } else {
+                            if (any { !it.isSelectable }) {
+                                forEachIndexed { eachIndex, _ ->
+                                    this[eachIndex] = this[eachIndex].copy(isSelectable = true)
+                                }
+                            }
+                        }
+
                         displayedMedia.postValue(this)
                     }
             }
@@ -174,7 +191,7 @@ internal class MediaStoreViewModel : ViewModel() {
                         it.folderId == uiAlbum.album.id
                     }
                 }
-                .map { UIMedia(it, isSelected = false, isVisible = true) }
+                .map { UIMedia(it, isSelectable = true, isSelected = false, isVisible = true) }
                 .toMutableList()
 
             (selectedMedia.value ?: emptyList()).forEach { selectedMedia ->

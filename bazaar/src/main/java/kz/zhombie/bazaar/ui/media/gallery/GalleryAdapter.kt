@@ -33,8 +33,9 @@ internal class GalleryAdapter constructor(
 
             override fun getChangePayload(oldItem: UIMedia, newItem: UIMedia): Any? {
                 return when {
-                    oldItem.isSelected != newItem.isSelected -> "toggle_selected"
-                    oldItem.isVisible != newItem.isVisible -> "toggle_visibility"
+                    oldItem.isSelectable != newItem.isSelectable -> PayloadKey.TOGGLE_SELECTION_ABILITY
+                    oldItem.isSelected != newItem.isSelected -> PayloadKey.TOGGLE_SELECTION
+                    oldItem.isVisible != newItem.isVisible -> PayloadKey.TOGGLE_VISIBILITY
                     else -> null
                 }
             }
@@ -44,6 +45,12 @@ internal class GalleryAdapter constructor(
     private object ViewType {
         const val IMAGE = 100
         const val VIDEO = 101
+    }
+
+    private object PayloadKey {
+        const val TOGGLE_SELECTION_ABILITY = "toggle_selection_ability"
+        const val TOGGLE_SELECTION = "toggle_selection"
+        const val TOGGLE_VISIBILITY = "toggle_visibility"
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIMedia> by lazy {
@@ -111,22 +118,35 @@ internal class GalleryAdapter constructor(
         } else {
             var isProcessed = false
             payloads.forEach {
-                if (it == "toggle_selected") {
-                    when (holder) {
-                        is ImageViewHolder -> {
-                            if (!isProcessed) {
-                                isProcessed = true
+                when (it) {
+                    PayloadKey.TOGGLE_SELECTION_ABILITY -> {
+                        when (holder) {
+                            is ImageViewHolder -> {
+                                if (!isProcessed) {
+                                    isProcessed = true
+                                }
+                                holder.toggleSelectionAbility(getItem(position))
                             }
-                            holder.toggleSelection(getItem(position))
                         }
                     }
-                } else if (it == "toggle_visibility") {
-                    when (holder) {
-                        is ImageViewHolder -> {
-                            if (!isProcessed) {
-                                isProcessed = true
+                    PayloadKey.TOGGLE_SELECTION -> {
+                        when (holder) {
+                            is ImageViewHolder -> {
+                                if (!isProcessed) {
+                                    isProcessed = true
+                                }
+                                holder.toggleSelection(getItem(position))
                             }
-                            holder.toggleVisibility(getItem(position))
+                        }
+                    }
+                    PayloadKey.TOGGLE_VISIBILITY -> {
+                        when (holder) {
+                            is ImageViewHolder -> {
+                                if (!isProcessed) {
+                                    isProcessed = true
+                                }
+                                holder.toggleVisibility(getItem(position))
+                            }
                         }
                     }
                 }
@@ -143,8 +163,24 @@ internal class GalleryAdapter constructor(
         private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
 
         fun bind(uiMedia: UIMedia) {
-            if (imageView.visibility != View.VISIBLE) {
-                imageView.visibility = View.VISIBLE
+            if (uiMedia.isVisible) {
+                if (imageView.visibility != View.VISIBLE) {
+                    imageView.visibility = View.VISIBLE
+                }
+            } else {
+                if (imageView.visibility != View.INVISIBLE) {
+                    imageView.visibility = View.INVISIBLE
+                }
+            }
+
+            if (uiMedia.isSelectable) {
+                if (checkbox.visibility != View.VISIBLE) {
+                    checkbox.visibility = View.VISIBLE
+                }
+            } else {
+                if (checkbox.visibility != View.GONE) {
+                    checkbox.visibility = View.GONE
+                }
             }
 
             imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
@@ -167,6 +203,14 @@ internal class GalleryAdapter constructor(
 
             checkbox.setOnClickListener {
                 callback.onImageCheckboxClicked(uiMedia)
+            }
+        }
+
+        fun toggleSelectionAbility(uiMedia: UIMedia) {
+            if (uiMedia.isSelectable) {
+                checkbox.visibility = View.VISIBLE
+            } else {
+                checkbox.visibility = View.GONE
             }
         }
 
