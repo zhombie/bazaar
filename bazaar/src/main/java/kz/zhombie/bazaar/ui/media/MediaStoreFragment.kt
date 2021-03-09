@@ -320,7 +320,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
-        viewModel.onImageCheckboxClicked(uiMedia)
+        viewModel.onMediaCheckboxClicked(uiMedia)
+    }
+
+    override fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
+    }
+
+    override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
+        viewModel.onMediaCheckboxClicked(uiMedia)
     }
 
     // Calculates height for 90% of fullscreen

@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 Bazaar.Builder(this)
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
-                    .setMode(Mode.IMAGE_AND_VIDEO)
+                    .setMode(Mode.VIDEO)
                     .setMaxSelectionCount(5)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
                     .setLocalMediaSearchAndSelectEnabled(true)

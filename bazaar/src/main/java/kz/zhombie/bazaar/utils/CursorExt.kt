@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import kz.zhombie.bazaar.api.model.Image
+import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -125,6 +126,16 @@ internal fun Cursor.readVideo(): Video? {
         null
     }
 }
+
+
+internal fun Cursor.readFile(): Media? {
+    return when (getInt(getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))) {
+        MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> readImage()
+        MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> readVideo()
+        else -> null
+    }
+}
+
 
 internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
     return try {

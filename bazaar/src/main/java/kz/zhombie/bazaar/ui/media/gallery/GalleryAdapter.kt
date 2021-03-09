@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.core.logging.Logger
-import kz.zhombie.bazaar.core.exception.ViewHolderException
-import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Video
+import kz.zhombie.bazaar.core.exception.ViewHolderException
+import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class GalleryAdapter constructor(
@@ -32,13 +32,11 @@ internal class GalleryAdapter constructor(
             override fun areContentsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =
                 oldItem == newItem
 
-            override fun getChangePayload(oldItem: UIMedia, newItem: UIMedia): Any? {
-                return when {
-                    oldItem.isSelectable != newItem.isSelectable -> PayloadKey.TOGGLE_SELECTION_ABILITY
-                    oldItem.isSelected != newItem.isSelected -> PayloadKey.TOGGLE_SELECTION
-                    oldItem.isVisible != newItem.isVisible -> PayloadKey.TOGGLE_VISIBILITY
-                    else -> null
-                }
+            override fun getChangePayload(oldItem: UIMedia, newItem: UIMedia): Any? = when {
+                oldItem.isSelectable != newItem.isSelectable -> PayloadKey.TOGGLE_SELECTION_ABILITY
+                oldItem.isSelected != newItem.isSelected -> PayloadKey.TOGGLE_SELECTION
+                oldItem.isVisible != newItem.isVisible -> PayloadKey.TOGGLE_VISIBILITY
+                else -> null
             }
         }
     }
@@ -58,9 +56,15 @@ internal class GalleryAdapter constructor(
         AsyncListDiffer(this, diffCallback)
     }
 
-    fun submitList(data: List<UIMedia>) {
-        Logger.d(TAG, "submitList() -> ${data.size}")
-        asyncListDiffer.submitList(data)
+    fun submitList(uiMedia: List<UIMedia>) {
+        Logger.d(TAG, "submitList() -> ${uiMedia.size}")
+        asyncListDiffer.submitList(uiMedia)
+    }
+
+    fun setListListener(callback: () -> Unit) {
+        asyncListDiffer.addListListener { _, _ ->
+            callback()
+        }
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
@@ -68,9 +72,10 @@ internal class GalleryAdapter constructor(
     private fun getItem(position: Int): UIMedia = asyncListDiffer.currentList[position]
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position).media) {
-            is Image -> ViewType.IMAGE
-            is Video -> ViewType.VIDEO
+        val item = getItem(position)
+        return when {
+            item.isImage() -> ViewType.IMAGE
+            item.isVideo() -> ViewType.VIDEO
             else -> super.getItemViewType(position)
         }
     }
@@ -78,17 +83,19 @@ internal class GalleryAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.IMAGE -> {
-                ImageViewHolder(
-                    LayoutInflater
-                        .from(parent.context)
-                        .inflate(R.layout.cell_image, parent, false)
+                ViewHolder(
+                    view = LayoutInflater
+                            .from(parent.context)
+                            .inflate(R.layout.cell_image, parent, false),
+                    viewType = viewType
                 )
             }
             ViewType.VIDEO -> {
-                VideoViewHolder(
-                    LayoutInflater
-                        .from(parent.context)
-                        .inflate(R.layout.cell_video, parent, false)
+                ViewHolder(
+                    view = LayoutInflater
+                            .from(parent.context)
+                            .inflate(R.layout.cell_video, parent, false),
+                    viewType = viewType
                 )
             }
             else ->
@@ -99,12 +106,7 @@ internal class GalleryAdapter constructor(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is ImageViewHolder -> {
-                holder.bind(item)
-            }
-            is VideoViewHolder -> {
-                holder.bind(item)
-            }
+            is ViewHolder -> holder.bind(item)
         }
     }
 
@@ -122,7 +124,7 @@ internal class GalleryAdapter constructor(
                 when (it) {
                     PayloadKey.TOGGLE_SELECTION_ABILITY -> {
                         when (holder) {
-                            is ImageViewHolder -> {
+                            is ViewHolder -> {
                                 if (!isProcessed) {
                                     isProcessed = true
                                 }
@@ -132,7 +134,7 @@ internal class GalleryAdapter constructor(
                     }
                     PayloadKey.TOGGLE_SELECTION -> {
                         when (holder) {
-                            is ImageViewHolder -> {
+                            is ViewHolder -> {
                                 if (!isProcessed) {
                                     isProcessed = true
                                 }
@@ -142,7 +144,7 @@ internal class GalleryAdapter constructor(
                     }
                     PayloadKey.TOGGLE_VISIBILITY -> {
                         when (holder) {
-                            is ImageViewHolder -> {
+                            is ViewHolder -> {
                                 if (!isProcessed) {
                                     isProcessed = true
                                 }
@@ -159,9 +161,14 @@ internal class GalleryAdapter constructor(
         }
     }
 
-    private inner class ImageViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+    private inner class ViewHolder constructor(view: View, viewType: Int) : RecyclerView.ViewHolder(view) {
         private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
         private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
+        private val textView = if (viewType == ViewType.VIDEO) {
+            view.findViewById<MaterialTextView>(R.id.textView)
+        } else {
+            null
+        }
 
         fun bind(uiMedia: UIMedia) {
             if (uiMedia.isVisible) {
@@ -183,7 +190,7 @@ internal class GalleryAdapter constructor(
                 if (checkbox.visibility != View.GONE) {
                     checkbox.visibility = View.GONE
                 }
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_alpha_black)
+                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
             }
 
             imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
@@ -200,12 +207,29 @@ internal class GalleryAdapter constructor(
                 checkbox.setIconResource(R.drawable.ic_unchecked)
             }
 
+            if (uiMedia.media is Video) {
+                val displayDuration = uiMedia.getDisplayDuration()
+                textView?.text = if (displayDuration.isNullOrBlank()) {
+                    "Видео"
+                } else {
+                    displayDuration
+                }
+            }
+
             imageView.setOnClickListener {
-                callback.onImageClicked(imageView, uiMedia)
+                if (uiMedia.isImage()) {
+                    callback.onImageClicked(imageView, uiMedia)
+                } else if (uiMedia.isVideo()) {
+                    callback.onVideoClicked(imageView, uiMedia)
+                }
             }
 
             checkbox.setOnClickListener {
-                callback.onImageCheckboxClicked(uiMedia)
+                if (uiMedia.isImage()) {
+                    callback.onImageCheckboxClicked(uiMedia)
+                } else if (uiMedia.isVideo()) {
+                    callback.onVideoCheckboxClicked(uiMedia)
+                }
             }
         }
 
@@ -215,7 +239,7 @@ internal class GalleryAdapter constructor(
                 imageView.foreground = null
             } else {
                 checkbox.visibility = View.GONE
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_alpha_black)
+                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
             }
         }
 
@@ -250,24 +274,12 @@ internal class GalleryAdapter constructor(
         }
     }
 
-    private inner  class VideoViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
-        private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
-
-        fun bind(uiMedia: UIMedia) {
-            imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
-
-            if (uiMedia.isSelected) {
-                checkbox.setIconResource(R.drawable.ic_checked)
-            } else {
-                checkbox.setIconResource(R.drawable.ic_unchecked)
-            }
-        }
-    }
-
     interface Callback {
         fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia)
         fun onImageCheckboxClicked(uiMedia: UIMedia)
+
+        fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia)
+        fun onVideoCheckboxClicked(uiMedia: UIMedia)
     }
 
 }

@@ -17,6 +17,7 @@ import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.utils.*
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import kz.zhombie.bazaar.utils.readImage
 import kz.zhombie.bazaar.utils.readOpenableImage
@@ -30,6 +31,8 @@ internal class MediaScanManager constructor(private val context: Context) {
         private val TAG: String = MediaScanManager::class.java.simpleName
 
         private const val DEFAULT_LOCAL_LOAD_LIMIT = 3000
+
+        private const val DEFAULT_MIME_TYPE_IMAGE = "image/jpeg"
     }
 
     fun createCameraInputTempFile(): Image? = try {
@@ -53,7 +56,7 @@ internal class MediaScanManager constructor(private val context: Context) {
             dateAdded = timestamp,
             dateModified = timestamp,
             dateCreated = timestamp,
-            mimeType = context.contentResolver?.getType(uri) ?: "image/jpeg",
+            mimeType = uri.gainMimeType(),
             width = 0,
             height = 0,
             thumbnail = null,
@@ -70,15 +73,55 @@ internal class MediaScanManager constructor(private val context: Context) {
         callback: (media: List<Media>) -> Unit
     ) = withContext(dispatcher) {
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val projection = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
+        val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
         val selection: String? = null
         val selectionArgs: MutableList<String>? = null
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+        val sortOrder = "${MediaStore.Images.ImageColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
         context.contentResolver
             ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
             ?.use { cursor ->
                 val data = cursor.mapTo(dispatcher, Image::class.java)
+                callback(data)
+            }
+    }
+
+    suspend fun loadLocalVideos(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        callback: (media: List<Media>) -> Unit
+    ) = withContext(dispatcher) {
+        val uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.VIDEO)
+        val selection: String? = null
+        val selectionArgs: MutableList<String>? = null
+        val sortOrder = "${MediaStore.Video.VideoColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+
+        context.contentResolver
+            ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
+            ?.use { cursor ->
+                val data = cursor.mapTo(dispatcher, Video::class.java)
+                callback(data)
+            }
+    }
+
+    suspend fun loadLocalImagesAndVideos(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        callback: (media: List<Media>) -> Unit
+    ) = withContext(dispatcher) {
+        val uri: Uri = MediaStore.Files.getContentUri("external")
+        val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.FILE)
+        val selection = (
+            MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            + " OR " +
+            MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+        )
+        val selectionArgs: MutableList<String>? = null
+        val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+
+        context.contentResolver
+            ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
+            ?.use { cursor ->
+                val data = cursor.mapTo(dispatcher, Media::class.java)
                 callback(data)
             }
     }
@@ -95,6 +138,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     when (clazz) {
                         Image::class.java -> this@mapTo.readImage()
                         Video::class.java -> this@mapTo.readVideo()
+                        Media::class.java -> this@mapTo.readFile()
                         else -> null
                     }
                 }
@@ -140,7 +184,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     }
 
                 // Set MimeType
-                image = image?.copy(mimeType = context.contentResolver?.getType(uri) ?: "image/jpeg")
+                image = image?.copy(mimeType = uri.gainMimeType())
 
                 // Retrieve additional metadata from bitmap
                 try {
@@ -215,6 +259,10 @@ internal class MediaScanManager constructor(private val context: Context) {
     private fun createFilename(): String {
         val timestamp = System.currentTimeMillis()
         return "IMG_${timestamp}"
+    }
+
+    private fun Uri.gainMimeType(): String {
+        return context.contentResolver?.getType(this) ?: DEFAULT_MIME_TYPE_IMAGE
     }
 
 }

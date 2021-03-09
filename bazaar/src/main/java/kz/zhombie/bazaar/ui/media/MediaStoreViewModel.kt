@@ -9,6 +9,7 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.model.Album
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.core.logging.Logger
@@ -72,9 +73,20 @@ internal class MediaStoreViewModel : ViewModel() {
 
     private fun onStart() {
         if (allMedia.isEmpty()) {
-            viewModelScope.launch {
-                mediaScanManager.loadLocalImages(Dispatchers.IO) {
-                    onLocalMediaLoaded(it)
+            viewModelScope.launch(Dispatchers.IO) {
+                when (settings.mode) {
+                    Mode.IMAGE ->
+                        mediaScanManager.loadLocalImages(Dispatchers.IO) {
+                            onLocalMediaLoaded(it)
+                        }
+                    Mode.VIDEO ->
+                        mediaScanManager.loadLocalVideos(Dispatchers.IO) {
+                            onLocalMediaLoaded(it)
+                        }
+                    Mode.IMAGE_AND_VIDEO ->
+                        mediaScanManager.loadLocalImagesAndVideos(Dispatchers.IO) {
+                            onLocalMediaLoaded(it)
+                        }
                 }
             }
         }
@@ -88,7 +100,14 @@ internal class MediaStoreViewModel : ViewModel() {
 
             val uiMedia = media.map { UIMedia(it, isSelectable = true, isSelected = false, isVisible = true) }
 
-            val defaultAlbum = UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
+            val defaultAlbum = when (settings.mode) {
+                Mode.IMAGE ->
+                    UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все фото", uiMedia.map { it.media }))
+                Mode.VIDEO ->
+                    UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все видео", uiMedia.map { it.media }))
+                Mode.IMAGE_AND_VIDEO ->
+                    UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
+            }
 
             activeAlbum.postValue(defaultAlbum)
             displayedMedia.postValue(uiMedia)
@@ -109,7 +128,7 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onImageCheckboxClicked(uiMedia: UIMedia) {
+    fun onMediaCheckboxClicked(uiMedia: UIMedia) {
         viewModelScope.launch(Dispatchers.IO) {
             Logger.d(TAG, "onImageCheckboxClicked() -> uiMedia: $uiMedia")
 
