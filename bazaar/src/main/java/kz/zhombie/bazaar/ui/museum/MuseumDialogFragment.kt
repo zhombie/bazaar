@@ -47,9 +47,7 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_mu
     private lateinit var titleView: MaterialTextView
     private lateinit var subtitleView: MaterialTextView
 
-    private val viewModel: MediaStoreViewModel by activityViewModels {
-        MediaStoreViewModelFactory(MediaScanManager(requireContext()))
-    }
+    private val viewModel: MediaStoreViewModel by activityViewModels()
 
     private var uiMedia: UIMedia? = null
     private var startViewPosition: ViewPosition? = null

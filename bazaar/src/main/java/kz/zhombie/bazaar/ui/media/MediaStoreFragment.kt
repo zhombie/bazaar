@@ -56,8 +56,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
     private lateinit var viewModel: MediaStoreViewModel
 
-    private lateinit var settings: MediaStoreScreen.Settings
-
     private var albumsAdapterManager: AlbumsAdapterManager? = null
     private var galleryAdapterManager: GalleryAdapterManager? = null
 
@@ -80,14 +78,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
         setStyle(STYLE_NORMAL, theme)
 
-        settings = arguments?.getSerializable(BundleKey.SETTINGS) as MediaStoreScreen.Settings
+        viewModel = ViewModelProvider(this, MediaStoreViewModelFactory())
+            .get(MediaStoreViewModel::class.java)
 
-        Logger.d(TAG, "settings: $settings")
-
+        val settings = arguments?.getSerializable(BundleKey.SETTINGS) as MediaStoreScreen.Settings
         val mediaScanManager = MediaScanManager(requireContext())
 
-        viewModel = ViewModelProvider(this, MediaStoreViewModelFactory(mediaScanManager))
-            .get(MediaStoreViewModel::class.java)
+        viewModel.setSettings(settings)
+        viewModel.setMediaScanManager(mediaScanManager)
     }
 
     // TODO: Try to get rid of hack, which helps to set fixed position.
@@ -224,36 +222,24 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         viewModel.getAction().observe(viewLifecycleOwner, { action ->
             when (action) {
                 is MediaStoreScreen.Action.TakePicture -> {
-                    if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
-                        takePicture.launch(action.input)
-                    }
+                    takePicture.launch(action.input)
                 }
                 is MediaStoreScreen.Action.TakenPictureResult -> {
-                    if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
-                        resultCallback?.onCameraResult(action.image)
-                    }
+                    resultCallback?.onCameraResult(action.image)
                     dismiss()
                 }
                 is MediaStoreScreen.Action.SelectGalleryImage -> {
-                    if (settings.isLocalMediaSearchAndSelectEnabled) {
-                        getGalleryImage.launch("image/*")
-                    }
+                    getGalleryImage.launch("image/*")
                 }
                 is MediaStoreScreen.Action.SelectedGalleryImageResult -> {
-                    if (settings.isLocalMediaSearchAndSelectEnabled) {
-                        resultCallback?.onGalleryResult(action.image)
-                    }
+                    resultCallback?.onGalleryResult(action.image)
                     dismiss()
                 }
                 is MediaStoreScreen.Action.SelectGalleryImages -> {
-                    if (settings.isLocalMediaSearchAndSelectEnabled) {
-                        getGalleryImages.launch("image/*")
-                    }
+                    getGalleryImages.launch("image/*")
                 }
                 is MediaStoreScreen.Action.SelectedGalleryImagesResult -> {
-                    if (settings.isLocalMediaSearchAndSelectEnabled) {
-                        resultCallback?.onGalleryResult(action.images)
-                    }
+                    resultCallback?.onGalleryResult(action.images)
                     dismiss()
                 }
                 else -> {
@@ -308,19 +294,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
      */
 
     override fun onCameraClicked() {
-        if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
-            viewModel.onCameraShotRequested()
-        }
+        viewModel.onCameraShotRequested()
     }
 
     override fun onExplorerClicked() {
-        if (settings.isLocalMediaSearchAndSelectEnabled) {
-            if (settings.maxSelectionCount == 1) {
-                viewModel.onSelectGalleryImageRequested()
-            } else {
-                viewModel.onSelectGalleryImagesRequested()
-            }
-        }
+        viewModel.onSelectGalleryImageRequested()
     }
 
     /**
@@ -333,7 +311,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
             viewModel.onLayoutChange(position)
         }
 
-        imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
+        if (imageView.viewTreeObserver.isAlive) {
+            imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
+        }
 
         MuseumDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
             .show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
@@ -350,27 +330,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
         Logger.d(TAG, "isSuccess: $isSuccess")
-        if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
-            viewModel.onPictureTaken(isSuccess)
-        }
+        viewModel.onPictureTaken(isSuccess)
     }
 
     private val getGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         Logger.d(TAG, "uri: $uri")
-        if (settings.isLocalMediaSearchAndSelectEnabled) {
-            viewModel.onGalleryImageSelected(uri)
-        }
+        viewModel.onGalleryImageSelected(uri)
     }
 
     private val getGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
         Logger.d(TAG, "uris: $uris")
-        if (settings.isLocalMediaSearchAndSelectEnabled) {
-            if (uris.isNullOrEmpty()) {
-                // Ignored
-            } else {
-                viewModel.onGalleryImagesSelected(uris.take(settings.maxSelectionCount))
-            }
-        }
+        viewModel.onGalleryImagesSelected(uris)
     }
 
 }
