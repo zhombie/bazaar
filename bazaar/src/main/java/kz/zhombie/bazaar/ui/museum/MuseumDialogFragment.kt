@@ -2,7 +2,10 @@ package kz.zhombie.bazaar.ui.museum
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.View
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
@@ -14,9 +17,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
-import kz.zhombie.bazaar.ui.media.MediaStoreViewModelFactory
 import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_museum) {
@@ -182,6 +183,7 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_mu
             activity.setSupportActionBar(toolbar)
             activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
             activity.supportActionBar?.setDisplayShowTitleEnabled(false)
+            toolbar.setNavigationOnClickListener { dismiss() }
         }
     }
 
@@ -200,6 +202,42 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_mu
             .setMinZoom(0F)
             .setPanEnabled(true)
             .setZoomEnabled(true)
+
+        gestureImageView.setOnClickListener {
+            if (footerView.visibility == View.VISIBLE) {
+                appBarLayout.animate()
+                    .alpha(0.0F)
+                    .setDuration(100L)
+                    .withEndAction {
+                        appBarLayout.visibility = View.INVISIBLE
+                    }
+                    .start()
+
+                footerView.animate()
+                    .alpha(0.0F)
+                    .setDuration(100L)
+                    .withEndAction {
+                        footerView.visibility = View.INVISIBLE
+                    }
+                    .start()
+            } else {
+                appBarLayout.animate()
+                    .alpha(1.0F)
+                    .setDuration(100L)
+                    .withStartAction {
+                        appBarLayout.visibility = View.VISIBLE
+                    }
+                    .start()
+
+                footerView.animate()
+                    .alpha(1.0F)
+                    .setDuration(100L)
+                    .withStartAction {
+                        footerView.visibility = View.VISIBLE
+                    }
+                    .start()
+            }
+        }
     }
 
 }
