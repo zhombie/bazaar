@@ -221,6 +221,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     private fun observeAction() {
         viewModel.getAction().observe(viewLifecycleOwner, { action ->
             when (action) {
+                // Take camera picture
                 is MediaStoreScreen.Action.TakePicture -> {
                     takePicture.launch(action.input)
                 }
@@ -228,18 +229,36 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
                     resultCallback?.onCameraResult(action.image)
                     dismiss()
                 }
-                is MediaStoreScreen.Action.SelectGalleryImage -> {
-                    getGalleryImage.launch("image/*")
+                // Media gallery image selection
+                is MediaStoreScreen.Action.SelectMediaGalleryImage -> {
+                    getMediaGalleryImage.launch("image/*")
                 }
-                is MediaStoreScreen.Action.SelectedGalleryImageResult -> {
+                is MediaStoreScreen.Action.SelectedMediaGalleryImageResult -> {
                     resultCallback?.onGalleryResult(action.image)
                     dismiss()
                 }
-                is MediaStoreScreen.Action.SelectGalleryImages -> {
-                    getGalleryImages.launch("image/*")
+                // Multiple media gallery images selection
+                is MediaStoreScreen.Action.SelectMediaGalleryImages -> {
+                    getMediaGalleryImages.launch("image/*")
                 }
-                is MediaStoreScreen.Action.SelectedGalleryImagesResult -> {
+                is MediaStoreScreen.Action.SelectedMediaGalleryImagesResult -> {
                     resultCallback?.onGalleryResult(action.images)
+                    dismiss()
+                }
+                // Media media gallery video selection
+                is MediaStoreScreen.Action.SelectMediaGalleryVideo -> {
+                    getMediaGalleryVideo.launch("video/*")
+                }
+                is MediaStoreScreen.Action.SelectedMediaGalleryVideoResult -> {
+                    resultCallback?.onGalleryResult(action.video)
+                    dismiss()
+                }
+                // Multiple media gallery videos selection
+                is MediaStoreScreen.Action.SelectMediaGalleryVideos -> {
+                    getMediaGalleryVideos.launch("video/*")
+                }
+                is MediaStoreScreen.Action.SelectedMediaGalleryVideosResult -> {
+                    resultCallback?.onGalleryResult(action.videos)
                     dismiss()
                 }
                 else -> {
@@ -298,7 +317,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     }
 
     override fun onExplorerClicked() {
-        viewModel.onSelectGalleryImageRequested()
+        viewModel.onSelectMediaGalleryRequested()
     }
 
     /**
@@ -340,14 +359,22 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         viewModel.onPictureTaken(isSuccess)
     }
 
-    private val getGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val getMediaGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         Logger.d(TAG, "uri: $uri")
-        viewModel.onGalleryImageSelected(uri)
+        viewModel.onMediaGalleryImageSelected(uri)
     }
 
-    private val getGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+    private val getMediaGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
         Logger.d(TAG, "uris: $uris")
-        viewModel.onGalleryImagesSelected(uris)
+        viewModel.onMediaGalleryImagesSelected(uris)
+    }
+
+    private val getMediaGalleryVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        Logger.d(TAG, "uri: $uri")
+    }
+
+    private val getMediaGalleryVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+        Logger.d(TAG, "uris: $uris")
     }
 
 }

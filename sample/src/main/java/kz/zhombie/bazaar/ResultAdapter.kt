@@ -4,12 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
+import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.model.Media
 
-class ResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ResultAdapter constructor(
+    var imageLoader: ImageLoader
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var media: List<Media> = emptyList()
         set(value) {
@@ -37,7 +39,7 @@ class ResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val textView = view.findViewById<MaterialTextView>(R.id.textView)
 
         fun bind(media: Media) {
-            imageView.load(media.uri)
+            imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
             textView.text = media.displayName + "\n" + media.size + "\n" + media.folderDisplayName
         }
 

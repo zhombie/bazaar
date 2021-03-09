@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
 
-        private val DEFAULT_IMAGE_LOAD = "Coil" to CoilImageLoader()
+        private val DEFAULT_IMAGE_LOAD = "Glide" to GlideImageLoader()
     }
 
     private object RequestCode {
@@ -46,11 +46,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         showButton = findViewById(R.id.showButton)
         recyclerView = findViewById(R.id.recyclerView)
 
-        adapter = ResultAdapter()
-        recyclerView.adapter = adapter
-
         imageLoaderView.text = DEFAULT_IMAGE_LOAD.first
         imageLoader = DEFAULT_IMAGE_LOAD.second
+
+        adapter = ResultAdapter(imageLoader)
+        recyclerView.adapter = adapter
 
         imageLoaderButton.setOnClickListener {
             MaterialAlertDialogBuilder(this)
@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                             imageLoaderView.text = DEFAULT_IMAGE_LOAD.first
                         }
                     }
+                    adapter.imageLoader = imageLoader
                 }
                 .show()
         }

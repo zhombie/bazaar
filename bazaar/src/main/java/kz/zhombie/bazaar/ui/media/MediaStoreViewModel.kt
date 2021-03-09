@@ -258,28 +258,23 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onSelectGalleryImageRequested() {
-        if (settings.maxSelectionCount == 1) {
-            onSelectGalleryImageRequestedInternally()
-        } else {
-            onSelectGalleryImagesRequestedInternally()
-        }
-    }
-
-    private fun onSelectGalleryImageRequestedInternally() {
-        Logger.d(TAG, "onSelectGalleryImageRequestedInternally()")
+    fun onSelectMediaGalleryRequested() {
+        Logger.d(TAG, "onSelectMediaGalleryRequested()")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             viewModelScope.launch(Dispatchers.IO) {
-                action.postValue(MediaStoreScreen.Action.SelectGalleryImage)
-            }
-        }
-    }
-
-    private fun onSelectGalleryImagesRequestedInternally() {
-        Logger.d(TAG, "onSelectGalleryImagesRequestedInternally()")
-        if (settings.isLocalMediaSearchAndSelectEnabled) {
-            viewModelScope.launch(Dispatchers.IO) {
-                action.postValue(MediaStoreScreen.Action.SelectGalleryImages)
+                if (settings.mode == Mode.IMAGE) {
+                    if (settings.maxSelectionCount == 1) {
+                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryImage)
+                    } else {
+                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryImages)
+                    }
+                } else if (settings.mode == Mode.VIDEO) {
+                    if (settings.maxSelectionCount == 1) {
+                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryVideo)
+                    } else {
+                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryVideos)
+                    }
+                }
             }
         }
     }
@@ -298,20 +293,20 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onGalleryImageSelected(uri: Uri?) {
+    fun onMediaGalleryImageSelected(uri: Uri?) {
         Logger.d(TAG, "onGalleryImageSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             viewModelScope.launch(Dispatchers.IO) {
                 mediaScanManager.loadSelectedGalleryImage(Dispatchers.IO, uri) { image ->
                     Logger.d(TAG, "loadSelectedGalleryImage() -> image: $image")
-                    action.postValue(MediaStoreScreen.Action.SelectedGalleryImageResult(image))
+                    action.postValue(MediaStoreScreen.Action.SelectedMediaGalleryImageResult(image))
                 }
             }
         }
     }
 
-    fun onGalleryImagesSelected(uris: List<Uri>?) {
+    fun onMediaGalleryImagesSelected(uris: List<Uri>?) {
         Logger.d(TAG, "onGalleryImagesSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
@@ -319,7 +314,7 @@ internal class MediaStoreViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 mediaScanManager.loadSelectedGalleryImages(Dispatchers.IO, allowedUris) { images ->
                     Logger.d(TAG, "loadSelectedGalleryImages() -> images: $images")
-                    action.postValue(MediaStoreScreen.Action.SelectedGalleryImagesResult(images))
+                    action.postValue(MediaStoreScreen.Action.SelectedMediaGalleryImagesResult(images))
                 }
             }
         }
