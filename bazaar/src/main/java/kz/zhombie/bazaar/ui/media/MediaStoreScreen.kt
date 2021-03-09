@@ -7,7 +7,7 @@ import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Video
 import java.io.Serializable
 
-object MediaStoreScreen {
+internal object MediaStoreScreen {
 
     data class Settings constructor(
         val mode: Mode,
@@ -25,6 +25,9 @@ object MediaStoreScreen {
     sealed class Action {
         data class TakePicture constructor(val input: Uri) : Action()
         data class TakenPictureResult constructor(val image: Image): Action()
+
+        data class TakeVideo constructor(val input: Uri) : Action()
+        data class TakenVideoResult constructor(val video: Video): Action()
 
         object SelectLocalMediaGalleryImage : Action()
         data class SelectedLocalMediaGalleryImageResult constructor(val image: Image) : Action()

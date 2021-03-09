@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,7 +37,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         private const val DEFAULT_MIME_TYPE_VIDEO = "video/mp4"
     }
 
-    fun createCameraInputTempFile(): Image? = try {
+    fun createCameraPictureInputTempFile(): Image? = try {
         // Must be same as <cache-path name="*" path="*" />
         val folder = "camera"
         val directory = File(context.cacheDir, folder).apply { mkdirs() }
@@ -63,6 +64,41 @@ internal class MediaScanManager constructor(private val context: Context) {
             thumbnail = null,
             folderId = null,
             folderDisplayName = folder
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
+    fun createCameraVideoInputTempFile(): Video? = try {
+        // Must be same as <cache-path name="*" path="*" />
+        val folder = "camera"
+        val directory = File(context.cacheDir, folder).apply { mkdirs() }
+
+        val filename = createVideoFilename()
+        val file = File.createTempFile("${filename}_", ".mp4", directory)
+        file.deleteOnExit()
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+
+        val timestamp = System.currentTimeMillis()
+
+        Video(
+            id = timestamp,
+            uri = uri,
+            title = file.name,
+            displayName = file.name,
+            size = file.length(),
+            dateAdded = timestamp,
+            dateModified = timestamp,
+            dateCreated = timestamp,
+            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
+            width = 0,
+            height = 0,
+            thumbnail = null,
+            folderId = null,
+            folderDisplayName = folder,
+            duration = null,
+            cover = null
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -109,7 +145,11 @@ internal class MediaScanManager constructor(private val context: Context) {
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         callback: (media: List<Media>) -> Unit
     ) = withContext(dispatcher) {
-        val uri: Uri = MediaStore.Files.getContentUri("external")
+        val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+        } else {
+            MediaStore.Files.getContentUri("external")
+        }
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.FILE)
         val selection = (
             MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE

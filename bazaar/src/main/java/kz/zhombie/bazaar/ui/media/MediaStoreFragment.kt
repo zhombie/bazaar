@@ -229,6 +229,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                     resultCallback?.onCameraResult(action.image)
                     dismiss()
                 }
+                // Take camera video
+                is MediaStoreScreen.Action.TakeVideo -> {
+                    takeVideo.launch(action.input)
+                }
+                is MediaStoreScreen.Action.TakenVideoResult -> {
+                    resultCallback?.onCameraResult(action.video)
+                    dismiss()
+                }
                 // Media gallery image selection
                 is MediaStoreScreen.Action.SelectLocalMediaGalleryImage -> {
                     getLocalMediaGalleryImage.launch("image/*")
@@ -357,6 +365,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
         Logger.d(TAG, "isSuccess: $isSuccess")
         viewModel.onPictureTaken(isSuccess)
+    }
+
+    private val takeVideo = registerForActivityResult(ActivityResultContracts.TakeVideo()) { bitmap ->
+        Logger.d(TAG, "bitmap: $bitmap")
+        viewModel.onVideoTaken(bitmap)
     }
 
     private val getLocalMediaGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->

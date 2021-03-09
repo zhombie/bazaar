@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.ui.media
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +15,7 @@ import kz.zhombie.bazaar.api.model.Album
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.ui.model.UIAlbum
 import kz.zhombie.bazaar.ui.model.UIMedia
@@ -53,7 +55,8 @@ internal class MediaStoreViewModel : ViewModel() {
     private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
 
-    private var takenPictureInput: Image? = null
+    private var takePictureInput: Image? = null
+    private var takeVideoInput: Video? = null
 
     init {
         Logger.d(TAG, "created")
@@ -248,11 +251,28 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onCameraShotRequested()")
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             viewModelScope.launch(Dispatchers.IO) {
-                val takenPictureInput = mediaScanManager.createCameraInputTempFile()
-                this@MediaStoreViewModel.takenPictureInput = takenPictureInput
-                Logger.d(TAG, "takenPictureInput: $takenPictureInput")
-                if (takenPictureInput != null) {
-                    action.postValue(MediaStoreScreen.Action.TakePicture(takenPictureInput.uri))
+                // TODO: ActivityResultContracts.TakeVideo returns null,
+                //  that's why after fix add an ability to record a video by camera
+//                if (settings.mode == Mode.IMAGE || settings.mode == Mode.IMAGE_AND_VIDEO) {
+//                    val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
+//                    this@MediaStoreViewModel.takePictureInput = takePictureInput
+//                    Logger.d(TAG, "takePictureInput: $takePictureInput")
+//                    if (takePictureInput != null) {
+//                        action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
+//                    }
+//                } else if (settings.mode == Mode.VIDEO) {
+//                    val takeVideoInput = mediaScanManager.createCameraVideoInputTempFile()
+//                    this@MediaStoreViewModel.takeVideoInput = takeVideoInput
+//                    Logger.d(TAG, "takeVideoInput: $takeVideoInput")
+//                    if (takeVideoInput != null) {
+//                        action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
+//                    }
+//                }
+                val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
+                this@MediaStoreViewModel.takePictureInput = takePictureInput
+                Logger.d(TAG, "takePictureInput: $takePictureInput")
+                if (takePictureInput != null) {
+                    action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
                 }
             }
         }
@@ -284,10 +304,24 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (!isSuccess) return
             viewModelScope.launch(Dispatchers.IO) {
-                val takenPictureInput = takenPictureInput
+                val takenPictureInput = takePictureInput
                 Logger.d(TAG, "takenPictureInput: $takenPictureInput")
                 if (takenPictureInput != null) {
                     action.postValue(MediaStoreScreen.Action.TakenPictureResult(takenPictureInput))
+                }
+            }
+        }
+    }
+
+    fun onVideoTaken(bitmap: Bitmap?) {
+        Logger.d(TAG, "onVideoTaken() -> bitmap: $bitmap")
+        if (settings.cameraSettings.isAnyCameraActionEnabled) {
+            if (bitmap == null) return
+            viewModelScope.launch(Dispatchers.IO) {
+                val takenVideoInput = takeVideoInput
+                Logger.d(TAG, "takenVideoInput: $takenVideoInput")
+                if (takenVideoInput != null) {
+                    action.postValue(MediaStoreScreen.Action.TakenVideoResult(takenVideoInput))
                 }
             }
         }

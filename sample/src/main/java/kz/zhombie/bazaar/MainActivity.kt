@@ -91,10 +91,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun checkPermissions(): Boolean {
-        return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        return if (permissions.all { ActivityCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED}) {
             true
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), RequestCode.READ_EXTERNAL_STORAGE)
+            ActivityCompat.requestPermissions(this, permissions, RequestCode.READ_EXTERNAL_STORAGE)
             false
         }
     }
