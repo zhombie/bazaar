@@ -6,10 +6,10 @@ interface ResultCallback {
     // Media captured by camera
     fun onCameraResult(media: Media)
 
-    // Media selected from local gallery
-    fun onGalleryResult(media: Media)
-    fun onGalleryResult(media: List<Media>)
+    // Media selected from local media gallery
+    fun onLocalMediaGalleryResult(media: Media)
+    fun onLocalMediaGalleryResult(media: List<Media>)
 
-    // Media selected from offered custom gallery
-    fun onMediaSelectResult(media: List<Media>)
+    // Media selected from offered custom media gallery
+    fun onMediaGallerySelectResult(media: List<Media>)
 }

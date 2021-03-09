@@ -26,17 +26,17 @@ object MediaStoreScreen {
         data class TakePicture constructor(val input: Uri) : Action()
         data class TakenPictureResult constructor(val image: Image): Action()
 
-        object SelectMediaGalleryImage : Action()
-        data class SelectedMediaGalleryImageResult constructor(val image: Image) : Action()
+        object SelectLocalMediaGalleryImage : Action()
+        data class SelectedLocalMediaGalleryImageResult constructor(val image: Image) : Action()
 
-        object SelectMediaGalleryImages : Action()
-        data class SelectedMediaGalleryImagesResult constructor(val images: List<Image>) : Action()
+        object SelectLocalMediaGalleryImages : Action()
+        data class SelectedLocalMediaGalleryImagesResult constructor(val images: List<Image>) : Action()
 
-        object SelectMediaGalleryVideo : Action()
-        data class SelectedMediaGalleryVideoResult constructor(val video: Video) : Action()
+        object SelectLocalMediaGalleryVideo : Action()
+        data class SelectedLocalMediaGalleryVideoResult constructor(val video: Video) : Action()
 
-        object SelectMediaGalleryVideos : Action()
-        data class SelectedMediaGalleryVideosResult constructor(val videos: List<Video>) : Action()
+        object SelectLocalMediaGalleryVideos : Action()
+        data class SelectedLocalMediaGalleryVideosResult constructor(val videos: List<Video>) : Action()
     }
 
 }

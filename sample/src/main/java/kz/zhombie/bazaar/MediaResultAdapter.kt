@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.api.model.Video
 
-class ResultAdapter constructor(
+class MediaResultAdapter constructor(
     var imageLoader: ImageLoader
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -24,7 +26,7 @@ class ResultAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.cell_result, parent, false)
+                .inflate(R.layout.cell_media_result, parent, false)
         )
     }
 
@@ -40,7 +42,17 @@ class ResultAdapter constructor(
 
         fun bind(media: Media) {
             imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
-            textView.text = media.displayName + "\n" + media.size + "\n" + media.folderDisplayName
+            val type = when (media) {
+                is Image -> "Фото"
+                is Video -> "Видео"
+                else -> "Неизвестно"
+            }
+            textView.text = """
+Название файла: ${media.displayName}
+Тип файла: $type
+Размер файла: ${media.size}
+Папка: ${media.folderDisplayName}
+            """.trim()
         }
 
     }

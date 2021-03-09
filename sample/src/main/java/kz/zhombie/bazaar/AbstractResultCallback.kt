@@ -7,12 +7,12 @@ abstract class AbstractResultCallback : ResultCallback {
     override fun onCameraResult(media: Media) {
     }
 
-    override fun onGalleryResult(media: Media) {
+    override fun onLocalMediaGalleryResult(media: Media) {
     }
 
-    override fun onGalleryResult(media: List<Media>) {
+    override fun onLocalMediaGalleryResult(media: List<Media>) {
     }
 
-    override fun onMediaSelectResult(media: List<Media>) {
+    override fun onMediaGallerySelectResult(media: List<Media>) {
     }
 }

@@ -17,13 +17,13 @@ import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class GalleryAdapter constructor(
+internal class MediaGalleryAdapter constructor(
     private val imageLoader: ImageLoader,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        private val TAG: String = GalleryAdapter::class.java.simpleName
+        private val TAG: String = MediaGalleryAdapter::class.java.simpleName
 
         private val diffCallback = object : DiffUtil.ItemCallback<UIMedia>() {
             override fun areItemsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =

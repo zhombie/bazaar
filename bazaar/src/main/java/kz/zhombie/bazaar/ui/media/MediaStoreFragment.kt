@@ -24,16 +24,16 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
-import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapter
-import kz.zhombie.bazaar.ui.media.gallery.GalleryAdapterManager
-import kz.zhombie.bazaar.ui.media.gallery.GalleryHeaderAdapter
+import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapter
+import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapterManager
+import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.windowHeight
 import java.util.*
 import kotlin.math.roundToInt
 
-internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.Callback, GalleryHeaderAdapter.Callback {
+internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAdapter.Callback, MediaGalleryHeaderAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -57,7 +57,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     private lateinit var viewModel: MediaStoreViewModel
 
     private var albumsAdapterManager: AlbumsAdapterManager? = null
-    private var galleryAdapterManager: GalleryAdapterManager? = null
+    private var mediaGalleryAdapterManager: MediaGalleryAdapterManager? = null
 
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
@@ -116,7 +116,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
                     topMargin = collapsedMargin
                 }
 
-                galleryAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+                mediaGalleryAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
 
                 albumsAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
@@ -154,12 +154,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         super.onViewCreated(view, savedInstanceState)
 
         headerView = view.findViewById(R.id.headerView)
-        val galleryView = view.findViewById<RecyclerView>(R.id.galleryView)
+        val mediaGalleryView = view.findViewById<RecyclerView>(R.id.mediaGalleryView)
         selectButton = view.findViewById(R.id.selectButton)
         val albumsView = view.findViewById<RecyclerView>(R.id.albumsView)
 
         setupHeaderView()
-        setupGalleryView(galleryView)
+        setupMediaGalleryView(mediaGalleryView)
         setupSelectButton(selectedMediaCount = 0)
         setupAlbumsView(albumsView)
 
@@ -175,8 +175,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         albumsAdapterManager?.destroy()
         albumsAdapterManager = null
 
-        galleryAdapterManager?.destroy()
-        galleryAdapterManager = null
+        mediaGalleryAdapterManager?.destroy()
+        mediaGalleryAdapterManager = null
 
         selectButton.setOnClickListener(null)
 
@@ -193,9 +193,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         headerView.setOnCloseButtonClickListener { dismiss() }
     }
 
-    private fun setupGalleryView(recyclerView: RecyclerView) {
-        galleryAdapterManager = GalleryAdapterManager(requireContext(), recyclerView)
-        galleryAdapterManager?.create(Settings.getImageLoader(), this, this)
+    private fun setupMediaGalleryView(recyclerView: RecyclerView) {
+        mediaGalleryAdapterManager = MediaGalleryAdapterManager(requireContext(), recyclerView)
+        mediaGalleryAdapterManager?.create(Settings.getImageLoader(), this, this)
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
@@ -204,7 +204,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         if (!selectButton.hasOnClickListeners()) {
             selectButton.setOnClickListener {
                 val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
-                resultCallback?.onMediaSelectResult(selectedMedia.map { it.media })
+                resultCallback?.onMediaGallerySelectResult(selectedMedia.map { it.media })
                 dismiss()
             }
         }
@@ -230,35 +230,35 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
                     dismiss()
                 }
                 // Media gallery image selection
-                is MediaStoreScreen.Action.SelectMediaGalleryImage -> {
-                    getMediaGalleryImage.launch("image/*")
+                is MediaStoreScreen.Action.SelectLocalMediaGalleryImage -> {
+                    getLocalMediaGalleryImage.launch("image/*")
                 }
-                is MediaStoreScreen.Action.SelectedMediaGalleryImageResult -> {
-                    resultCallback?.onGalleryResult(action.image)
+                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImageResult -> {
+                    resultCallback?.onLocalMediaGalleryResult(action.image)
                     dismiss()
                 }
                 // Multiple media gallery images selection
-                is MediaStoreScreen.Action.SelectMediaGalleryImages -> {
-                    getMediaGalleryImages.launch("image/*")
+                is MediaStoreScreen.Action.SelectLocalMediaGalleryImages -> {
+                    getLocalMediaGalleryImages.launch("image/*")
                 }
-                is MediaStoreScreen.Action.SelectedMediaGalleryImagesResult -> {
-                    resultCallback?.onGalleryResult(action.images)
+                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesResult -> {
+                    resultCallback?.onLocalMediaGalleryResult(action.images)
                     dismiss()
                 }
                 // Media media gallery video selection
-                is MediaStoreScreen.Action.SelectMediaGalleryVideo -> {
-                    getMediaGalleryVideo.launch("video/*")
+                is MediaStoreScreen.Action.SelectLocalMediaGalleryVideo -> {
+                    getLocalMediaGalleryVideo.launch("video/*")
                 }
-                is MediaStoreScreen.Action.SelectedMediaGalleryVideoResult -> {
-                    resultCallback?.onGalleryResult(action.video)
+                is MediaStoreScreen.Action.SelectedLocalMediaGalleryVideoResult -> {
+                    resultCallback?.onLocalMediaGalleryResult(action.video)
                     dismiss()
                 }
                 // Multiple media gallery videos selection
-                is MediaStoreScreen.Action.SelectMediaGalleryVideos -> {
-                    getMediaGalleryVideos.launch("video/*")
+                is MediaStoreScreen.Action.SelectLocalMediaGalleryVideos -> {
+                    getLocalMediaGalleryVideos.launch("video/*")
                 }
-                is MediaStoreScreen.Action.SelectedMediaGalleryVideosResult -> {
-                    resultCallback?.onGalleryResult(action.videos)
+                is MediaStoreScreen.Action.SelectedLocalMediaGalleryVideosResult -> {
+                    resultCallback?.onLocalMediaGalleryResult(action.videos)
                     dismiss()
                 }
                 else -> {
@@ -276,7 +276,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
     private fun observeDisplayedMedia() {
         viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { media ->
-            galleryAdapterManager?.submitList(media)
+            mediaGalleryAdapterManager?.submitList(media)
         })
     }
 
@@ -297,7 +297,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
                 headerView.toggleIcon(false)
                 albumsAdapterManager?.hide()
 
-                galleryAdapterManager?.scrollToTop()
+                mediaGalleryAdapterManager?.scrollToTop()
             }
         })
     }
@@ -309,7 +309,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     }
 
     /**
-     * [GalleryHeaderAdapter.Callback] implementation
+     * [MediaGalleryHeaderAdapter.Callback] implementation
      */
 
     override fun onCameraClicked() {
@@ -321,7 +321,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
     }
 
     /**
-     * [GalleryAdapter.Callback] implementation
+     * [MediaGalleryAdapter.Callback] implementation
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
@@ -359,22 +359,24 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         viewModel.onPictureTaken(isSuccess)
     }
 
-    private val getMediaGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val getLocalMediaGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         Logger.d(TAG, "uri: $uri")
-        viewModel.onMediaGalleryImageSelected(uri)
+        viewModel.onLocalMediaGalleryImageSelected(uri)
     }
 
-    private val getMediaGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+    private val getLocalMediaGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
         Logger.d(TAG, "uris: $uris")
-        viewModel.onMediaGalleryImagesSelected(uris)
+        viewModel.onLocalMediaGalleryImagesSelected(uris)
     }
 
-    private val getMediaGalleryVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val getLocalMediaGalleryVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         Logger.d(TAG, "uri: $uri")
+        viewModel.onLocalMediaGalleryVideoSelected(uri)
     }
 
-    private val getMediaGalleryVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+    private val getLocalMediaGalleryVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
         Logger.d(TAG, "uris: $uris")
+        viewModel.onLocalMediaGalleryVideosSelected(uris)
     }
 
 }

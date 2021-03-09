@@ -10,23 +10,23 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class GalleryAdapterManager constructor(
+internal class MediaGalleryAdapterManager constructor(
     private val context: Context,
     private val recyclerView: RecyclerView
 ) {
 
-    private var galleryHeaderAdapter: GalleryHeaderAdapter? = null
-    private var galleryAdapter: GalleryAdapter? = null
+    private var mediaGalleryHeaderAdapter: MediaGalleryHeaderAdapter? = null
+    private var mediaGalleryAdapter: MediaGalleryAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
 
     fun create(
         imageLoader: ImageLoader,
-        galleryHeaderAdapterCallback: GalleryHeaderAdapter.Callback,
-        galleryAdapterCallback: GalleryAdapter.Callback
+        mediaGalleryHeaderAdapterCallback: MediaGalleryHeaderAdapter.Callback,
+        mediaGalleryAdapterCallback: MediaGalleryAdapter.Callback
     ) {
-        galleryHeaderAdapter = GalleryHeaderAdapter(galleryHeaderAdapterCallback)
-        galleryAdapter = GalleryAdapter(imageLoader, galleryAdapterCallback)
-        concatAdapter = ConcatAdapter(galleryHeaderAdapter, galleryAdapter)
+        mediaGalleryHeaderAdapter = MediaGalleryHeaderAdapter(mediaGalleryHeaderAdapterCallback)
+        mediaGalleryAdapter = MediaGalleryAdapter(imageLoader, mediaGalleryAdapterCallback)
+        concatAdapter = ConcatAdapter(mediaGalleryHeaderAdapter, mediaGalleryAdapter)
         recyclerView.adapter = concatAdapter
 
         val layoutManager = GridLayoutManager(
@@ -75,7 +75,7 @@ internal class GalleryAdapterManager constructor(
     }
 
     fun submitList(uiMedia: List<UIMedia>) {
-        galleryAdapter?.submitList(uiMedia)
+        mediaGalleryAdapter?.submitList(uiMedia)
     }
 
     fun scrollToTop() {
@@ -83,10 +83,10 @@ internal class GalleryAdapterManager constructor(
     }
 
     fun destroy() {
-        galleryHeaderAdapter?.let { concatAdapter?.removeAdapter(it) }
-        galleryAdapter?.let { concatAdapter?.removeAdapter(it) }
-        galleryHeaderAdapter = null
-        galleryAdapter = null
+        mediaGalleryHeaderAdapter?.let { concatAdapter?.removeAdapter(it) }
+        mediaGalleryAdapter?.let { concatAdapter?.removeAdapter(it) }
+        mediaGalleryHeaderAdapter = null
+        mediaGalleryAdapter = null
         concatAdapter = null
     }
 

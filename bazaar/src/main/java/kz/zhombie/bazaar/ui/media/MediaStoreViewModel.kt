@@ -264,15 +264,15 @@ internal class MediaStoreViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 if (settings.mode == Mode.IMAGE) {
                     if (settings.maxSelectionCount == 1) {
-                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryImage)
+                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImage)
                     } else {
-                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryImages)
+                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImages)
                     }
                 } else if (settings.mode == Mode.VIDEO) {
                     if (settings.maxSelectionCount == 1) {
-                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryVideo)
+                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideo)
                     } else {
-                        action.postValue(MediaStoreScreen.Action.SelectMediaGalleryVideos)
+                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideos)
                     }
                 }
             }
@@ -293,28 +293,55 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onMediaGalleryImageSelected(uri: Uri?) {
-        Logger.d(TAG, "onGalleryImageSelected() -> uri: $uri")
+    fun onLocalMediaGalleryImageSelected(uri: Uri?) {
+        Logger.d(TAG, "onLocalMediaGalleryImageSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             viewModelScope.launch(Dispatchers.IO) {
-                mediaScanManager.loadSelectedGalleryImage(Dispatchers.IO, uri) { image ->
+                mediaScanManager.loadLocalSelectedMediaGalleryImage(Dispatchers.IO, uri) { image ->
                     Logger.d(TAG, "loadSelectedGalleryImage() -> image: $image")
-                    action.postValue(MediaStoreScreen.Action.SelectedMediaGalleryImageResult(image))
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImageResult(image))
                 }
             }
         }
     }
 
-    fun onMediaGalleryImagesSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onGalleryImagesSelected() -> uris: $uris")
+    fun onLocalMediaGalleryImagesSelected(uris: List<Uri>?) {
+        Logger.d(TAG, "onLocalMediaGalleryImagesSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
-            val allowedUris = uris.take(settings.maxSelectionCount)
             viewModelScope.launch(Dispatchers.IO) {
-                mediaScanManager.loadSelectedGalleryImages(Dispatchers.IO, allowedUris) { images ->
+                val allowedUris = uris.take(settings.maxSelectionCount)
+                mediaScanManager.loadLocalSelectedMediaGalleryImages(Dispatchers.IO, allowedUris) { images ->
                     Logger.d(TAG, "loadSelectedGalleryImages() -> images: $images")
-                    action.postValue(MediaStoreScreen.Action.SelectedMediaGalleryImagesResult(images))
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesResult(images))
+                }
+            }
+        }
+    }
+
+    fun onLocalMediaGalleryVideoSelected(uri: Uri?) {
+        Logger.d(TAG, "onLocalMediaGalleryVideoSelected() -> uri: $uri")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uri == null) return
+            viewModelScope.launch(Dispatchers.IO) {
+                mediaScanManager.loadLocalSelectedMediaGalleryVideo(Dispatchers.IO, uri) { video ->
+                    Logger.d(TAG, "loadLocalSelectedMediaGalleryVideo() -> video: $video")
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryVideoResult(video))
+                }
+            }
+        }
+    }
+
+    fun onLocalMediaGalleryVideosSelected(uris: List<Uri>?) {
+        Logger.d(TAG, "onLocalMediaGalleryVideosSelected() -> uris: $uris")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uris.isNullOrEmpty()) return
+            viewModelScope.launch(Dispatchers.IO) {
+                val allowedUris = uris.take(settings.maxSelectionCount)
+                mediaScanManager.loadLocalSelectedMediaGalleryVideos(Dispatchers.IO, allowedUris) { videos ->
+                    Logger.d(TAG, "loadLocalSelectedMediaGalleryVideos() -> images: $videos")
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryVideosResult(videos))
                 }
             }
         }

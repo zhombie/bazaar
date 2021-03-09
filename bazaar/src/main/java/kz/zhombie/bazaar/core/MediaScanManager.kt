@@ -33,6 +33,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         private const val DEFAULT_LOCAL_LOAD_LIMIT = 3000
 
         private const val DEFAULT_MIME_TYPE_IMAGE = "image/jpeg"
+        private const val DEFAULT_MIME_TYPE_VIDEO = "video/mp4"
     }
 
     fun createCameraInputTempFile(): Image? = try {
@@ -40,7 +41,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         val folder = "camera"
         val directory = File(context.cacheDir, folder).apply { mkdirs() }
 
-        val filename = createFilename()
+        val filename = createImageFilename()
         val file = File.createTempFile("${filename}_", ".jpg", directory)
         file.deleteOnExit()
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
@@ -56,7 +57,7 @@ internal class MediaScanManager constructor(private val context: Context) {
             dateAdded = timestamp,
             dateModified = timestamp,
             dateCreated = timestamp,
-            mimeType = uri.gainMimeType(),
+            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
             width = 0,
             height = 0,
             thumbnail = null,
@@ -146,14 +147,14 @@ internal class MediaScanManager constructor(private val context: Context) {
         return@withContext array
     }
 
-    suspend fun loadSelectedGalleryImages(
+    suspend fun loadLocalSelectedMediaGalleryImages(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         uris: List<Uri>,
         callback: (images: List<Image>) -> Unit
     ) = withContext(dispatcher) {
         val images = mutableListOf<Image>()
         uris.forEach { uri ->
-            loadSelectedGalleryImage(dispatcher, uri) { image ->
+            loadLocalSelectedMediaGalleryImage(dispatcher, uri) { image ->
                 images.add(image)
             }
         }
@@ -162,7 +163,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
-    suspend fun loadSelectedGalleryImage(
+    suspend fun loadLocalSelectedMediaGalleryImage(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         uri: Uri,
         callback: (image: Image) -> Unit
@@ -172,7 +173,8 @@ internal class MediaScanManager constructor(private val context: Context) {
                 var image: Image? = null
 
                 // Create new file from uri (content://...)
-                val file = uri.transformGalleryImageToLocalFile(dispatcher) ?: return@withContext
+                val filename = createImageFilename()
+                val file = uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext
 
                 // Retrieve local info from MediaStore
                 val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -184,7 +186,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     }
 
                 // Set MimeType
-                image = image?.copy(mimeType = uri.gainMimeType())
+                image = image?.copy(mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE))
 
                 // Retrieve additional metadata from bitmap
                 try {
@@ -211,11 +213,87 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
-    private suspend fun Uri.transformGalleryImageToLocalFile(
-        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    suspend fun loadLocalSelectedMediaGalleryVideos(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        uris: List<Uri>,
+        callback: (videos: List<Video>) -> Unit
+    ) = withContext(dispatcher) {
+        val videos = mutableListOf<Video>()
+        uris.forEach { uri ->
+            loadLocalSelectedMediaGalleryVideo(dispatcher, uri) { video ->
+                videos.add(video)
+            }
+        }
+        if (!videos.isNullOrEmpty()) {
+            callback(videos)
+        }
+    }
+
+    suspend fun loadLocalSelectedMediaGalleryVideo(
+        dispatcher: CoroutineDispatcher,
+        uri: Uri,
+        callback: (video: Video) -> Unit
+    ) = withContext(dispatcher) {
+        try {
+            if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+                var video: Video? = null
+
+                // Create new file from uri (content://...)
+                val filename = createVideoFilename()
+                val file = uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext
+
+                Logger.d(TAG, "Created local file: $file")
+
+                // Retrieve local info from MediaStore
+                val projection = ContentResolverCompat.getOpenableContentProjection()
+
+                context.contentResolver
+                    ?.query(uri, projection, null, null, null)
+                    ?.use { cursor ->
+                        video = cursor.readOpenableVideo(uri, file)
+                    }
+
+                Logger.d(TAG, "Scanned by MediaStore: $video")
+
+                // Set MimeType
+                video = video?.copy(mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_VIDEO))
+
+                // Retrieve additional metadata from bitmap
+                try {
+                    context.contentResolver
+                        ?.openFileDescriptor(uri, "r")
+                        ?.use {
+                            val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
+                            if (bitmap != null) {
+                                video = video?.copy(width = bitmap.width, height = bitmap.height)
+                            }
+                        }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                Logger.d(TAG, "video: $video")
+
+                video?.let {
+                    callback(it)
+                }
+            } else {
+                throw UnsupportedOperationException("Unsupported uri.scheme!")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private suspend fun Uri.transformLocalMediaGalleryItemToFile(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        filename: String
     ): File? = withContext(dispatcher) {
-        val filename = createFilename()
+        Logger.d(TAG, "transformLocalMediaGalleryItemToFile() -> filename: $filename")
+
         val file = File(context.cacheDir, filename)
+
+        Logger.d(TAG, "Created local file [$file] with name $filename")
 
         // If file could not be created, then there is no need to continue code flow
         try {
@@ -229,7 +307,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         try {
             val outputStream = FileOutputStream(file)
-            val inputStream = context.contentResolver?.openInputStream(this@transformGalleryImageToLocalFile)
+            val inputStream = context.contentResolver?.openInputStream(this@transformLocalMediaGalleryItemToFile)
 
             inputStream?.use {
                 copy(dispatcher, inputStream, outputStream)
@@ -256,13 +334,18 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
-    private fun createFilename(): String {
+    private fun createImageFilename(): String {
         val timestamp = System.currentTimeMillis()
         return "IMG_${timestamp}"
     }
 
-    private fun Uri.gainMimeType(): String {
-        return context.contentResolver?.getType(this) ?: DEFAULT_MIME_TYPE_IMAGE
+    private fun createVideoFilename(): String {
+        val timestamp = System.currentTimeMillis()
+        return "VIDEO_${timestamp}"
+    }
+
+    private fun Uri.gainMimeType(default: String): String {
+        return context.contentResolver?.getType(this) ?: default
     }
 
 }

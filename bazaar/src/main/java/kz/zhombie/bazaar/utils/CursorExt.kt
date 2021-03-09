@@ -166,3 +166,36 @@ internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
         null
     }
 }
+
+
+internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
+    return try {
+        var displayName = file.name
+        var size: Long = 0
+        if (moveToFirst()) {
+            displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
+            size = getLong(getColumnIndex(OpenableColumns.SIZE))
+        }
+        Video(
+            id = -1,
+            uri = uri,
+            title = displayName,
+            displayName = displayName,
+            size = size,
+            dateAdded = 0,
+            dateModified = file.lastModified(),
+            dateCreated = 0,
+            mimeType = "",
+            width = 0,
+            height = 0,
+            thumbnail = null,
+            folderId = null,
+            folderDisplayName = null,
+            duration = null,
+            cover = null
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}

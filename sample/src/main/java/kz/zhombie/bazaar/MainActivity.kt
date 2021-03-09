@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     private lateinit var imageLoader: ImageLoader
 
-    private lateinit var adapter: ResultAdapter
+    private lateinit var adapter: MediaResultAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         imageLoaderView.text = DEFAULT_IMAGE_LOAD.first
         imageLoader = DEFAULT_IMAGE_LOAD.second
 
-        adapter = ResultAdapter(imageLoader)
+        adapter = MediaResultAdapter(imageLoader)
         recyclerView.adapter = adapter
 
         imageLoaderButton.setOnClickListener {
@@ -116,17 +116,17 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         adapter.media = listOf(media)
     }
 
-    override fun onGalleryResult(media: Media) {
+    override fun onLocalMediaGalleryResult(media: Media) {
         Log.d(TAG, "media: $media")
         adapter.media = listOf(media)
     }
 
-    override fun onGalleryResult(media: List<Media>) {
+    override fun onLocalMediaGalleryResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
         adapter.media = media
     }
 
-    override fun onMediaSelectResult(media: List<Media>) {
+    override fun onMediaGallerySelectResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
         adapter.media = media
     }
