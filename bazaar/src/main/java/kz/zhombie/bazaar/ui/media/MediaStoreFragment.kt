@@ -29,6 +29,8 @@ import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapterManager
 import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
+import kz.zhombie.bazaar.utils.contract.GetContentContract
+import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.windowHeight
 import java.util.*
 import kotlin.math.roundToInt
@@ -95,7 +97,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
         dialog.setOnShowListener {
             if (dialog is BottomSheetDialog) {
-                val bottomSheet = dialog.findViewById<ViewGroup>(R.id.design_bottom_sheet) ?: return@setOnShowListener
+                val bottomSheet = dialog.findViewById<ViewGroup>(com.google.android.material.R.id.design_bottom_sheet) ?: return@setOnShowListener
                 bottomSheet.updateLayoutParams<ViewGroup.LayoutParams> {
                     height = getBottomSheetDialogDefaultHeight()
                 }
@@ -277,9 +279,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 }
                 // Media gallery image or video selection
                 is MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo -> {
-                    // TODO: Filter image/* and video/* mime types only (now it shows only data for first mime type)
-                    getLocalMediaGalleryImageOrVideo.launch("*/*")
-//                    getLocalMediaGalleryImageOrVideo.launch("image/*, video/*")
+                    getLocalMediaGalleryImageOrVideo.launch(arrayOf("image/*, video/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaGalleryImageOrVideoResult -> {
                     resultCallback?.onLocalMediaGalleryResult(action.media)
@@ -287,9 +287,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 }
                 // Multiple media gallery images or videos selection
                 is MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos -> {
-                    // TODO: Filter image/* and video/* mime types only (now it shows only data for first mime type)
-                    getLocalMediaGalleryImagesOrVideos.launch("*/*")
-//                    getLocalMediaGalleryImagesOrVideos.launch("image/*, video/*")
+                    getLocalMediaGalleryImagesOrVideos.launch(arrayOf("image/*, video/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesOrVideosResult -> {
                     resultCallback?.onLocalMediaGalleryResult(action.media)
@@ -399,32 +397,26 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
     }
 
     private val getLocalMediaGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        Logger.d(TAG, "uri: $uri")
         viewModel.onLocalMediaGalleryImageSelected(uri)
     }
 
     private val getLocalMediaGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        Logger.d(TAG, "uris: $uris")
         viewModel.onLocalMediaGalleryImagesSelected(uris)
     }
 
     private val getLocalMediaGalleryVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        Logger.d(TAG, "uri: $uri")
         viewModel.onLocalMediaGalleryVideoSelected(uri)
     }
 
     private val getLocalMediaGalleryVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        Logger.d(TAG, "uris: $uris")
         viewModel.onLocalMediaGalleryVideosSelected(uris)
     }
 
-    private val getLocalMediaGalleryImageOrVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        Logger.d(TAG, "uri: $uri")
+    private val getLocalMediaGalleryImageOrVideo = registerForActivityResult(GetContentContract()) { uri ->
         viewModel.onLocalMediaGalleryImageOrVideoSelected(uri)
     }
 
-    private val getLocalMediaGalleryImagesOrVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        Logger.d(TAG, "uris: $uris")
+    private val getLocalMediaGalleryImagesOrVideos = registerForActivityResult(GetMultipleContentsContract()) { uris ->
         viewModel.onLocalMediaGalleryImagesOrVideosSelected(uris)
     }
 

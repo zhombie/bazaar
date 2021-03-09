@@ -14,6 +14,10 @@ internal class AlbumsAdapterManager constructor(
     private val recyclerView: RecyclerView,
 ) {
 
+    companion object {
+        private val TAG = AlbumsAdapterManager::class.java.simpleName
+    }
+
     private var albumsAdapter: AlbumsAdapter? = null
 
     fun create(onAlbumClicked: (uiAlbum: UIAlbum) -> Unit) {
