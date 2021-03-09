@@ -3,6 +3,7 @@ package kz.zhombie.bazaar.ui.media.gallery
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -177,10 +178,12 @@ internal class GalleryAdapter constructor(
                 if (checkbox.visibility != View.VISIBLE) {
                     checkbox.visibility = View.VISIBLE
                 }
+                imageView.foreground = null
             } else {
                 if (checkbox.visibility != View.GONE) {
                     checkbox.visibility = View.GONE
                 }
+                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_alpha_black)
             }
 
             imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
@@ -209,8 +212,10 @@ internal class GalleryAdapter constructor(
         fun toggleSelectionAbility(uiMedia: UIMedia) {
             if (uiMedia.isSelectable) {
                 checkbox.visibility = View.VISIBLE
+                imageView.foreground = null
             } else {
                 checkbox.visibility = View.GONE
+                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_alpha_black)
             }
         }
 

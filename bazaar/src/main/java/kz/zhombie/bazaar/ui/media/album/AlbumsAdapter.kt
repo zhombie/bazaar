@@ -65,7 +65,7 @@ internal class AlbumsAdapter constructor(
         fun bind(uiAlbum: UIAlbum) {
             val cover = uiAlbum.album.cover
             if (cover == null) {
-                imageView.setImageResource(R.drawable.ic_placeholder_black)
+                imageView.setImageResource(R.drawable.bg_black)
             } else {
                 imageLoader.loadGridItemImage(itemView.context, imageView, cover)
             }

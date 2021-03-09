@@ -13,10 +13,10 @@ class GlideImageLoader : ImageLoader {
         Glide.with(context)
             .load(uri)
             .centerCrop()
-            .error(R.drawable.ic_placeholder_white)
-            .fallback(R.drawable.ic_placeholder_white)
+            .error(R.drawable.bg_rounded_white_with_stroke)
+            .fallback(R.drawable.bg_rounded_white_with_stroke)
             .override(300, 300)
-            .placeholder(R.drawable.ic_placeholder_white)
+            .placeholder(R.drawable.bg_rounded_white_with_stroke)
             .into(imageView)
     }
 
@@ -28,10 +28,10 @@ class GlideImageLoader : ImageLoader {
         Glide.with(context)
             .load(uri)
             .centerCrop()
-            .error(R.drawable.ic_placeholder_black)
-            .fallback(R.drawable.ic_placeholder_black)
+            .error(R.drawable.bg_black)
+            .fallback(R.drawable.bg_black)
             .fitCenter()
-            .placeholder(R.drawable.ic_placeholder_black)
+            .placeholder(R.drawable.bg_black)
             .into(imageView)
     }
 

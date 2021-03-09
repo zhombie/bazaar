@@ -194,10 +194,27 @@ internal class MediaStoreViewModel : ViewModel() {
                 .map { UIMedia(it, isSelectable = true, isSelected = false, isVisible = true) }
                 .toMutableList()
 
-            (selectedMedia.value ?: emptyList()).forEach { selectedMedia ->
-                val index = albumUiMedia.indexOfFirst { it.media.id == selectedMedia.media.id }
+            val selectedMedia = selectedMedia.value ?: emptyList()
+            selectedMedia.forEach { eachSelectedMedia ->
+                val index = albumUiMedia.indexOfFirst { it.media.id == eachSelectedMedia.media.id }
                 if (index > -1) {
                     albumUiMedia[index] = albumUiMedia[index].copy(isSelected = true)
+                }
+            }
+
+            if (selectedMedia.size >= settings.maxSelectionCount) {
+                albumUiMedia.forEachIndexed { eachIndex, eachAlbumUIMedia ->
+                    if (eachAlbumUIMedia.isSelected) {
+                        // Ignored
+                    } else {
+                        albumUiMedia[eachIndex] = albumUiMedia[eachIndex].copy(isSelectable = false)
+                    }
+                }
+            } else {
+                if (albumUiMedia.any { !it.isSelectable }) {
+                    albumUiMedia.forEachIndexed { eachIndex, _ ->
+                        albumUiMedia[eachIndex] = albumUiMedia[eachIndex].copy(isSelectable = true)
+                    }
                 }
             }
 
