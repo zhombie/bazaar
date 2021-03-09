@@ -15,6 +15,7 @@ import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.api.result.AbstractResultCallback
 
 class MainActivity : AppCompatActivity(), ResultCallback {
 
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
         showButton.setOnClickListener {
             if (checkPermissions()) {
-                Bazaar.Builder(this)
+                Bazaar.Builder(AbstractResultCallback { adapter.media = it })
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
                     .setMode(Mode.VIDEO)
