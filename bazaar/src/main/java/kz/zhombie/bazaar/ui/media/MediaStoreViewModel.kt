@@ -73,7 +73,7 @@ internal class MediaStoreViewModel constructor(
 
             val uiMedia = data.map { UIMedia(it, isSelected = false, isVisible = true) }
 
-            val defaultAlbum = UIAlbum(Album(0, "Все медиа", uiMedia.map { it.media }))
+            val defaultAlbum = UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
 
             activeAlbum.postValue(defaultAlbum)
             displayedMedia.postValue(uiMedia)
@@ -153,7 +153,7 @@ internal class MediaStoreViewModel constructor(
 
             val albumUiMedia = allMedia
                 .filter {
-                    if (uiAlbum.album.id == 0L) {
+                    if (uiAlbum.album.id == UIAlbum.ALL_MEDIA_ID) {
                         true
                     } else {
                         it.folderId == uiAlbum.album.id
@@ -188,16 +188,23 @@ internal class MediaStoreViewModel constructor(
         }
     }
 
-    fun onSelectFromExplorerRequested() {
-        Logger.d(TAG, "onSelectFromExplorerRequested()")
+    fun onSelectGalleryImageRequested() {
+        Logger.d(TAG, "onSelectGalleryImageRequested()")
         viewModelScope.launch(Dispatchers.IO) {
             action.postValue(MediaStoreScreen.Action.SelectGalleryImage)
         }
     }
 
+    fun onSelectGalleryImagesRequested() {
+        Logger.d(TAG, "onSelectGalleryImagesRequested()")
+        viewModelScope.launch(Dispatchers.IO) {
+            action.postValue(MediaStoreScreen.Action.SelectGalleryImages)
+        }
+    }
+
     fun onPictureTaken(isSuccess: Boolean) {
-        if (!isSuccess) return
         Logger.d(TAG, "onPictureTaken() -> isSuccess: $isSuccess")
+        if (!isSuccess) return
         viewModelScope.launch(Dispatchers.IO) {
             val takenPictureInput = takenPictureInput
             Logger.d(TAG, "takenPictureInput: $takenPictureInput")
@@ -208,12 +215,23 @@ internal class MediaStoreViewModel constructor(
     }
 
     fun onGalleryImageSelected(uri: Uri?) {
-        if (uri == null) return
         Logger.d(TAG, "onGalleryImageSelected() -> uri: $uri")
+        if (uri == null) return
         viewModelScope.launch(Dispatchers.IO) {
-            mediaScanManager.loadSelectedGalleryImage(uri) { image ->
-                Logger.d(TAG, "loadSelectedGalleryBitmap() -> image: $image")
+            mediaScanManager.loadSelectedGalleryImage(Dispatchers.IO, uri) { image ->
+                Logger.d(TAG, "loadSelectedGalleryImage() -> image: $image")
                 action.postValue(MediaStoreScreen.Action.SelectedGalleryImageResult(image))
+            }
+        }
+    }
+
+    fun onGalleryImagesSelected(uris: List<Uri>) {
+        Logger.d(TAG, "onGalleryImagesSelected() -> uris: $uris")
+        if (uris.isEmpty()) return
+        viewModelScope.launch(Dispatchers.IO) {
+            mediaScanManager.loadSelectedGalleryImages(Dispatchers.IO, uris) { images ->
+                Logger.d(TAG, "loadSelectedGalleryImages() -> images: $images")
+                action.postValue(MediaStoreScreen.Action.SelectedGalleryImagesResult(images))
             }
         }
     }

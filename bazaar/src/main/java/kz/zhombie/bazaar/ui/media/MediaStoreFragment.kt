@@ -1,6 +1,7 @@
 package kz.zhombie.bazaar.ui.media
 
 import android.app.Dialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -164,57 +165,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         setupSelectButton(selectedMediaCount = 0)
         setupAlbumsView(albumsView)
 
-        viewModel.getAction().observe(viewLifecycleOwner, { action ->
-            when (action) {
-                is MediaStoreScreen.Action.TakePicture -> {
-                    takePicture.launch(action.input)
-                }
-                is MediaStoreScreen.Action.TakenPictureResult -> {
-                    resultCallback?.onCameraResult(action.image)
-                    dismiss()
-                }
-                is MediaStoreScreen.Action.SelectGalleryImage -> {
-                    getGalleryImage.launch("image/*")
-                }
-                is MediaStoreScreen.Action.SelectedGalleryImageResult -> {
-                    resultCallback?.onGalleryResult(action.image)
-                    dismiss()
-                }
-                else -> {
-                }
-            }
-        })
-
-        viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
-            Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
-            setupSelectButton(media.size)
-        })
-
-        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { media ->
-            galleryAdapterManager?.submitList(media)
-        })
-
-        viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, { albums ->
-            albumsAdapterManager?.submitList(albums)
-        })
-
-        viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
-            if (isAlbumsDisplayed) {
-                headerView.toggleIcon(true)
-                albumsAdapterManager?.show()
-
-                (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                headerView.toggleIcon(false)
-                albumsAdapterManager?.hide()
-
-                galleryAdapterManager?.scrollToTop()
-            }
-        })
-
-        viewModel.getActiveAlbum().observe(viewLifecycleOwner, { album ->
-            headerView.setTitle(album.album.displayName)
-        })
+        observeAction()
+        observeSelectedMedia()
+        observeDisplayedMedia()
+        observeDisplayedAlbums()
+        observeIsAlbumsDisplayed()
+        observeActiveAlbum()
     }
 
     override fun onDestroy() {
@@ -264,16 +220,107 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
         }
     }
 
+    private fun observeAction() {
+        viewModel.getAction().observe(viewLifecycleOwner, { action ->
+            when (action) {
+                is MediaStoreScreen.Action.TakePicture -> {
+                    if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
+                        takePicture.launch(action.input)
+                    }
+                }
+                is MediaStoreScreen.Action.TakenPictureResult -> {
+                    if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
+                        resultCallback?.onCameraResult(action.image)
+                    }
+                    dismiss()
+                }
+                is MediaStoreScreen.Action.SelectGalleryImage -> {
+                    if (settings.isLocalMediaSearchAndSelectEnabled) {
+                        getGalleryImage.launch("image/*")
+                    }
+                }
+                is MediaStoreScreen.Action.SelectedGalleryImageResult -> {
+                    if (settings.isLocalMediaSearchAndSelectEnabled) {
+                        resultCallback?.onGalleryResult(action.image)
+                    }
+                    dismiss()
+                }
+                is MediaStoreScreen.Action.SelectGalleryImages -> {
+                    if (settings.isLocalMediaSearchAndSelectEnabled) {
+                        getGalleryImages.launch("image/*")
+                    }
+                }
+                is MediaStoreScreen.Action.SelectedGalleryImagesResult -> {
+                    if (settings.isLocalMediaSearchAndSelectEnabled) {
+                        resultCallback?.onGalleryResult(action.images)
+                    }
+                    dismiss()
+                }
+                else -> {
+                }
+            }
+        })
+    }
+
+    private fun observeSelectedMedia() {
+        viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
+            Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
+            setupSelectButton(media.size)
+        })
+    }
+
+    private fun observeDisplayedMedia() {
+        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { media ->
+            galleryAdapterManager?.submitList(media)
+        })
+    }
+
+    private fun observeDisplayedAlbums() {
+        viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, { albums ->
+            albumsAdapterManager?.submitList(albums)
+        })
+    }
+
+    private fun observeIsAlbumsDisplayed() {
+        viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
+            if (isAlbumsDisplayed) {
+                headerView.toggleIcon(true)
+                albumsAdapterManager?.show()
+
+                (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                headerView.toggleIcon(false)
+                albumsAdapterManager?.hide()
+
+                galleryAdapterManager?.scrollToTop()
+            }
+        })
+    }
+
+    private fun observeActiveAlbum() {
+        viewModel.getActiveAlbum().observe(viewLifecycleOwner, { album ->
+            headerView.setTitle(album.album.displayName)
+        })
+    }
+
     /**
      * [GalleryHeaderAdapter.Callback] implementation
      */
 
     override fun onCameraClicked() {
-        viewModel.onCameraShotRequested()
+        if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
+            viewModel.onCameraShotRequested()
+        }
     }
 
     override fun onExplorerClicked() {
-        viewModel.onSelectFromExplorerRequested()
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (settings.maxSelectionCount == 1) {
+                viewModel.onSelectGalleryImageRequested()
+            } else {
+                viewModel.onSelectGalleryImagesRequested()
+            }
+        }
     }
 
     /**
@@ -303,12 +350,27 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), GalleryAdapter.
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
         Logger.d(TAG, "isSuccess: $isSuccess")
-        viewModel.onPictureTaken(isSuccess)
+        if (settings.cameraSettings.isPhotoShootEnabled || settings.cameraSettings.isVideoCaptureEnabled) {
+            viewModel.onPictureTaken(isSuccess)
+        }
     }
 
     private val getGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         Logger.d(TAG, "uri: $uri")
-        viewModel.onGalleryImageSelected(uri)
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            viewModel.onGalleryImageSelected(uri)
+        }
+    }
+
+    private val getGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+        Logger.d(TAG, "uris: $uris")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uris.isNullOrEmpty()) {
+                // Ignored
+            } else {
+                viewModel.onGalleryImagesSelected(uris.take(settings.maxSelectionCount))
+            }
+        }
     }
 
 }

@@ -26,6 +26,7 @@ class Bazaar private constructor() {
             isPhotoShootEnabled = false,
             isVideoCaptureEnabled = false
         )
+        private var isLocalMediaSearchAndSelectEnabled: Boolean = false
         private var isAlbumBasedInterfaceEnabled: Boolean = false
 
         fun setTag(tag: String): Builder {
@@ -53,6 +54,11 @@ class Bazaar private constructor() {
             return this
         }
 
+        fun setLocalMediaSearchAndSelectEnabled(isEnabled: Boolean): Builder {
+            this.isLocalMediaSearchAndSelectEnabled = isEnabled
+            return this
+        }
+
         fun setAlbumBasedInterfaceEnabled(isEnabled: Boolean): Builder {
             this.isAlbumBasedInterfaceEnabled = isEnabled
             return this
@@ -73,6 +79,7 @@ class Bazaar private constructor() {
                     mode = mode,
                     maxSelectionCount = maxSelectionCount,
                     cameraSettings = cameraSettings,
+                    isLocalMediaSearchAndSelectEnabled = isLocalMediaSearchAndSelectEnabled,
                     isAlbumBasedInterfaceEnabled = isAlbumBasedInterfaceEnabled
                 )
             )

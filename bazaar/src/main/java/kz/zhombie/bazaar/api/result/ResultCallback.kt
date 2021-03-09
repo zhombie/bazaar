@@ -8,6 +8,7 @@ interface ResultCallback {
 
     // Media selected from local gallery
     fun onGalleryResult(media: Media)
+    fun onGalleryResult(media: List<Media>)
 
     // Media selected from offered custom gallery
     fun onMediaSelectResult(media: List<Media>)

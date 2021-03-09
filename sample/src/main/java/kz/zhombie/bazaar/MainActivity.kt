@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                     .setMode(Mode.IMAGE_AND_VIDEO)
                     .setMaxSelectionCount(5)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
+                    .setLocalMediaSearchAndSelectEnabled(true)
                     .setAlbumBasedInterfaceEnabled(true)
                     .show(supportFragmentManager)
             }
@@ -117,6 +118,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     override fun onGalleryResult(media: Media) {
         Log.d(TAG, "media: $media")
         adapter.media = listOf(media)
+    }
+
+    override fun onGalleryResult(media: List<Media>) {
+        Log.d(TAG, "media: $media")
+        adapter.media = media
     }
 
     override fun onMediaSelectResult(media: List<Media>) {

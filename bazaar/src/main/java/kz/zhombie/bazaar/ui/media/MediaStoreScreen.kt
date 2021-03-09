@@ -8,10 +8,11 @@ import java.io.Serializable
 
 object MediaStoreScreen {
 
-    data class Settings(
+    data class Settings constructor(
         val mode: Mode,
         val maxSelectionCount: Int,
         val cameraSettings: CameraSettings,
+        val isLocalMediaSearchAndSelectEnabled: Boolean,
         val isAlbumBasedInterfaceEnabled: Boolean
     ) : Serializable
 
@@ -26,6 +27,9 @@ object MediaStoreScreen {
 
         object SelectGalleryImage : Action()
         data class SelectedGalleryImageResult constructor(val image: Image) : Action()
+
+        object SelectGalleryImages : Action()
+        data class SelectedGalleryImagesResult constructor(val images: List<Image>) : Action()
     }
 
 }
