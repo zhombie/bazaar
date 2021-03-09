@@ -10,6 +10,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
+import java.util.concurrent.TimeUnit
 
 class MediaResultAdapter constructor(
     var imageLoader: ImageLoader
@@ -48,13 +49,43 @@ class MediaResultAdapter constructor(
                 else -> "Неизвестно"
             }
             textView.text = """
-Название файла: ${media.displayName}
-Тип файла: $type
-Размер файла: ${media.size}
+Название: ${media.displayName}
+Тип: $type
+Размер: ${media.size}
+Продолжительность: ${getDuration(media)}, ${getDisplayDuration(media)}
 Папка: ${media.folderDisplayName}
+Расширение: ${media.extension}
+Ширина x Высота: ${media.width}x${media.height} 
+Ссылка: ${media.uri}
             """.trim()
         }
 
+    }
+
+    private fun getDuration(media: Media): Long? {
+        return if (media is Video) {
+            media.duration
+        } else {
+            null
+        }
+    }
+
+    private fun getDisplayDuration(media: Media): String? {
+        return if (media is Video) {
+            val duration = media.duration ?: return null
+            try {
+                val minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
+                val seconds = duration % minutes.toInt()
+
+                "${String.format("%02d", minutes)}:${String.format("%02d", seconds)}"
+            } catch (exception: ArithmeticException) {
+                val seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
+
+                String.format("00:%02d", seconds)
+            }
+        } else {
+            null
+        }
     }
 
 }
