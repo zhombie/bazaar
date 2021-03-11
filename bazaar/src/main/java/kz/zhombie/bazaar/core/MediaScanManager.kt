@@ -22,6 +22,7 @@ import kz.zhombie.bazaar.utils.*
 import kz.zhombie.bazaar.utils.ContentResolverCompat
 import java.io.*
 import java.util.*
+import kotlin.math.min
 
 internal class MediaScanManager constructor(private val context: Context) {
 
@@ -32,9 +33,13 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         private const val DEFAULT_MIME_TYPE_IMAGE = "image/jpeg"
         private const val DEFAULT_MIME_TYPE_VIDEO = "video/mp4"
+
+        private const val REQUIRED_IMAGE_WIDTH = 512
     }
 
     fun createCameraPictureInputTempFile(): Image? = try {
+        Logger.d(TAG, "createCameraPictureInputTempFile()")
+
         // Must be same as <cache-path name="*" path="*" />
         val folder = "camera"
         val directory = File(context.cacheDir, folder).apply { mkdirs() }
@@ -47,9 +52,12 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         val timestamp = System.currentTimeMillis()
 
+        Logger.d(TAG, "createCameraPictureInputTempFile() -> file.absolutePath: ${file.absolutePath}")
+
         Image(
             id = timestamp,
             uri = uri,
+            path = file.absolutePath,
             title = file.name,
             displayName = file.name,
             mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
@@ -62,7 +70,8 @@ internal class MediaScanManager constructor(private val context: Context) {
             folderId = null,
             folderDisplayName = folder,
             width = 0,
-            height = 0
+            height = 0,
+            source = null
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -85,6 +94,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         Video(
             id = timestamp,
             uri = uri,
+            path = file.absolutePath,
             title = file.name,
             displayName = file.name,
             mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
@@ -225,6 +235,9 @@ internal class MediaScanManager constructor(private val context: Context) {
                         image = cursor.readOpenableImage(uri, file)
                     }
 
+                // Set file path
+                image = image?.copy(path = file.absolutePath)
+
                 // Set MimeType
                 image = image?.copy(mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE))
 
@@ -236,14 +249,29 @@ internal class MediaScanManager constructor(private val context: Context) {
 
                 // Retrieve additional metadata from bitmap
                 try {
-                    context.contentResolver
-                        ?.openFileDescriptor(uri, "r")
-                        ?.use {
-                            val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
-                            if (bitmap != null) {
-                                image = image?.copy(width = bitmap.width, height = bitmap.height, thumbnail = bitmap)
+                    val imageScale = decodeScaledBitmap(uri)
+                    if (imageScale == null) {
+                        context.contentResolver
+                            ?.openFileDescriptor(uri, "r")
+                            ?.use {
+                                val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
+                                if (bitmap != null) {
+                                    image = image?.copy(
+                                        width = bitmap.width,
+                                        height = bitmap.height,
+                                        thumbnail = bitmap,
+                                        source = bitmap
+                                    )
+                                }
                             }
-                        }
+                    } else {
+                        image = image?.copy(
+                            width = imageScale.source.size.width,
+                            height = imageScale.source.size.height,
+                            thumbnail = imageScale.processed.bitmap,
+                            source = imageScale.source.bitmap
+                        )
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -301,6 +329,9 @@ internal class MediaScanManager constructor(private val context: Context) {
 
                 Logger.d(TAG, "Scanned by MediaStore: $video")
 
+                // Set file path
+                video = video?.copy(path = file.absolutePath)
+
                 // Set MimeType
                 video = video?.copy(mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_VIDEO))
 
@@ -345,7 +376,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         val file = File(context.cacheDir, filename)
 
-        Logger.d(TAG, "Created local file [$file] with name $filename")
+        Logger.d(TAG, "Create local file [$file] with name $filename")
 
         // If file could not be created, then there is no need to continue code flow
         try {
@@ -398,6 +429,111 @@ internal class MediaScanManager constructor(private val context: Context) {
 
     private fun Uri.gainMimeType(default: String): String {
         return context.contentResolver?.getType(this) ?: default
+    }
+
+    suspend fun decodeFile(dispatcher: CoroutineDispatcher = Dispatchers.IO, image: Image): Image = withContext(dispatcher) {
+        val bitmap = BitmapFactory.decodeFile(image.path)
+        Logger.d(TAG, "takenImage: $bitmap, ${bitmap.width} x ${bitmap.height}")
+        val size = if (!image.path.isNullOrBlank()) {
+            File(image.path).length()
+        } else {
+            bitmap.allocationByteCount.toLong()
+        }
+        val width = bitmap.width
+        val height = bitmap.height
+        val bytes = ByteArrayOutputStream()
+        var thumbnail = bitmap
+        if (bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytes)) {
+            thumbnail = BitmapFactory.decodeByteArray(bytes.toByteArray(), 0, bytes.size())
+        }
+        return@withContext image.copy(
+            size = size,
+            thumbnail = thumbnail,
+            width = width,
+            height = height,
+            source = bitmap
+        )
+    }
+
+    suspend fun deleteFile(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        image: Image
+    ): Boolean = withContext(dispatcher) {
+        if (!image.path.isNullOrBlank()) {
+            val file = File(image.path)
+            return@withContext if (file.exists()) file.delete() else false
+        }
+        return@withContext false
+    }
+
+    @Throws(FileNotFoundException::class)
+    private fun getImageSize(inputStream: InputStream): ImageBitmap.Size {
+        Logger.d(TAG, "getImageSize() -> inputStream: $inputStream")
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+        Logger.d(TAG, "getImageSize() -> bitmap: $bitmap")
+        return ImageBitmap.Size(options.outWidth, options.outHeight)
+    }
+
+    private fun calculateSampleSize(currentWidth: Int, requiredWidth: Int): Int {
+        var inSampleSize = 1
+        if (currentWidth > requiredWidth) {
+            val halfWidth = currentWidth / 2
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps
+            // width larger than the requested width
+            while (halfWidth / inSampleSize >= requiredWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
+    }
+
+    @Throws(IllegalArgumentException::class)
+    private fun decodeScaledBitmap(uri: Uri): ImageBitmap? {
+        Logger.d(TAG, "decodeScaledBitmap() -> uri: $uri")
+
+        val inputStream = context.contentResolver?.openInputStream(uri) ?: return null
+
+        val size = getImageSize(inputStream)
+        val source = ImageBitmap.Source(BitmapFactory.decodeStream(inputStream), size)
+
+        Logger.d(TAG, "decodeScaledBitmap() -> size: $size")
+
+        val requiredWidth = min(REQUIRED_IMAGE_WIDTH, size.width)
+        val sourceWidth = size.width
+        val sampleSize = calculateSampleSize(sourceWidth, requiredWidth)
+
+        val options = BitmapFactory.Options()
+        options.inSampleSize = sampleSize
+        options.inDensity = sourceWidth
+        options.inTargetDensity = requiredWidth * sampleSize
+
+        val bitmap = (BitmapFactory.decodeStream(inputStream, null, options) ?: return null)
+        // reset density to display bitmap correctly
+        bitmap.density = context.resources.displayMetrics.densityDpi
+        return ImageBitmap(source, ImageBitmap.Processed(bitmap))
+    }
+
+    data class ImageBitmap constructor(
+        val source: Source,
+        val processed: Processed
+    ) {
+
+        data class Source constructor(
+            val bitmap: Bitmap,
+            val size: Size
+        )
+
+        data class Processed constructor(
+            val bitmap: Bitmap
+        )
+
+        data class Size constructor(
+            val width: Int,
+            val height: Int
+        )
+
     }
 
 }

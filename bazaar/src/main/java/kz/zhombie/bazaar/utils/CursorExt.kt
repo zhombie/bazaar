@@ -46,6 +46,7 @@ internal fun Cursor.readImage(): Image? {
         Image(
             id = id,
             uri = externalContentUri,
+            path = null,
             title = title,
             displayName = displayName,
             mimeType = mimeType,
@@ -58,7 +59,8 @@ internal fun Cursor.readImage(): Image? {
             folderId = bucketId,
             folderDisplayName = bucketDisplayName,
             width = width,
-            height = height
+            height = height,
+            source = null
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -107,6 +109,7 @@ internal fun Cursor.readVideo(): Video? {
         Video(
             id = id,
             uri = externalContentUri,
+            path = null,
             title = title,
             displayName = displayName,
             mimeType = mimeType,
@@ -149,6 +152,7 @@ internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
         Image(
             id = -1,
             uri = uri,
+            path = null,
             title = displayName,
             displayName = displayName,
             mimeType = null,
@@ -161,7 +165,8 @@ internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
             folderId = null,
             folderDisplayName = null,
             width = 0,
-            height = 0
+            height = 0,
+            source = null
         )
     } catch (e: Exception) {
         e.printStackTrace()
@@ -181,6 +186,7 @@ internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
         Video(
             id = -1,
             uri = uri,
+            path = null,
             title = displayName,
             displayName = displayName,
             mimeType = null,

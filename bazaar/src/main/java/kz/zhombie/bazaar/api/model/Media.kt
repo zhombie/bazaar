@@ -10,6 +10,7 @@ import android.net.Uri
 open class Media constructor(
     override val id: Long,
     override val uri: Uri,
+    override val path: String?,
     override val title: String,
     override val displayName: String,
     override val mimeType: String? = null,
@@ -27,6 +28,7 @@ open class Media constructor(
 ) : Entity(
     id = id,
     uri = uri,
+    path = path,
     title = title,
     displayName = displayName,
     mimeType = mimeType,

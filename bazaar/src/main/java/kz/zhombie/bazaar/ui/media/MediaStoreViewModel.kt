@@ -314,10 +314,13 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (!isSuccess) return
             viewModelScope.launch(Dispatchers.IO) {
-                val takenPictureInput = takePictureInput
-                Logger.d(TAG, "takenPictureInput: $takenPictureInput")
-                if (takenPictureInput != null) {
-                    action.postValue(MediaStoreScreen.Action.TakenPictureResult(takenPictureInput))
+                var image = takePictureInput
+                Logger.d(TAG, "takenPictureInput: $image")
+                if (image != null) {
+                    image = mediaScanManager.decodeFile(Dispatchers.IO, image)
+                    Logger.d(TAG, "takenPictureInput: $image")
+                    action.postValue(MediaStoreScreen.Action.TakenPictureResult(image))
+                    takePictureInput = null
                 }
             }
         }
@@ -328,10 +331,11 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (bitmap == null) return
             viewModelScope.launch(Dispatchers.IO) {
-                val takenVideoInput = takeVideoInput
-                Logger.d(TAG, "takenVideoInput: $takenVideoInput")
-                if (takenVideoInput != null) {
-                    action.postValue(MediaStoreScreen.Action.TakenVideoResult(takenVideoInput))
+                val video = takeVideoInput
+                Logger.d(TAG, "takenVideoInput: $video")
+                if (video != null) {
+                    action.postValue(MediaStoreScreen.Action.TakenVideoResult(video))
+                    takeVideoInput = null
                 }
             }
         }
@@ -357,7 +361,7 @@ internal class MediaStoreViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val allowedUris = uris.take(settings.maxSelectionCount)
                 mediaScanManager.loadLocalSelectedMediaGalleryImages(Dispatchers.IO, allowedUris) { images ->
-                    Logger.d(TAG, "loadSelectedGalleryImages() -> images: $images")
+                    Logger.d(TAG, "loadLocalSelectedMediaGalleryImages() -> images: $images")
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesResult(images))
                 }
             }

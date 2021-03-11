@@ -57,6 +57,7 @@ class MediaResultAdapter constructor(
 Расширение: ${media.extension}
 Ширина x Высота: ${media.width}x${media.height} 
 Ссылка: ${media.uri}
+Путь: ${media.path}
             """.trim()
         }
 

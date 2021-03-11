@@ -9,6 +9,7 @@ import android.net.Uri
 data class Video constructor(
     override val id: Long,
     override val uri: Uri,
+    override val path: String?,
     override val title: String,
     override val displayName: String,
     override val mimeType: String?,
@@ -27,6 +28,7 @@ data class Video constructor(
 ) : Media(
     id = id,
     uri = uri,
+    path = path,
     title = title,
     displayName = displayName,
     mimeType = mimeType,
