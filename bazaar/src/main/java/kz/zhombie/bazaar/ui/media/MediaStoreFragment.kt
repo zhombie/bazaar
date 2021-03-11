@@ -211,9 +211,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
         if (!selectButton.hasOnClickListeners()) {
             selectButton.setOnClickListener {
-                val selectedMedia = viewModel.getSelectedMedia().value ?: emptyList()
-                resultCallback?.onMediaGallerySelectResult(selectedMedia.map { it.media })
-                dismiss()
+                viewModel.onSubmitSelectMediaRequested()
             }
         }
     }
@@ -229,6 +227,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
     private fun observeAction() {
         viewModel.getAction().observe(viewLifecycleOwner, { action ->
             when (action) {
+                is MediaStoreScreen.Action.SubmitSelectedMedia -> {
+                    resultCallback?.onMediaGallerySelectResult(action.media)
+                    dismiss()
+                }
                 // Take camera picture
                 is MediaStoreScreen.Action.TakePicture -> {
                     takePicture.launch(action.input)
@@ -349,7 +351,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
     }
 
     override fun onExplorerClicked() {
-        viewModel.onSelectMediaGalleryRequested()
+        viewModel.onSelectLocalMediaGalleryRequested()
     }
 
     /**

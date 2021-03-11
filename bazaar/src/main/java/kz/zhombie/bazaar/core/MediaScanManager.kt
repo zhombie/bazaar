@@ -11,9 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
@@ -341,18 +339,15 @@ internal class MediaScanManager constructor(private val context: Context) {
                     video = video?.copy(extension = extension)
                 }
 
-                // Retrieve additional metadata from bitmap
-                try {
-                    context.contentResolver
-                        ?.openFileDescriptor(uri, "r")
-                        ?.use {
-                            val bitmap: Bitmap? = BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
-                            if (bitmap != null) {
-                                video = video?.copy(width = bitmap.width, height = bitmap.height, thumbnail = bitmap)
-                            }
-                        }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                // Retrieve additional metadata from uri
+                val metadata = video?.uri.retrieveVideoMetadata(context, dispatcher)
+                if (metadata != null) {
+                    video = video?.copy(
+                        width = metadata.width,
+                        height = metadata.height,
+                        duration = metadata.duration,
+                        thumbnail = metadata.frame
+                    )
                 }
 
                 Logger.d(TAG, "video: $video")

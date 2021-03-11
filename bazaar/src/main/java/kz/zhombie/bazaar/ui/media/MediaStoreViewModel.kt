@@ -282,8 +282,8 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onSelectMediaGalleryRequested() {
-        Logger.d(TAG, "onSelectMediaGalleryRequested()")
+    fun onSelectLocalMediaGalleryRequested() {
+        Logger.d(TAG, "onSelectLocalMediaGalleryRequested()")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             viewModelScope.launch(Dispatchers.IO) {
                 if (settings.mode == Mode.IMAGE) {
@@ -388,7 +388,7 @@ internal class MediaStoreViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val allowedUris = uris.take(settings.maxSelectionCount)
                 mediaScanManager.loadLocalSelectedMediaGalleryVideos(Dispatchers.IO, allowedUris) { videos ->
-                    Logger.d(TAG, "loadLocalSelectedMediaGalleryVideos() -> images: $videos")
+                    Logger.d(TAG, "loadLocalSelectedMediaGalleryVideos() -> videos: $videos")
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryVideosResult(videos))
                 }
             }
@@ -410,6 +410,27 @@ internal class MediaStoreViewModel : ViewModel() {
             if (uris.isNullOrEmpty()) return
             viewModelScope.launch(Dispatchers.IO) {
             }
+        }
+    }
+
+    fun onSubmitSelectMediaRequested() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val selectedMedia = (selectedMedia.value ?: emptyList())
+                .map { it.media }
+                .take(settings.maxSelectionCount)
+            val result = mutableListOf<Media>()
+            selectedMedia.forEach {
+                if (it is Image) {
+                    mediaScanManager.loadLocalSelectedMediaGalleryImage(Dispatchers.IO, it.uri) { image ->
+                        result.add(image)
+                    }
+                } else if (it is Video) {
+                    mediaScanManager.loadLocalSelectedMediaGalleryVideo(Dispatchers.IO, it.uri) { video ->
+                        result.add(video)
+                    }
+                }
+            }
+            action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(result))
         }
     }
 

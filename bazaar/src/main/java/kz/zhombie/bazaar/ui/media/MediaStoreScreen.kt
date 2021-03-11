@@ -24,6 +24,8 @@ internal object MediaStoreScreen {
     }
 
     sealed class Action {
+        data class SubmitSelectedMedia(val media: List<Media>) : Action()
+
         data class TakePicture constructor(val input: Uri) : Action()
         data class TakenPictureResult constructor(val image: Image): Action()
 
