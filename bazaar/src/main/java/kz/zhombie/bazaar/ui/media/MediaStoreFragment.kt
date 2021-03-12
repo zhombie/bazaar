@@ -17,6 +17,7 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
@@ -256,6 +257,19 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 is MediaStoreScreen.Action.SubmitSelectedMedia -> {
                     resultCallback?.onMediaGallerySelectResult(action.media)
                     dismiss()
+                }
+                is MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo -> {
+                    MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
+                        .setTitle("Выбор действия")
+                        .setSingleChoiceItems(arrayOf(getString(R.string.take_picture), getString(R.string.take_video)), -1,) { dialog, which ->
+                            dialog.dismiss()
+                            if (which == 0) {
+                                viewModel.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakePicture::class)
+                            } else if (which == 1) {
+                                viewModel.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakeVideo::class)
+                            }
+                        }
+                        .show()
                 }
                 // Take camera picture
                 is MediaStoreScreen.Action.TakePicture -> {

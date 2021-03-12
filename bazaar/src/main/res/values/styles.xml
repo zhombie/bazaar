@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Bottom Sheet-->
     <style name="BottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -25,11 +26,132 @@
         <item name="cornerSize">@dimen/media_item_corner_radius</item>
     </style>
 
+    <style name="CircularShapeAppearance" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="RoundedShapeAppearance" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
     <style name="BottomSheet.ShapeAppearance" parent="ShapeAppearance.MaterialComponents">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopLeft">13dp</item>
         <item name="cornerSizeTopRight">13dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!--Alert Dialog-->
+    <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/AlertDialogStyle</item>
+
+        <!--Background dim-->
+        <item name="android:backgroundDimAmount">0.7</item>
+
+        <!--Shape appearance-->
+        <item name="shapeAppearanceMediumComponent">@style/RoundedShapeAppearance</item>
+
+        <!--Item RadioButton or CheckBox color-->
+        <item name="colorControlNormal">#7B797A</item>
+        <item name="colorControlActivated">#409EFF</item>
+
+        <!--Positive button style-->
+        <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
+
+        <!--Negative button style-->
+        <item name="buttonBarNegativeButtonStyle">@style/Alert.Button.Negative</item>
+
+        <!--Negative button style-->
+        <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
+
+        <!--Padding-->
+        <item name="listPreferredItemPaddingLeft">24dp</item>
+        <item name="listPreferredItemPaddingRight">24dp</item>
+
+        <!--Title-->
+        <item name="materialAlertDialogTitleTextStyle">@style/Alert.TitleText</item>
+
+        <!--Body-->
+        <item name="materialAlertDialogBodyTextStyle">@style/Alert.BodyText</item>
+    </style>
+
+    <style name="AlertDialogStyle" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/RoundedShapeAppearance</item>
+    </style>
+
+    <style name="Alert.TitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">@style/Alert.TitleTextAppearance</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+
+    <style name="Alert.BodyText" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:letterSpacing">0.0</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+        <item name="android:textAppearance">@style/Alert.BodyTextAppearance</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+
+    <style name="Alert.TitleTextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Alert.BodyTextAppearance" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">sans-serif</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:letterSpacing">0.0</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">#409EFF</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@color/ripple</item>
+
+        <item name="background">@null</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="Alert.Button.Negative" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:letterSpacing">0.0</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">#909399</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@color/ripple</item>
+
+        <item name="background">@null</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="Alert.Button.Neutral" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:letterSpacing">0.0</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">#4A4A4A</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@color/ripple</item>
+
+        <item name="background">@null</item>
+        <item name="android:background">@null</item>
     </style>
 </resources>

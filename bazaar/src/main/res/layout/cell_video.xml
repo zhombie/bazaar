@@ -47,8 +47,8 @@
         android:layout_height="43dp"
         android:layout_gravity="top|end"
         android:layout_margin="2dp"
-        android:background="@drawable/ripple"
-        android:backgroundTint="@null"
+        android:backgroundTint="@color/bg_button_gray"
+        android:gravity="center"
         android:includeFontPadding="false"
         android:insetBottom="0dp"
         android:insetLeft="0dp"
@@ -56,10 +56,13 @@
         android:insetTop="0dp"
         android:minHeight="0dp"
         android:minWidth="0dp"
-        android:padding="10dp"
+        android:text="@null"
         app:icon="@drawable/ic_checked"
         app:iconGravity="textEnd"
+        app:iconPadding="0dp"
         app:iconSize="33dp"
-        app:iconTint="@null" />
+        app:iconTint="@null"
+        app:rippleColor="?attr/colorControlHighlight"
+        app:shapeAppearance="@style/CircularShapeAppearance" />
 
 </kz.zhombie.bazaar.ui.components.view.SquareFrameLayout>

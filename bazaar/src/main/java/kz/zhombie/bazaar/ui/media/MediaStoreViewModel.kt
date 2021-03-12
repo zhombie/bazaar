@@ -19,6 +19,7 @@ import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.model.UIFolder
 import kz.zhombie.bazaar.ui.model.UIMedia
+import kotlin.reflect.KClass
 
 internal class MediaStoreViewModel : ViewModel() {
 
@@ -257,7 +258,7 @@ internal class MediaStoreViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 // TODO: ActivityResultContracts.TakeVideo returns null,
                 //  that's why after fix add an ability to record a video by camera
-//                if (settings.mode == Mode.IMAGE || settings.mode == Mode.IMAGE_AND_VIDEO) {
+//                if (settings.mode == Mode.IMAGE) {
 //                    val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
 //                    this@MediaStoreViewModel.takePictureInput = takePictureInput
 //                    Logger.d(TAG, "takePictureInput: $takePictureInput")
@@ -271,12 +272,36 @@ internal class MediaStoreViewModel : ViewModel() {
 //                    if (takeVideoInput != null) {
 //                        action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
 //                    }
+//                } else if (settings.mode == Mode.IMAGE_AND_VIDEO) {
+//                    action.postValue(MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo)
 //                }
                 val takePictureInput = mediaScanManager.createCameraPictureInputTempFile(Dispatchers.IO)
                 this@MediaStoreViewModel.takePictureInput = takePictureInput
                 Logger.d(TAG, "takePictureInput: $takePictureInput")
                 if (takePictureInput != null) {
                     action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
+                }
+            }
+        }
+    }
+
+    fun onChoiceMadeBetweenTakePictureOrVideo(kClass: KClass<*>) {
+        if (settings.cameraSettings.isAnyCameraActionEnabled) {
+            viewModelScope.launch(Dispatchers.IO) {
+                if (kClass == MediaStoreScreen.Action.TakePicture::class) {
+                    val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
+                    this@MediaStoreViewModel.takePictureInput = takePictureInput
+                    Logger.d(TAG, "takePictureInput: $takePictureInput")
+                    if (takePictureInput != null) {
+                        action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
+                    }
+                } else if (kClass == MediaStoreScreen.Action.TakeVideo::class) {
+                    val takeVideoInput = mediaScanManager.createCameraVideoInputTempFile()
+                    this@MediaStoreViewModel.takeVideoInput = takeVideoInput
+                    Logger.d(TAG, "takeVideoInput: $takeVideoInput")
+                    if (takeVideoInput != null) {
+                        action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
+                    }
                 }
             }
         }

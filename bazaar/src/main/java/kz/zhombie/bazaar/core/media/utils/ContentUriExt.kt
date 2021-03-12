@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import androidx.annotation.WorkerThread
 import java.net.URISyntaxException
 
+@Suppress("DEPRECATION")
 @WorkerThread
 @Throws(URISyntaxException::class)
 internal fun Uri.getFilePath(context: Context): String? {

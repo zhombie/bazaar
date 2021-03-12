@@ -2,4 +2,7 @@
 <resources>
     <string name="camera">Camera</string>
     <string name="explorer">Explorer</string>
+
+    <string name="take_picture">Take picture</string>
+    <string name="take_video">Take video</string>
 </resources>

@@ -6,8 +6,10 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.shape.ShapeAppearanceModel
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.utils.dp2Px
 import kotlin.math.roundToInt
@@ -82,7 +84,7 @@ internal class HeaderView @JvmOverloads constructor(
         closeButtonLayoutParams.rightToRight = ConstraintSet.PARENT_ID
         closeButtonLayoutParams.bottomToBottom = ViewId.TITLE_BUTTON
         closeButton.layoutParams = closeButtonLayoutParams
-        closeButton.background = null
+        closeButton.backgroundTintList = ContextCompat.getColorStateList(context, R.color.bg_button_gray)
         closeButton.insetTop = 0
         closeButton.insetBottom = 0
         closeButton.minWidth = 50F.dp2Px().roundToInt()
@@ -92,7 +94,9 @@ internal class HeaderView @JvmOverloads constructor(
         closeButton.iconGravity = MaterialButton.ICON_GRAVITY_TEXT_END
         closeButton.iconPadding = 0
         closeButton.iconTint = null
-//        closeButton.setRippleColorResource(R.attr.colorControlHighlight)
+        closeButton.shapeAppearanceModel = ShapeAppearanceModel
+            .builder(context, R.style.CircularShapeAppearance, 0)
+            .build()
         return closeButton
     }
 
