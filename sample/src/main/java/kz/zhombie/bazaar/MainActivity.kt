@@ -118,14 +118,17 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
         showButton.setOnClickListener {
             if (checkPermissions()) {
-                Bazaar.Builder(AbstractResultCallback { adapter.media = it })
+                Bazaar.Builder(AbstractResultCallback { media ->
+                    Log.d(TAG, "media: $media")
+                    adapter.media = media
+                })
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
                     .setMode(mode)
                     .setMaxSelectionCount(maxSelectionCount)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
                     .setLocalMediaSearchAndSelectEnabled(true)
-                    .setAlbumBasedInterfaceEnabled(true)
+                    .setFoldersBasedInterfaceEnabled(true)
                     .show(supportFragmentManager)
             }
         }

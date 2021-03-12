@@ -27,7 +27,7 @@ class Bazaar private constructor() {
             isVideoCaptureEnabled = false
         )
         private var isLocalMediaSearchAndSelectEnabled: Boolean = false
-        private var isAlbumBasedInterfaceEnabled: Boolean = false
+        private var isFolderBasedInterfaceEnabled: Boolean = false
 
         fun setTag(tag: String): Builder {
             this.tag = tag
@@ -59,8 +59,8 @@ class Bazaar private constructor() {
             return this
         }
 
-        fun setAlbumBasedInterfaceEnabled(isEnabled: Boolean): Builder {
-            this.isAlbumBasedInterfaceEnabled = isEnabled
+        fun setFoldersBasedInterfaceEnabled(isEnabled: Boolean): Builder {
+            this.isFolderBasedInterfaceEnabled = isEnabled
             return this
         }
 
@@ -80,7 +80,7 @@ class Bazaar private constructor() {
                     maxSelectionCount = maxSelectionCount,
                     cameraSettings = cameraSettings,
                     isLocalMediaSearchAndSelectEnabled = isLocalMediaSearchAndSelectEnabled,
-                    isAlbumBasedInterfaceEnabled = isAlbumBasedInterfaceEnabled
+                    isFolderBasedInterfaceEnabled = isFolderBasedInterfaceEnabled
                 )
             )
             fragment.setResultCallback(requireNotNull(resultCallback) { "It makes no sense without a resultant callback." })

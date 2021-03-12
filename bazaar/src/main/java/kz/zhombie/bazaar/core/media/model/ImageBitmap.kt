@@ -8,12 +8,12 @@ internal data class ImageBitmap constructor(
 ) {
 
     data class Source constructor(
-        val bitmap: Bitmap,
+        val bitmap: Bitmap?,
         val size: Size
     )
 
     data class Processed constructor(
-        val bitmap: Bitmap
+        val bitmap: Bitmap?
     )
 
     data class Size constructor(

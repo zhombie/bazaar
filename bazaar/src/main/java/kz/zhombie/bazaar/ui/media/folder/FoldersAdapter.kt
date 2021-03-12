@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.album
+package kz.zhombie.bazaar.ui.media.folder
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,43 +11,43 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.SquareImageView
-import kz.zhombie.bazaar.ui.model.UIAlbum
+import kz.zhombie.bazaar.ui.model.UIFolder
 
-internal class AlbumsAdapter constructor(
+internal class FoldersAdapter constructor(
     private val imageLoader: ImageLoader,
-    private val onAlbumClicked: (uiAlbum: UIAlbum) -> Unit
+    private val onFolderClicked: (uiFolder: UIFolder) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        private val TAG: String = AlbumsAdapter::class.java.simpleName
+        private val TAG: String = FoldersAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<UIAlbum>() {
-            override fun areItemsTheSame(oldItem: UIAlbum, newItem: UIAlbum): Boolean =
-                oldItem.album.id == newItem.album.id
+        private val diffCallback = object : DiffUtil.ItemCallback<UIFolder>() {
+            override fun areItemsTheSame(oldItem: UIFolder, newItem: UIFolder): Boolean =
+                oldItem.folder.id == newItem.folder.id
 
-            override fun areContentsTheSame(oldItem: UIAlbum, newItem: UIAlbum): Boolean =
+            override fun areContentsTheSame(oldItem: UIFolder, newItem: UIFolder): Boolean =
                 oldItem == newItem
         }
     }
 
-    private val asyncListDiffer: AsyncListDiffer<UIAlbum> by lazy {
+    private val asyncListDiffer: AsyncListDiffer<UIFolder> by lazy {
         AsyncListDiffer(this, diffCallback)
     }
 
-    fun submitList(data: List<UIAlbum>) {
+    fun submitList(data: List<UIFolder>) {
         Logger.d(TAG, "submitList() -> ${data.size}")
         asyncListDiffer.submitList(data)
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
 
-    private fun getItem(position: Int): UIAlbum = asyncListDiffer.currentList[position]
+    private fun getItem(position: Int): UIFolder = asyncListDiffer.currentList[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ViewHolder(
             LayoutInflater
                 .from(parent.context)
-                .inflate(R.layout.cell_album, parent, false)
+                .inflate(R.layout.cell_folder, parent, false)
         )
     }
 
@@ -62,19 +62,19 @@ internal class AlbumsAdapter constructor(
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
 
-        fun bind(uiAlbum: UIAlbum) {
-            val cover = uiAlbum.album.cover
+        fun bind(uiFolder: UIFolder) {
+            val cover = uiFolder.folder.cover
             if (cover == null) {
                 imageView.setImageResource(R.drawable.bg_black)
             } else {
                 imageLoader.loadGridItemImage(itemView.context, imageView, cover)
             }
 
-            titleView.text = uiAlbum.album.displayName
+            titleView.text = uiFolder.folder.displayName
 
-            subtitleView.text = "Элементы: ${uiAlbum.album.size}"
+            subtitleView.text = "Элементы: ${uiFolder.folder.size}"
 
-            itemView.setOnClickListener { onAlbumClicked(uiAlbum) }
+            itemView.setOnClickListener { onFolderClicked(uiFolder) }
         }
 
     }

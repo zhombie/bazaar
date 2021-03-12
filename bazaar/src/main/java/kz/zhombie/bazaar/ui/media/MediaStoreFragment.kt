@@ -24,7 +24,7 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
-import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
+import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
 import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapter
 import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapterManager
 import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryHeaderAdapter
@@ -60,7 +60,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
     private lateinit var viewModel: MediaStoreViewModel
 
-    private var albumsAdapterManager: AlbumsAdapterManager? = null
+    private var foldersAdapterManager: FoldersAdapterManager? = null
     private var mediaGalleryAdapterManager: MediaGalleryAdapterManager? = null
 
     private var expandedHeight: Int = 0
@@ -122,7 +122,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
                 mediaGalleryAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
 
-                albumsAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+                foldersAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
         }
 
@@ -160,27 +160,27 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
         headerView = view.findViewById(R.id.headerView)
         val mediaGalleryView = view.findViewById<RecyclerView>(R.id.mediaGalleryView)
         selectButton = view.findViewById(R.id.selectButton)
-        val albumsView = view.findViewById<RecyclerView>(R.id.albumsView)
+        val foldersView = view.findViewById<RecyclerView>(R.id.foldersView)
         progressView = view.findViewById(R.id.progressView)
 
         setupHeaderView()
         setupMediaGalleryView(mediaGalleryView)
         setupSelectButton(selectedMediaCount = 0)
-        setupAlbumsView(albumsView)
+        setupFoldersView(foldersView)
         setupProgressView()
 
         observeScreenState()
         observeAction()
         observeSelectedMedia()
         observeDisplayedMedia()
-        observeDisplayedAlbums()
-        observeIsAlbumsDisplayed()
-        observeActiveAlbum()
+        observeDisplayedFolders()
+        observeIsFoldersDisplayed()
+        observeActiveFolder()
     }
 
     override fun onDestroy() {
-        albumsAdapterManager?.destroy()
-        albumsAdapterManager = null
+        foldersAdapterManager?.destroy()
+        foldersAdapterManager = null
 
         mediaGalleryAdapterManager?.destroy()
         mediaGalleryAdapterManager = null
@@ -221,11 +221,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
         }
     }
 
-    private fun setupAlbumsView(recyclerView: RecyclerView) {
-        albumsAdapterManager = AlbumsAdapterManager(requireContext(), recyclerView)
-        albumsAdapterManager?.hide()
-        albumsAdapterManager?.create {
-            viewModel.onAlbumClicked(it)
+    private fun setupFoldersView(recyclerView: RecyclerView) {
+        foldersAdapterManager = FoldersAdapterManager(requireContext(), recyclerView)
+        foldersAdapterManager?.hide()
+        foldersAdapterManager?.create {
+            viewModel.onFolderClicked(it)
         }
     }
 
@@ -339,31 +339,31 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
         })
     }
 
-    private fun observeDisplayedAlbums() {
-        viewModel.getDisplayedAlbums().observe(viewLifecycleOwner, { albums ->
-            albumsAdapterManager?.submitList(albums)
+    private fun observeDisplayedFolders() {
+        viewModel.getDisplayedFolders().observe(viewLifecycleOwner, { folders ->
+            foldersAdapterManager?.submitList(folders)
         })
     }
 
-    private fun observeIsAlbumsDisplayed() {
-        viewModel.getIsAlbumsDisplayed().observe(viewLifecycleOwner, { isAlbumsDisplayed ->
-            if (isAlbumsDisplayed) {
+    private fun observeIsFoldersDisplayed() {
+        viewModel.getIsFoldersDisplayed().observe(viewLifecycleOwner, { isFoldersDisplayed ->
+            if (isFoldersDisplayed) {
                 headerView.toggleIcon(true)
-                albumsAdapterManager?.show()
+                foldersAdapterManager?.show()
 
                 (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
                 headerView.toggleIcon(false)
-                albumsAdapterManager?.hide()
+                foldersAdapterManager?.hide()
 
                 mediaGalleryAdapterManager?.scrollToTop()
             }
         })
     }
 
-    private fun observeActiveAlbum() {
-        viewModel.getActiveAlbum().observe(viewLifecycleOwner, { album ->
-            headerView.setTitle(album.album.displayName)
+    private fun observeActiveFolder() {
+        viewModel.getActiveFolder().observe(viewLifecycleOwner, { uiFolder ->
+            headerView.setTitle(uiFolder.folder.displayName)
         })
     }
 

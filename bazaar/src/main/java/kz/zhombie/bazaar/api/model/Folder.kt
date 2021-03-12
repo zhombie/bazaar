@@ -2,7 +2,7 @@ package kz.zhombie.bazaar.api.model
 
 import android.net.Uri
 
-data class Album constructor(
+data class Folder constructor(
     val id: Long,
     val displayName: String,
     val items: List<Media>

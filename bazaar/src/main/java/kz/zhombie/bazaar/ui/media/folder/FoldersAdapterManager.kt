@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.album
+package kz.zhombie.bazaar.ui.media.folder
 
 import android.content.Context
 import android.view.View
@@ -7,26 +7,26 @@ import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
-import kz.zhombie.bazaar.ui.model.UIAlbum
+import kz.zhombie.bazaar.ui.model.UIFolder
 
-internal class AlbumsAdapterManager constructor(
+internal class FoldersAdapterManager constructor(
     private val context: Context,
     private val recyclerView: RecyclerView,
 ) {
 
     companion object {
-        private val TAG = AlbumsAdapterManager::class.java.simpleName
+        private val TAG = FoldersAdapterManager::class.java.simpleName
     }
 
-    private var albumsAdapter: AlbumsAdapter? = null
+    private var foldersAdapter: FoldersAdapter? = null
 
-    fun create(onAlbumClicked: (uiAlbum: UIAlbum) -> Unit) {
-        if (albumsAdapter == null) {
-            albumsAdapter = AlbumsAdapter(Settings.getImageLoader()) {
-                onAlbumClicked(it)
+    fun create(onFolderClicked: (uiFolder: UIFolder) -> Unit) {
+        if (foldersAdapter == null) {
+            foldersAdapter = FoldersAdapter(Settings.getImageLoader()) {
+                onFolderClicked(it)
             }
 
-            recyclerView.adapter = albumsAdapter
+            recyclerView.adapter = foldersAdapter
 
             val layoutManager = GridLayoutManager(
                 context,
@@ -43,10 +43,10 @@ internal class AlbumsAdapterManager constructor(
 
             recyclerView.addItemDecoration(
                 SpacingItemDecoration(
-                    context.resources.getDimensionPixelOffset(R.dimen.album_item_margin_left),
-                    context.resources.getDimensionPixelOffset(R.dimen.album_item_margin_top),
-                    context.resources.getDimensionPixelOffset(R.dimen.album_item_margin_right),
-                    context.resources.getDimensionPixelOffset(R.dimen.album_item_margin_bottom)
+                    context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_left),
+                    context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_top),
+                    context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_right),
+                    context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_bottom)
                 )
             )
         }
@@ -74,12 +74,12 @@ internal class AlbumsAdapterManager constructor(
         )
     }
 
-    fun submitList(albums: List<UIAlbum>) {
-        albumsAdapter?.submitList(albums)
+    fun submitList(folders: List<UIFolder>) {
+        foldersAdapter?.submitList(folders)
     }
 
     fun destroy() {
-        albumsAdapter = null
+        foldersAdapter = null
     }
 
 }

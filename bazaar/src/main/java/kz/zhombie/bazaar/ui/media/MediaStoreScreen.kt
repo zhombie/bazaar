@@ -15,7 +15,7 @@ internal object MediaStoreScreen {
         val maxSelectionCount: Int,
         val cameraSettings: CameraSettings,
         val isLocalMediaSearchAndSelectEnabled: Boolean,
-        val isAlbumBasedInterfaceEnabled: Boolean
+        val isFolderBasedInterfaceEnabled: Boolean
     ) : Serializable
 
     enum class State {

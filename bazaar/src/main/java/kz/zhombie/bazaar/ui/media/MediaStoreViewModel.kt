@@ -11,13 +11,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.api.core.settings.Mode
-import kz.zhombie.bazaar.api.model.Album
+import kz.zhombie.bazaar.api.model.Folder
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.media.MediaScanManager
-import kz.zhombie.bazaar.ui.model.UIAlbum
+import kz.zhombie.bazaar.ui.model.UIFolder
 import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class MediaStoreViewModel : ViewModel() {
@@ -43,14 +43,14 @@ internal class MediaStoreViewModel : ViewModel() {
     private val displayedMedia by lazy { MutableLiveData<List<UIMedia>>() }
     fun getDisplayedMedia(): LiveData<List<UIMedia>> = displayedMedia
 
-    private val displayedAlbums by lazy { MutableLiveData<List<UIAlbum>>() }
-    fun getDisplayedAlbums(): LiveData<List<UIAlbum>> = displayedAlbums
+    private val displayedFolders by lazy { MutableLiveData<List<UIFolder>>() }
+    fun getDisplayedFolders(): LiveData<List<UIFolder>> = displayedFolders
 
-    private val isAlbumsDisplayed by lazy { MutableLiveData(false) }
-    fun getIsAlbumsDisplayed(): LiveData<Boolean> = isAlbumsDisplayed
+    private val isFoldersDisplayed by lazy { MutableLiveData(false) }
+    fun getIsFoldersDisplayed(): LiveData<Boolean> = isFoldersDisplayed
 
-    private val activeAlbum by lazy { MutableLiveData<UIAlbum>() }
-    fun getActiveAlbum(): LiveData<UIAlbum> = activeAlbum
+    private val activeFolder by lazy { MutableLiveData<UIFolder>() }
+    fun getActiveFolder(): LiveData<UIFolder> = activeFolder
 
     private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
     fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
@@ -107,31 +107,31 @@ internal class MediaStoreViewModel : ViewModel() {
 
             val uiMedia = media.map { UIMedia(it, isSelectable = true, isSelected = false, isVisible = true) }
 
-            val defaultAlbum = when (settings.mode) {
+            val defaultFolder = when (settings.mode) {
                 Mode.IMAGE ->
-                    UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все фото", uiMedia.map { it.media }))
+                    UIFolder(Folder(UIFolder.ALL_MEDIA_ID, "Все фото", uiMedia.map { it.media }))
                 Mode.VIDEO ->
-                    UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все видео", uiMedia.map { it.media }))
+                    UIFolder(Folder(UIFolder.ALL_MEDIA_ID, "Все видео", uiMedia.map { it.media }))
                 Mode.IMAGE_AND_VIDEO ->
-                    UIAlbum(Album(UIAlbum.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
+                    UIFolder(Folder(UIFolder.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
             }
 
-            activeAlbum.postValue(defaultAlbum)
+            activeFolder.postValue(defaultFolder)
             displayedMedia.postValue(uiMedia)
 
-            val albums = media.mapNotNull { media ->
+            val folders = media.mapNotNull { media ->
                 val folderId = media.folderId ?: return@mapNotNull null
                 val folderDisplayName = media.folderDisplayName ?: return@mapNotNull null
                 val items = uiMedia.mapNotNull { if (it.media.folderId == folderId) it.media else null }
-                UIAlbum(Album(folderId, folderDisplayName, items))
+                UIFolder(Folder(folderId, folderDisplayName, items))
             }
-                .distinctBy { it.album.id }
-                .sortedBy { it.album.displayName }
+                .distinctBy { it.folder.id }
+                .sortedBy { it.folder.displayName }
                 .toMutableList()
 
-            albums.add(0, defaultAlbum)
+            folders.add(0, defaultFolder)
 
-            displayedAlbums.postValue(albums)
+            displayedFolders.postValue(folders)
         }
     }
 
@@ -202,19 +202,19 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onHeaderViewTitleClicked() {
-        isAlbumsDisplayed.postValue(!(isAlbumsDisplayed.value ?: false))
+        isFoldersDisplayed.postValue(!(isFoldersDisplayed.value ?: false))
     }
 
-    fun onAlbumClicked(uiAlbum: UIAlbum) {
+    fun onFolderClicked(uiFolder: UIFolder) {
         viewModelScope.launch(Dispatchers.IO) {
-            Logger.d(TAG, "onAlbumClicked() -> uiAlbum: ${uiAlbum.album.displayName}")
+            Logger.d(TAG, "onFolderClicked() -> uiFolder: ${uiFolder.folder.displayName}")
 
-            val albumUiMedia = allMedia
+            val folderUiMedia = allMedia
                 .filter {
-                    if (uiAlbum.album.id == UIAlbum.ALL_MEDIA_ID) {
+                    if (uiFolder.folder.id == UIFolder.ALL_MEDIA_ID) {
                         true
                     } else {
-                        it.folderId == uiAlbum.album.id
+                        it.folderId == uiFolder.folder.id
                     }
                 }
                 .map { UIMedia(it, isSelectable = true, isSelected = false, isVisible = true) }
@@ -222,32 +222,32 @@ internal class MediaStoreViewModel : ViewModel() {
 
             val selectedMedia = selectedMedia.value ?: emptyList()
             selectedMedia.forEach { eachSelectedMedia ->
-                val index = albumUiMedia.indexOfFirst { it.media.id == eachSelectedMedia.media.id }
+                val index = folderUiMedia.indexOfFirst { it.media.id == eachSelectedMedia.media.id }
                 if (index > -1) {
-                    albumUiMedia[index] = albumUiMedia[index].copy(isSelected = true)
+                    folderUiMedia[index] = folderUiMedia[index].copy(isSelected = true)
                 }
             }
 
             if (selectedMedia.size >= settings.maxSelectionCount) {
-                albumUiMedia.forEachIndexed { eachIndex, eachAlbumUIMedia ->
-                    if (eachAlbumUIMedia.isSelected) {
+                folderUiMedia.forEachIndexed { eachIndex, eachFolderUIMedia ->
+                    if (eachFolderUIMedia.isSelected) {
                         // Ignored
                     } else {
-                        albumUiMedia[eachIndex] = albumUiMedia[eachIndex].copy(isSelectable = false)
+                        folderUiMedia[eachIndex] = folderUiMedia[eachIndex].copy(isSelectable = false)
                     }
                 }
             } else {
-                if (albumUiMedia.any { !it.isSelectable }) {
-                    albumUiMedia.forEachIndexed { eachIndex, _ ->
-                        albumUiMedia[eachIndex] = albumUiMedia[eachIndex].copy(isSelectable = true)
+                if (folderUiMedia.any { !it.isSelectable }) {
+                    folderUiMedia.forEachIndexed { eachIndex, _ ->
+                        folderUiMedia[eachIndex] = folderUiMedia[eachIndex].copy(isSelectable = true)
                     }
                 }
             }
 
-            activeAlbum.postValue(uiAlbum)
-            displayedMedia.postValue(albumUiMedia)
+            activeFolder.postValue(uiFolder)
+            displayedMedia.postValue(folderUiMedia)
 
-            isAlbumsDisplayed.postValue(false)
+            isFoldersDisplayed.postValue(false)
         }
     }
 
