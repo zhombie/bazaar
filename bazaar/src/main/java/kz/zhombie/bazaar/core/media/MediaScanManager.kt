@@ -12,6 +12,7 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.*
+import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
@@ -226,7 +227,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
                 // Create new file from uri (content://...)
                 val filename = createImageFilename()
-                val file = (uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext null)
+                val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
 
                 // Retrieve local info from MediaStore
                 val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -308,7 +309,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
                 // Create new file from uri (content://...)
                 val filename = createVideoFilename()
-                val file = (uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext null)
+                val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
 
                 Logger.d(TAG, "Created local file: $file")
 
@@ -339,8 +340,8 @@ internal class MediaScanManager constructor(private val context: Context) {
                 val metadata = video?.uri.retrieveVideoMetadata(context, dispatcher)
                 if (metadata != null) {
                     video = video?.copy(
-                        width = metadata.width,
-                        height = metadata.height,
+                        width = metadata.width ?: 0,
+                        height = metadata.height ?: 0,
                         duration = metadata.duration,
                         thumbnail = metadata.thumbnail
                     )
@@ -349,6 +350,63 @@ internal class MediaScanManager constructor(private val context: Context) {
                 Logger.d(TAG, "video: $video")
 
                 return@withContext video
+            } else {
+                throw UnsupportedOperationException("Unsupported uri.scheme!")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return@withContext null
+        }
+    }
+
+    suspend fun loadLocalSelectedAudio(
+        dispatcher: CoroutineDispatcher,
+        uri: Uri
+    ): Audio? = withContext(dispatcher) {
+        try {
+            if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+                var audio: Audio? = null
+
+                // Create new file from uri (content://...)
+                val filename = createAudioFilename()
+                val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
+
+                Logger.d(TAG, "Created local file: $file")
+
+                // Retrieve local info from MediaStore
+                val projection = ContentResolverCompat.getOpenableContentProjection()
+
+                context.contentResolver
+                    ?.query(uri, projection, null, null, null)
+                    ?.use { cursor ->
+                        audio = cursor.readOpenableAudio(uri, file)
+                    }
+
+                Logger.d(TAG, "Scanned by MediaStore: $audio")
+
+                // Set file path
+                audio = audio?.copy(path = file.absolutePath)
+
+                // Set MimeType
+                audio = audio?.copy(mimeType = uri.gainMimeType(null))
+
+                // Set extension
+                val extension = file.getExtension(mimeType = audio?.mimeType)
+                if (!extension.isNullOrBlank()) {
+                    audio = audio?.copy(extension = extension)
+                }
+
+                // Retrieve additional metadata from uri
+                val metadata = audio?.uri.retrieveAudioMetadata(context, dispatcher)
+                if (metadata != null) {
+                    audio = audio?.copy(
+                        duration = metadata.duration
+                    )
+                }
+
+                Logger.d(TAG, "audio: $audio")
+
+                return@withContext audio
             } else {
                 throw UnsupportedOperationException("Unsupported uri.scheme!")
             }
@@ -386,11 +444,11 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
-    private suspend fun Uri.transformLocalMediaGalleryItemToFile(
+    private suspend fun Uri.transformLocalContentToFile(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         filename: String
     ): File? = withContext(dispatcher) {
-        Logger.d(TAG, "transformLocalMediaGalleryItemToFile() -> filename: $filename")
+        Logger.d(TAG, "transformLocalContentToFile() -> filename: $filename")
 
         val file = File(context.cacheDir, filename)
 
@@ -408,7 +466,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         try {
             val outputStream = FileOutputStream(file)
-            val inputStream = context.contentResolver?.openInputStream(this@transformLocalMediaGalleryItemToFile)
+            val inputStream = context.contentResolver?.openInputStream(this@transformLocalContentToFile)
 
             inputStream?.use {
                 copy(dispatcher, inputStream, outputStream)
@@ -445,7 +503,12 @@ internal class MediaScanManager constructor(private val context: Context) {
         return "VIDEO_${timestamp}"
     }
 
-    private fun Uri.gainMimeType(default: String): String {
+    private fun createAudioFilename(): String {
+        val timestamp = System.currentTimeMillis()
+        return "AUDIO_${timestamp}"
+    }
+
+    private fun Uri.gainMimeType(default: String?): String? {
         return context.contentResolver?.getType(this) ?: default
     }
 

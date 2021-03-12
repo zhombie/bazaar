@@ -47,9 +47,8 @@ internal class GetMultipleContentsContract : ActivityResultContract<Array<String
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): List<Uri> {
-        return if (intent == null || resultCode != Activity.RESULT_OK) {
-            emptyList()
-        } else getClipDataUris(intent)
+        return if (intent == null || resultCode != Activity.RESULT_OK) emptyList()
+        else getClipDataUris(intent)
     }
 
 }

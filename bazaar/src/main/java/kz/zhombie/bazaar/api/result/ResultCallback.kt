@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.api.result
 
+import kz.zhombie.bazaar.api.model.Entity
 import kz.zhombie.bazaar.api.model.Media
 
 interface ResultCallback {
@@ -9,6 +10,9 @@ interface ResultCallback {
     // Media selected from local media gallery
     fun onLocalMediaGalleryResult(media: Media)
     fun onLocalMediaGalleryResult(media: List<Media>)
+
+    // Other types, not media. For example, Audio
+    fun onLocalEntityResult(entity: Entity)
 
     // Media selected from offered custom media gallery
     fun onMediaGallerySelectResult(media: List<Media>)

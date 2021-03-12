@@ -38,7 +38,9 @@ import kz.zhombie.bazaar.utils.windowHeight
 import java.util.*
 import kotlin.math.roundToInt
 
-internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAdapter.Callback, MediaGalleryHeaderAdapter.Callback {
+internal class MediaStoreFragment : BottomSheetDialogFragment(),
+    MediaGalleryAdapter.Callback,
+    MediaGalleryHeaderAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -206,7 +208,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
         mediaGalleryAdapterManager = MediaGalleryAdapterManager(requireContext(), recyclerView)
         mediaGalleryAdapterManager?.create(
             imageLoader = Settings.getImageLoader(),
-            isCameraEnabled = viewModel.getSettings().cameraSettings.isAnyCameraActionEnabled,
+            isCameraEnabled = viewModel.getSettings().isCameraShouldBeAvailable(),
             isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
             mediaGalleryHeaderAdapterCallback = this,
             mediaGalleryAdapterCallback = this
@@ -261,7 +263,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 is MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo -> {
                     MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
                         .setTitle("Выбор действия")
-                        .setSingleChoiceItems(arrayOf(getString(R.string.take_picture), getString(R.string.take_video)), -1,) { dialog, which ->
+                        .setSingleChoiceItems(arrayOf(getString(R.string.take_picture), getString(R.string.take_video)), -1) { dialog, which ->
                             dialog.dismiss()
                             if (which == 0) {
                                 viewModel.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakePicture::class)
@@ -333,6 +335,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesOrVideosResult -> {
                     resultCallback?.onLocalMediaGalleryResult(action.media)
+                    dismiss()
+                }
+                is MediaStoreScreen.Action.SelectLocalAudio -> {
+                    getLocalAudio.launch(arrayOf("audio/*"))
+                }
+                is MediaStoreScreen.Action.SelectedLocalAudio -> {
+                    resultCallback?.onLocalEntityResult(action.audio)
                     dismiss()
                 }
                 is MediaStoreScreen.Action.Empty -> {
@@ -433,7 +442,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
     }
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
-        Logger.d(TAG, "isSuccess: $isSuccess")
         viewModel.onPictureTaken(isSuccess)
     }
 
@@ -464,6 +472,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
     private val getLocalMediaGalleryImagesOrVideos = registerForActivityResult(GetMultipleContentsContract()) { uris ->
         viewModel.onLocalMediaGalleryImagesOrVideosSelected(uris)
+    }
+
+    private val getLocalAudio = registerForActivityResult(GetContentContract()) { uri ->
+        viewModel.onLocalAudioSelected(uri)
+    }
+
+    private val getLocalAudios = registerForActivityResult(GetMultipleContentsContract()) { uris ->
+        viewModel.onLocalAudiosSelected(uris)
     }
 
 }

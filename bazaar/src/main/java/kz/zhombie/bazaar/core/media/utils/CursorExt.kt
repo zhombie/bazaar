@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
@@ -200,6 +201,38 @@ internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
             folderDisplayName = null,
             width = 0,
             height = 0,
+            duration = null
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+
+internal fun Cursor.readOpenableAudio(uri: Uri, file: File): Audio? {
+    return try {
+        var displayName = file.name
+        var size: Long = 0
+        if (moveToFirst()) {
+            displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
+            size = getLong(getColumnIndex(OpenableColumns.SIZE))
+        }
+        Audio(
+            id = -1,
+            uri = uri,
+            path = null,
+            title = displayName,
+            displayName = displayName,
+            mimeType = null,
+            extension = null,
+            size = size,
+            dateAdded = 0,
+            dateModified = file.lastModified(),
+            dateCreated = 0,
+            thumbnail = null,
+            folderId = null,
+            folderDisplayName = null,
             duration = null
         )
     } catch (e: Exception) {

@@ -95,6 +95,9 @@ internal class MediaStoreViewModel : ViewModel() {
                         mediaScanManager.loadLocalImagesAndVideos(Dispatchers.IO) {
                             onLocalMediaLoaded(it)
                         }
+                    Mode.AUDIO -> {
+                        action.postValue(MediaStoreScreen.Action.SelectLocalAudio)
+                    }
                 }
             }
         }
@@ -115,9 +118,13 @@ internal class MediaStoreViewModel : ViewModel() {
                     UIFolder(Folder(UIFolder.ALL_MEDIA_ID, "Все видео", uiMedia.map { it.media }))
                 Mode.IMAGE_AND_VIDEO ->
                     UIFolder(Folder(UIFolder.ALL_MEDIA_ID, "Все медиа", uiMedia.map { it.media }))
+                else ->
+                    null
             }
 
-            activeFolder.postValue(defaultFolder)
+            if (defaultFolder != null) {
+                activeFolder.postValue(defaultFolder)
+            }
             displayedMedia.postValue(uiMedia)
 
             val folders = media.mapNotNull { media ->
@@ -130,7 +137,9 @@ internal class MediaStoreViewModel : ViewModel() {
                 .sortedBy { it.folder.displayName }
                 .toMutableList()
 
-            folders.add(0, defaultFolder)
+            if (defaultFolder != null) {
+                folders.add(0, defaultFolder)
+            }
 
             displayedFolders.postValue(folders)
         }
@@ -311,23 +320,32 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onSelectLocalMediaGalleryRequested()")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             viewModelScope.launch(Dispatchers.IO) {
-                if (settings.mode == Mode.IMAGE) {
-                    if (settings.maxSelectionCount == 1) {
-                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImage)
-                    } else {
-                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImages)
+                when (settings.mode) {
+                    Mode.IMAGE -> {
+                        if (settings.maxSelectionCount == 1) {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImage)
+                        } else {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImages)
+                        }
                     }
-                } else if (settings.mode == Mode.VIDEO) {
-                    if (settings.maxSelectionCount == 1) {
-                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideo)
-                    } else {
-                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideos)
+                    Mode.VIDEO -> {
+                        if (settings.maxSelectionCount == 1) {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideo)
+                        } else {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryVideos)
+                        }
                     }
-                } else if (settings.mode == Mode.IMAGE_AND_VIDEO) {
-                    if (settings.maxSelectionCount == 1) {
-                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo)
-                    } else {
-                        action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos)
+                    Mode.IMAGE_AND_VIDEO -> {
+                        if (settings.maxSelectionCount == 1) {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo)
+                        } else {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos)
+                        }
+                    }
+                    Mode.AUDIO -> {
+                        if (settings.maxSelectionCount == 1) {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalAudio)
+                        }
                     }
                 }
             }
@@ -493,6 +511,29 @@ internal class MediaStoreViewModel : ViewModel() {
                 screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
+    }
+
+    fun onLocalAudioSelected(uri: Uri?) {
+        Logger.d(TAG, "onLocalAudioSelected() -> uri: $uri")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uri == null) return
+            viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                val audio = mediaScanManager.loadLocalSelectedAudio(Dispatchers.IO, uri)
+                if (audio == null) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalAudio(audio))
+                }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
+            }
+        }
+    }
+
+    fun onLocalAudiosSelected(uris: List<Uri>?) {
+
     }
 
     fun onSubmitSelectMediaRequested() {

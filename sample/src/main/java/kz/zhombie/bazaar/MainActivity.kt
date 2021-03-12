@@ -13,6 +13,7 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.model.Entity
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
@@ -92,12 +93,13 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         modeButton.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Mode")
-                .setSingleChoiceItems(arrayOf(Mode.IMAGE.toString(), Mode.VIDEO.toString(), Mode.IMAGE_AND_VIDEO.toString()), -1) { dialog, which ->
+                .setSingleChoiceItems(arrayOf(Mode.IMAGE.toString(), Mode.VIDEO.toString(), Mode.IMAGE_AND_VIDEO.toString(), Mode.AUDIO.toString()), -1) { dialog, which ->
                     dialog.dismiss()
                     mode = when (which) {
                         0 -> Mode.IMAGE
                         1 -> Mode.VIDEO
                         2 -> Mode.IMAGE_AND_VIDEO
+                        3 -> Mode.AUDIO
                         else -> Mode.IMAGE_AND_VIDEO
                     }
                     modeView.text = mode.toString()
@@ -118,9 +120,15 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
         showButton.setOnClickListener {
             if (checkPermissions()) {
-                Bazaar.Builder(AbstractResultCallback { media ->
-                    Log.d(TAG, "media: $media")
-                    adapter.media = media
+                Bazaar.Builder(object : AbstractResultCallback {
+                    override fun onLocalEntityResult(entity: List<Entity>) {
+                        Log.d(TAG, "entity: $entity")
+                    }
+
+                    override fun onMediaGalleryResult(media: List<Media>) {
+                        Log.d(TAG, "media: $media")
+                        adapter.media = media
+                    }
                 })
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
@@ -169,6 +177,10 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     override fun onLocalMediaGalleryResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
         adapter.media = media
+    }
+
+    override fun onLocalEntityResult(entity: Entity) {
+        Log.d(TAG, "entity: $entity")
     }
 
     override fun onMediaGallerySelectResult(media: List<Media>) {
