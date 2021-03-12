@@ -83,18 +83,24 @@ internal class MediaStoreViewModel : ViewModel() {
         if (allMedia.isEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
                 when (settings.mode) {
-                    Mode.IMAGE ->
-                        mediaScanManager.loadLocalImages(Dispatchers.IO) {
-                            onLocalMediaLoaded(it)
+                    Mode.IMAGE -> {
+                        val images = mediaScanManager.loadLocalImages(Dispatchers.IO)
+                        if (images != null) {
+                            onLocalMediaLoaded(images)
                         }
-                    Mode.VIDEO ->
-                        mediaScanManager.loadLocalVideos(Dispatchers.IO) {
-                            onLocalMediaLoaded(it)
+                    }
+                    Mode.VIDEO -> {
+                        val videos = mediaScanManager.loadLocalVideos(Dispatchers.IO)
+                        if (videos != null) {
+                            onLocalMediaLoaded(videos)
                         }
-                    Mode.IMAGE_AND_VIDEO ->
-                        mediaScanManager.loadLocalImagesAndVideos(Dispatchers.IO) {
-                            onLocalMediaLoaded(it)
+                    }
+                    Mode.IMAGE_AND_VIDEO -> {
+                        val media = mediaScanManager.loadLocalImagesAndVideos(Dispatchers.IO)
+                        if (media != null) {
+                            onLocalMediaLoaded(media)
                         }
+                    }
                     Mode.AUDIO -> {
                         action.postValue(MediaStoreScreen.Action.SelectLocalAudio)
                     }

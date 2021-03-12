@@ -127,9 +127,8 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
 
     suspend fun loadLocalImages(
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        callback: (media: List<Media>) -> Unit
-    ) = withContext(dispatcher) {
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ): List<Media>? = withContext(dispatcher) {
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
         val selection: String? = null
@@ -139,15 +138,15 @@ internal class MediaScanManager constructor(private val context: Context) {
         context.contentResolver
             ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
             ?.use { cursor ->
-                val data = cursor.mapTo(dispatcher, Image::class.java)
-                callback(data)
+                return@withContext cursor.mapTo(dispatcher, Image::class.java)
             }
+
+        return@withContext null
     }
 
     suspend fun loadLocalVideos(
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        callback: (media: List<Media>) -> Unit
-    ) = withContext(dispatcher) {
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ): List<Media>? = withContext(dispatcher) {
         val uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.VIDEO)
         val selection: String? = null
@@ -157,15 +156,15 @@ internal class MediaScanManager constructor(private val context: Context) {
         context.contentResolver
             ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
             ?.use { cursor ->
-                val data = cursor.mapTo(dispatcher, Video::class.java)
-                callback(data)
+                return@withContext cursor.mapTo(dispatcher, Video::class.java)
             }
+
+        return@withContext null
     }
 
     suspend fun loadLocalImagesAndVideos(
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        callback: (media: List<Media>) -> Unit
-    ) = withContext(dispatcher) {
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ): List<Media>? = withContext(dispatcher) {
         val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
         } else {
@@ -183,9 +182,10 @@ internal class MediaScanManager constructor(private val context: Context) {
         context.contentResolver
             ?.query(uri, projection, selection, selectionArgs?.toTypedArray(), sortOrder)
             ?.use { cursor ->
-                val data = cursor.mapTo(dispatcher, Media::class.java)
-                callback(data)
+                return@withContext cursor.mapTo(dispatcher, Media::class.java)
             }
+
+        return@withContext null
     }
 
     private suspend fun <T> Cursor.mapTo(
