@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.utils
+package kz.zhombie.bazaar.core.media.utils
 
 import android.content.ContentUris
 import android.database.Cursor

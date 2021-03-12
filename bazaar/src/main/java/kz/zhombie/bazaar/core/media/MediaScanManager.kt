@@ -1,6 +1,6 @@
 @file:Suppress("BlockingMethodInNonBlockingContext")
 
-package kz.zhombie.bazaar.core
+package kz.zhombie.bazaar.core.media
 
 import android.content.ContentResolver
 import android.content.Context
@@ -16,8 +16,13 @@ import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.core.media.model.ImageBitmap
+import kz.zhombie.bazaar.core.media.utils.*
+import kz.zhombie.bazaar.core.media.utils.readFile
+import kz.zhombie.bazaar.core.media.utils.readImage
+import kz.zhombie.bazaar.core.media.utils.readOpenableImage
+import kz.zhombie.bazaar.core.media.utils.readVideo
 import kz.zhombie.bazaar.utils.*
-import kz.zhombie.bazaar.utils.ContentResolverCompat
 import java.io.*
 import java.util.*
 import kotlin.math.min
@@ -35,83 +40,90 @@ internal class MediaScanManager constructor(private val context: Context) {
         private const val REQUIRED_IMAGE_WIDTH = 512
     }
 
-    fun createCameraPictureInputTempFile(): Image? = try {
-        Logger.d(TAG, "createCameraPictureInputTempFile()")
+    suspend fun createCameraPictureInputTempFile(dispatcher: CoroutineDispatcher = Dispatchers.IO): Image? =
+        withContext(dispatcher) {
+            try {
+                Logger.d(TAG, "createCameraPictureInputTempFile()")
 
-        // Must be same as <cache-path name="*" path="*" />
-        val folder = "camera"
-        val directory = File(context.cacheDir, folder).apply { mkdirs() }
+                // Must be same as <cache-path name="*" path="*" />
+                val folder = "camera"
+                val directory = File(context.cacheDir, folder).apply { mkdirs() }
 
-        val filename = createImageFilename()
-        val extension = "jpg"
-        val file = File.createTempFile("${filename}_", ".$extension", directory)
-        file.deleteOnExit()
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                val filename = createImageFilename()
+                val extension = "jpg"
+                val file = File.createTempFile("${filename}_", ".$extension", directory)
+                file.deleteOnExit()
+                val uri =
+                    FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
-        val timestamp = System.currentTimeMillis()
+                val timestamp = System.currentTimeMillis()
 
-        Logger.d(TAG, "createCameraPictureInputTempFile() -> file.absolutePath: ${file.absolutePath}")
+                Logger.d(TAG, "createCameraPictureInputTempFile() -> file.absolutePath: ${file.absolutePath}")
 
-        Image(
-            id = timestamp,
-            uri = uri,
-            path = file.absolutePath,
-            title = file.name,
-            displayName = file.name,
-            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
-            extension = extension,
-            size = file.length(),
-            dateAdded = timestamp,
-            dateModified = timestamp,
-            dateCreated = timestamp,
-            thumbnail = null,
-            folderId = null,
-            folderDisplayName = folder,
-            width = 0,
-            height = 0,
-            source = null
-        )
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
+                Image(
+                    id = timestamp,
+                    uri = uri,
+                    path = file.absolutePath,
+                    title = file.name,
+                    displayName = file.name,
+                    mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
+                    extension = extension,
+                    size = file.length(),
+                    dateAdded = timestamp,
+                    dateModified = timestamp,
+                    dateCreated = timestamp,
+                    thumbnail = null,
+                    folderId = null,
+                    folderDisplayName = folder,
+                    width = 0,
+                    height = 0,
+                    source = null
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
 
-    fun createCameraVideoInputTempFile(): Video? = try {
-        // Must be same as <cache-path name="*" path="*" />
-        val folder = "camera"
-        val directory = File(context.cacheDir, folder).apply { mkdirs() }
+    suspend fun createCameraVideoInputTempFile(dispatcher: CoroutineDispatcher = Dispatchers.IO): Video? =
+        withContext(dispatcher) {
+            try {
+                // Must be same as <cache-path name="*" path="*" />
+                val folder = "camera"
+                val directory = File(context.cacheDir, folder).apply { mkdirs() }
 
-        val filename = createVideoFilename()
-        val extension = "mp4"
-        val file = File.createTempFile("${filename}_", ".$extension", directory)
-        file.deleteOnExit()
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                val filename = createVideoFilename()
+                val extension = "mp4"
+                val file = File.createTempFile("${filename}_", ".$extension", directory)
+                file.deleteOnExit()
+                val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
 
-        val timestamp = System.currentTimeMillis()
+                val timestamp = System.currentTimeMillis()
 
-        Video(
-            id = timestamp,
-            uri = uri,
-            path = file.absolutePath,
-            title = file.name,
-            displayName = file.name,
-            mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
-            extension = extension,
-            size = file.length(),
-            dateAdded = timestamp,
-            dateModified = timestamp,
-            dateCreated = timestamp,
-            thumbnail = null,
-            folderId = null,
-            folderDisplayName = folder,
-            width = 0,
-            height = 0,
-            duration = null
-        )
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
+                Video(
+                    id = timestamp,
+                    uri = uri,
+                    path = file.absolutePath,
+                    title = file.name,
+                    displayName = file.name,
+                    mimeType = uri.gainMimeType(DEFAULT_MIME_TYPE_IMAGE),
+                    extension = extension,
+                    size = file.length(),
+                    dateAdded = timestamp,
+                    dateModified = timestamp,
+                    dateCreated = timestamp,
+                    thumbnail = null,
+                    folderId = null,
+                    folderDisplayName = folder,
+                    width = 0,
+                    height = 0,
+                    duration = null
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
 
     suspend fun loadLocalImages(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -346,7 +358,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                         width = metadata.width,
                         height = metadata.height,
                         duration = metadata.duration,
-                        thumbnail = metadata.frame
+                        thumbnail = metadata.thumbnail
                     )
                 }
 
@@ -508,27 +520,6 @@ internal class MediaScanManager constructor(private val context: Context) {
         // reset density to display bitmap correctly
         bitmap.density = context.resources.displayMetrics.densityDpi
         return ImageBitmap(source, ImageBitmap.Processed(bitmap))
-    }
-
-    data class ImageBitmap constructor(
-        val source: Source,
-        val processed: Processed
-    ) {
-
-        data class Source constructor(
-            val bitmap: Bitmap,
-            val size: Size
-        )
-
-        data class Processed constructor(
-            val bitmap: Bitmap
-        )
-
-        data class Size constructor(
-            val width: Int,
-            val height: Int
-        )
-
     }
 
 }

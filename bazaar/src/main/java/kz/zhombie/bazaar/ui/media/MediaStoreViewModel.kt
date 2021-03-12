@@ -16,7 +16,7 @@ import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Video
-import kz.zhombie.bazaar.core.MediaScanManager
+import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.model.UIAlbum
 import kz.zhombie.bazaar.ui.model.UIMedia
 
@@ -272,7 +272,7 @@ internal class MediaStoreViewModel : ViewModel() {
 //                        action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
 //                    }
 //                }
-                val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
+                val takePictureInput = mediaScanManager.createCameraPictureInputTempFile(Dispatchers.IO)
                 this@MediaStoreViewModel.takePictureInput = takePictureInput
                 Logger.d(TAG, "takePictureInput: $takePictureInput")
                 if (takePictureInput != null) {
@@ -415,9 +415,11 @@ internal class MediaStoreViewModel : ViewModel() {
 
     fun onSubmitSelectMediaRequested() {
         viewModelScope.launch(Dispatchers.IO) {
+            screenState.postValue(MediaStoreScreen.State.LOADING)
+
             val selectedMedia = (selectedMedia.value ?: emptyList())
-                .map { it.media }
                 .take(settings.maxSelectionCount)
+                .map { it.media }
             val result = mutableListOf<Media>()
             selectedMedia.forEach {
                 if (it is Image) {
@@ -431,6 +433,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 }
             }
             action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(result))
+            screenState.postValue(MediaStoreScreen.State.CONTENT)
         }
     }
 

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
@@ -19,8 +20,8 @@ import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.result.ResultCallback
-import kz.zhombie.bazaar.core.MediaScanManager
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.album.AlbumsAdapterManager
@@ -55,6 +56,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
 
     private lateinit var headerView: HeaderView
     private lateinit var selectButton: SelectButton
+    private lateinit var progressView: FrameLayout
 
     private lateinit var viewModel: MediaStoreViewModel
 
@@ -159,12 +161,15 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
         val mediaGalleryView = view.findViewById<RecyclerView>(R.id.mediaGalleryView)
         selectButton = view.findViewById(R.id.selectButton)
         val albumsView = view.findViewById<RecyclerView>(R.id.albumsView)
+        progressView = view.findViewById(R.id.progressView)
 
         setupHeaderView()
         setupMediaGalleryView(mediaGalleryView)
         setupSelectButton(selectedMediaCount = 0)
         setupAlbumsView(albumsView)
+        setupProgressView()
 
+        observeScreenState()
         observeAction()
         observeSelectedMedia()
         observeDisplayedMedia()
@@ -222,6 +227,26 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(), MediaGalleryAda
         albumsAdapterManager?.create {
             viewModel.onAlbumClicked(it)
         }
+    }
+
+    private fun setupProgressView() {
+        progressView.visibility = View.GONE
+    }
+
+    private fun observeScreenState() {
+        viewModel.getScreenState().observe(viewLifecycleOwner, { state ->
+            when (state) {
+                MediaStoreScreen.State.LOADING -> {
+                    progressView.visibility = View.VISIBLE
+                }
+                MediaStoreScreen.State.CONTENT -> {
+                    progressView.visibility = View.GONE
+                }
+                else -> {
+                    progressView.visibility = View.GONE
+                }
+            }
+        })
     }
 
     private fun observeAction() {

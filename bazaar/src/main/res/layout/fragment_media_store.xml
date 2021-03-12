@@ -55,6 +55,35 @@
         tools:listitem="@layout/cell_album"
         tools:visibility="visible" />
 
+    <FrameLayout
+        android:id="@+id/progressView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#BBF6F6F6"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/selectButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerView">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_rounded_alpha_light_black"
+            android:indeterminate="true"
+            android:indeterminateTint="@android:color/white"
+            android:progressTint="@android:color/white"
+            app:indicatorColor="@android:color/white"
+            app:indicatorInset="40dp"
+            app:indicatorSize="45dp"
+            app:trackColor="@android:color/transparent"
+            app:trackCornerRadius="13dp"
+            app:trackThickness="4dp" />
+
+    </FrameLayout>
+    
     <View
         android:id="@+id/backgroundView"
         android:layout_width="0dp"

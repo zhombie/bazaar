@@ -18,7 +18,10 @@ internal object MediaStoreScreen {
         val isAlbumBasedInterfaceEnabled: Boolean
     ) : Serializable
 
-    enum class State
+    enum class State {
+        LOADING,
+        CONTENT
+    }
 
     sealed class Action {
         data class SubmitSelectedMedia(val media: List<Media>) : Action()
