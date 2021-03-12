@@ -314,6 +314,8 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (!isSuccess) return
             viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
                 var image = takePictureInput
                 Logger.d(TAG, "takenPictureInput: $image")
                 if (image != null) {
@@ -322,6 +324,8 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.TakenPictureResult(image))
                     takePictureInput = null
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -331,12 +335,16 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (bitmap == null) return
             viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
                 val video = takeVideoInput
                 Logger.d(TAG, "takenVideoInput: $video")
                 if (video != null) {
                     action.postValue(MediaStoreScreen.Action.TakenVideoResult(video))
                     takeVideoInput = null
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -346,10 +354,17 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             viewModelScope.launch(Dispatchers.IO) {
-                mediaScanManager.loadLocalSelectedMediaGalleryImage(Dispatchers.IO, uri) { image ->
-                    Logger.d(TAG, "loadSelectedGalleryImage() -> image: $image")
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                val image = mediaScanManager.loadLocalSelectedMediaGalleryImage(Dispatchers.IO, uri)
+                Logger.d(TAG, "loadSelectedGalleryImage() -> image: $image")
+                if (image == null) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImageResult(image))
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -359,11 +374,18 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
                 val allowedUris = uris.take(settings.maxSelectionCount)
-                mediaScanManager.loadLocalSelectedMediaGalleryImages(Dispatchers.IO, allowedUris) { images ->
-                    Logger.d(TAG, "loadLocalSelectedMediaGalleryImages() -> images: $images")
+                val images = mediaScanManager.loadLocalSelectedMediaGalleryImages(Dispatchers.IO, allowedUris)
+                Logger.d(TAG, "loadLocalSelectedMediaGalleryImages() -> images: $images")
+                if (images.isNullOrEmpty()) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesResult(images))
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -373,10 +395,17 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             viewModelScope.launch(Dispatchers.IO) {
-                mediaScanManager.loadLocalSelectedMediaGalleryVideo(Dispatchers.IO, uri) { video ->
-                    Logger.d(TAG, "loadLocalSelectedMediaGalleryVideo() -> video: $video")
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                val video = mediaScanManager.loadLocalSelectedMediaGalleryVideo(Dispatchers.IO, uri)
+                Logger.d(TAG, "loadLocalSelectedMediaGalleryVideo() -> video: $video")
+                if (video == null) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryVideoResult(video))
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -386,11 +415,18 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
                 val allowedUris = uris.take(settings.maxSelectionCount)
-                mediaScanManager.loadLocalSelectedMediaGalleryVideos(Dispatchers.IO, allowedUris) { videos ->
-                    Logger.d(TAG, "loadLocalSelectedMediaGalleryVideos() -> videos: $videos")
+                val videos = mediaScanManager.loadLocalSelectedMediaGalleryVideos(Dispatchers.IO, allowedUris)
+                Logger.d(TAG, "loadLocalSelectedMediaGalleryVideos() -> videos: $videos")
+                if (videos.isNullOrEmpty()) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryVideosResult(videos))
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -400,6 +436,16 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                val media = mediaScanManager.loadLocalSelectedMediaGalleryImageOrVideo(Dispatchers.IO, uri)
+                if (media == null) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImageOrVideoResult(media))
+                }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -409,6 +455,17 @@ internal class MediaStoreViewModel : ViewModel() {
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                val allowedUris = uris.take(settings.maxSelectionCount)
+                val media = mediaScanManager.loadLocalSelectedMediaGalleryImagesOrVideos(Dispatchers.IO, allowedUris)
+                if (media.isNullOrEmpty()) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesOrVideosResult(media))
+                }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
@@ -419,20 +476,18 @@ internal class MediaStoreViewModel : ViewModel() {
 
             val selectedMedia = (selectedMedia.value ?: emptyList())
                 .take(settings.maxSelectionCount)
-                .map { it.media }
-            val result = mutableListOf<Media>()
-            selectedMedia.forEach {
-                if (it is Image) {
-                    mediaScanManager.loadLocalSelectedMediaGalleryImage(Dispatchers.IO, it.uri) { image ->
-                        result.add(image)
-                    }
-                } else if (it is Video) {
-                    mediaScanManager.loadLocalSelectedMediaGalleryVideo(Dispatchers.IO, it.uri) { video ->
-                        result.add(video)
+                .mapNotNull {
+                    when (it.media) {
+                        is Image ->
+                            mediaScanManager.loadLocalSelectedMediaGalleryImage(Dispatchers.IO, it.media.uri)
+                        is Video ->
+                            mediaScanManager.loadLocalSelectedMediaGalleryVideo(Dispatchers.IO, it.media.uri)
+                        else ->
+                            null
                     }
                 }
-            }
-            action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(result))
+
+            action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(selectedMedia))
             screenState.postValue(MediaStoreScreen.State.CONTENT)
         }
     }

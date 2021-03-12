@@ -49,6 +49,8 @@ internal object MediaStoreScreen {
 
         object SelectLocalMediaGalleryImagesOrVideos : Action()
         data class SelectedLocalMediaGalleryImagesOrVideosResult constructor(val media: List<Media>) : Action()
+
+        object Empty : Action()
     }
 
 }

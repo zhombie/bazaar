@@ -209,32 +209,24 @@ internal class MediaScanManager constructor(private val context: Context) {
 
     suspend fun loadLocalSelectedMediaGalleryImages(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        uris: List<Uri>,
-        callback: (images: List<Image>) -> Unit
-    ) = withContext(dispatcher) {
-        val images = mutableListOf<Image>()
-        uris.forEach { uri ->
-            loadLocalSelectedMediaGalleryImage(dispatcher, uri) { image ->
-                images.add(image)
-            }
-        }
-        if (!images.isNullOrEmpty()) {
-            callback(images)
+        uris: List<Uri>
+    ): List<Image> = withContext(dispatcher) {
+        return@withContext uris.mapNotNull { uri ->
+            loadLocalSelectedMediaGalleryImage(dispatcher, uri)
         }
     }
 
     suspend fun loadLocalSelectedMediaGalleryImage(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        uri: Uri,
-        callback: (image: Image) -> Unit
-    ) = withContext(dispatcher) {
+        uri: Uri
+    ): Image? = withContext(dispatcher) {
         try {
             if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
                 var image: Image? = null
 
                 // Create new file from uri (content://...)
                 val filename = createImageFilename()
-                val file = uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext
+                val file = (uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext null)
 
                 // Retrieve local info from MediaStore
                 val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -287,45 +279,36 @@ internal class MediaScanManager constructor(private val context: Context) {
                     e.printStackTrace()
                 }
 
-                image?.let {
-                    callback(it)
-                }
+                return@withContext image
             } else {
                 throw UnsupportedOperationException("Unsupported uri.scheme!")
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            return@withContext null
         }
     }
 
     suspend fun loadLocalSelectedMediaGalleryVideos(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        uris: List<Uri>,
-        callback: (videos: List<Video>) -> Unit
-    ) = withContext(dispatcher) {
-        val videos = mutableListOf<Video>()
-        uris.forEach { uri ->
-            loadLocalSelectedMediaGalleryVideo(dispatcher, uri) { video ->
-                videos.add(video)
-            }
-        }
-        if (!videos.isNullOrEmpty()) {
-            callback(videos)
+        uris: List<Uri>
+    ): List<Video> = withContext(dispatcher) {
+        return@withContext uris.mapNotNull { uri ->
+            loadLocalSelectedMediaGalleryVideo(dispatcher, uri)
         }
     }
 
     suspend fun loadLocalSelectedMediaGalleryVideo(
         dispatcher: CoroutineDispatcher,
-        uri: Uri,
-        callback: (video: Video) -> Unit
-    ) = withContext(dispatcher) {
+        uri: Uri
+    ): Video? = withContext(dispatcher) {
         try {
             if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
                 var video: Video? = null
 
                 // Create new file from uri (content://...)
                 val filename = createVideoFilename()
-                val file = uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext
+                val file = (uri.transformLocalMediaGalleryItemToFile(dispatcher, filename) ?: return@withContext null)
 
                 Logger.d(TAG, "Created local file: $file")
 
@@ -365,14 +348,41 @@ internal class MediaScanManager constructor(private val context: Context) {
 
                 Logger.d(TAG, "video: $video")
 
-                video?.let {
-                    callback(it)
-                }
+                return@withContext video
             } else {
                 throw UnsupportedOperationException("Unsupported uri.scheme!")
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            return@withContext null
+        }
+    }
+
+    suspend fun loadLocalSelectedMediaGalleryImagesOrVideos(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        uris: List<Uri>
+    ): List<Media> = withContext(dispatcher) {
+        return@withContext uris.mapNotNull { uri ->
+            loadLocalSelectedMediaGalleryImageOrVideo(dispatcher, uri)
+        }
+    }
+
+    suspend fun loadLocalSelectedMediaGalleryImageOrVideo(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        uri: Uri
+    ): Media? = withContext(dispatcher) {
+        val mimeType = uri.getMimeType(context)?.toLowerCase(Locale.ROOT)
+        Logger.d(TAG, "loadLocalSelectedMediaGalleryImageOrVideo() -> mimeType: $mimeType")
+        if (mimeType.isNullOrBlank()) {
+            return@withContext null
+        }
+        return@withContext when {
+            mimeType.startsWith("image") ->
+                loadLocalSelectedMediaGalleryImage(dispatcher, uri)
+            mimeType.startsWith("video") ->
+                loadLocalSelectedMediaGalleryVideo(dispatcher, uri)
+            else ->
+                null
         }
     }
 
