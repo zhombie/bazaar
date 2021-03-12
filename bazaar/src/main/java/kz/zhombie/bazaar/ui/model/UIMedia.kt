@@ -32,6 +32,8 @@ internal data class UIMedia constructor(
             } catch (exception: ArithmeticException) {
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(media.duration)
 
+                if (seconds == 0L) return null
+
                 String.format("00:%02d", seconds)
             }
         } else {

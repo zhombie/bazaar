@@ -46,7 +46,7 @@ internal class MediaStoreViewModel : ViewModel() {
     private val displayedAlbums by lazy { MutableLiveData<List<UIAlbum>>() }
     fun getDisplayedAlbums(): LiveData<List<UIAlbum>> = displayedAlbums
 
-    private val isAlbumsDisplayed by lazy { MutableLiveData<Boolean>(false) }
+    private val isAlbumsDisplayed by lazy { MutableLiveData(false) }
     fun getIsAlbumsDisplayed(): LiveData<Boolean> = isAlbumsDisplayed
 
     private val activeAlbum by lazy { MutableLiveData<UIAlbum>() }
