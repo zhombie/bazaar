@@ -160,29 +160,9 @@ internal class VisualMediaAdapter constructor(
         }
 
         fun bind(uiMedia: UIMedia) {
-            if (uiMedia.isVisible) {
-                if (imageView.visibility != View.VISIBLE) {
-                    imageView.visibility = View.VISIBLE
-                }
-            } else {
-                if (imageView.visibility != View.INVISIBLE) {
-                    imageView.visibility = View.INVISIBLE
-                }
-            }
-
-            if (uiMedia.isSelectable) {
-                if (checkbox.visibility != View.VISIBLE) {
-                    checkbox.visibility = View.VISIBLE
-                }
-                imageView.foreground = null
-            } else {
-                if (checkbox.visibility != View.GONE) {
-                    checkbox.visibility = View.GONE
-                }
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
-            }
-
             imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
+
+            toggleSelectionAbility(uiMedia)
 
             if (uiMedia.isSelected) {
                 imageView.scaleX = 0.9F
@@ -195,6 +175,8 @@ internal class VisualMediaAdapter constructor(
 
                 checkbox.setIconResource(R.drawable.ic_unchecked)
             }
+
+            toggleVisibility(uiMedia)
 
             if (uiMedia.media is Video) {
                 val displayDuration = uiMedia.getDisplayDuration()
@@ -224,10 +206,14 @@ internal class VisualMediaAdapter constructor(
 
         fun toggleSelectionAbility(uiMedia: UIMedia) {
             if (uiMedia.isSelectable) {
-                checkbox.visibility = View.VISIBLE
+                if (checkbox.visibility != View.VISIBLE) {
+                    checkbox.visibility = View.VISIBLE
+                }
                 imageView.foreground = null
             } else {
-                checkbox.visibility = View.GONE
+                if (checkbox.visibility != View.GONE) {
+                    checkbox.visibility = View.GONE
+                }
                 imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
             }
         }
@@ -255,10 +241,14 @@ internal class VisualMediaAdapter constructor(
         }
 
         fun toggleVisibility(uiMedia: UIMedia) {
-            imageView.visibility = if (uiMedia.isVisible) {
-                View.VISIBLE
+            if (uiMedia.isVisible) {
+                if (imageView.visibility != View.VISIBLE) {
+                    imageView.visibility = View.VISIBLE
+                }
             } else {
-                View.INVISIBLE
+                if (imageView.visibility != View.INVISIBLE) {
+                    imageView.visibility = View.INVISIBLE
+                }
             }
         }
     }

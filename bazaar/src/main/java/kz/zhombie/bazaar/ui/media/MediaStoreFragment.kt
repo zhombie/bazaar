@@ -26,6 +26,7 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
+import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapterManager
 import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapter
@@ -42,7 +43,7 @@ import kotlin.math.roundToInt
 
 internal class MediaStoreFragment : BottomSheetDialogFragment(),
     VisualMediaAdapter.Callback,
-    VisualMediaHeaderAdapter.Callback {
+    VisualMediaHeaderAdapter.Callback, AudiosAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -234,7 +235,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         if (audiosAdapterManager == null) {
             audiosAdapterManager = AudiosAdapterManager(requireContext(), recyclerView)
             audiosAdapterManager?.create(
-                imageLoader = Settings.getImageLoader()
+                imageLoader = Settings.getImageLoader(),
+                callback = this
             )
         }
     }
@@ -471,6 +473,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
         viewModel.onMediaCheckboxClicked(uiMedia)
+    }
+
+    /**
+     * [AudiosAdapter.Callback] implementation
+     */
+
+    override fun onAudioClicked(uiMultimedia: UIMultimedia) {
+        viewModel.onMediaCheckboxClicked(uiMultimedia)
     }
 
     // Calculates height for 90% of fullscreen

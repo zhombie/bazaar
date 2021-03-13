@@ -3,10 +3,11 @@ package kz.zhombie.bazaar.ui.media.audible
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.slider.Slider
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
@@ -15,7 +16,8 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMultimedia
 
 internal class AudiosAdapter constructor(
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
+    private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -89,16 +91,132 @@ internal class AudiosAdapter constructor(
         }
     }
 
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        Logger.d(TAG, "payloads: $payloads")
+        if (payloads.isNullOrEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            var isProcessed = false
+            val item = getItem(position)
+            if (!item.isAudio()) {
+                super.onBindViewHolder(holder, position, payloads)
+                return
+            }
+            if (holder !is ViewHolder) {
+                super.onBindViewHolder(holder, position, payloads)
+                return
+            }
+            payloads.forEach {
+                when (it) {
+                    PayloadKey.TOGGLE_SELECTION_ABILITY -> {
+                        if (!isProcessed) isProcessed = true
+                        holder.toggleSelectionAbility(item)
+                    }
+                    PayloadKey.TOGGLE_SELECTION -> {
+                        if (!isProcessed) isProcessed = true
+                        holder.toggleSelection(item)
+                    }
+                    PayloadKey.TOGGLE_VISIBILITY -> {
+                        if (!isProcessed) isProcessed = true
+                        holder.toggleVisibility(item)
+                    }
+                }
+            }
+            if (!isProcessed) {
+                super.onBindViewHolder(holder, position, payloads)
+            }
+        }
+    }
+
     private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+        private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
-        private val slider = view.findViewById<Slider>(R.id.slider)
+        private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
         private val durationView = view.findViewById<MaterialTextView>(R.id.durationView)
 
         fun bind(uiMultimedia: UIMultimedia) {
+            Logger.d(TAG, "uiMultimedia: $uiMultimedia")
+
+            toggleSelectionAbility(uiMultimedia)
+
+            if (uiMultimedia.isSelected) {
+                checkbox.scaleX = 1.0F
+                checkbox.scaleY = 1.0F
+
+                checkbox.visibility = View.VISIBLE
+            } else {
+                checkbox.scaleX = 0.0F
+                checkbox.scaleY = 0.0F
+
+                checkbox.visibility = View.INVISIBLE
+            }
+
             titleView.text = uiMultimedia.multimedia.displayName
-            durationView.text = uiMultimedia.getDisplayDuration()
+
+            val folderDisplayName = uiMultimedia.multimedia.folderDisplayName
+            if (folderDisplayName.isNullOrBlank()) {
+                subtitleView.text = null
+                subtitleView.visibility = View.GONE
+            } else {
+                subtitleView.text = folderDisplayName
+                subtitleView.visibility = View.VISIBLE
+            }
+
+            val displayDuration = uiMultimedia.getDisplayDuration()
+            if (displayDuration.isNullOrBlank()) {
+                durationView.text = null
+                durationView.visibility = View.GONE
+            } else {
+                durationView.text = displayDuration
+                durationView.visibility = View.VISIBLE
+            }
+
+            itemView.setOnClickListener { callback.onAudioClicked(uiMultimedia) }
         }
 
+        fun toggleSelectionAbility(uiMultimedia: UIMultimedia) {
+            if (uiMultimedia.isSelectable) {
+                itemView.isEnabled = true
+                itemView.foreground = null
+            } else {
+                itemView.isEnabled = false
+                itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_alpha_black)
+            }
+        }
+
+        fun toggleSelection(uiMultimedia: UIMultimedia) {
+            if (uiMultimedia.isSelected) {
+                checkbox.animate()
+                    .setDuration(100L)
+                    .scaleX(1.0F)
+                    .scaleY(1.0F)
+                    .withStartAction {
+                        checkbox.visibility = View.VISIBLE
+                    }
+                    .start()
+            } else {
+                checkbox.animate()
+                    .setDuration(100L)
+                    .scaleX(0.0F)
+                    .scaleY(0.0F)
+                    .withEndAction {
+                        checkbox.visibility = View.INVISIBLE
+                    }
+                    .start()
+            }
+        }
+
+        fun toggleVisibility(uiMultimedia: UIMultimedia) {
+        }
+
+    }
+
+    interface Callback {
+        fun onAudioClicked(uiMultimedia: UIMultimedia)
     }
 
 }

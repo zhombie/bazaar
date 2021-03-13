@@ -17,9 +17,10 @@ internal class AudiosAdapterManager  constructor(
     private var audiosAdapter: AudiosAdapter? = null
 
     fun create(
-        imageLoader: ImageLoader
+        imageLoader: ImageLoader,
+        callback: AudiosAdapter.Callback
     ) {
-        audiosAdapter = AudiosAdapter(imageLoader)
+        audiosAdapter = AudiosAdapter(imageLoader, callback)
 
         recyclerView.adapter = audiosAdapter
 
@@ -37,10 +38,10 @@ internal class AudiosAdapterManager  constructor(
 
         recyclerView.addItemDecoration(
             SpacingItemDecoration(
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_left),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_top),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_right),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_bottom)
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_left),
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_top),
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_right),
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_bottom)
             )
         )
     }

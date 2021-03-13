@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <dimen name="item_bottom_margin">?attr/itemBottomMargin</dimen>-->
-<!--    <dimen name="item_left_margin">?attr/itemLeftMargin</dimen>-->
-<!--    <dimen name="item_right_margin">?attr/itemRightMargin</dimen>-->
-<!--    <dimen name="item_top_margin">?attr/itemTopMargin</dimen>-->
-
-    <dimen name="grid_margin_horizontal">6.5dp</dimen>
-    <dimen name="grid_margin_top">14dp</dimen>
-    <dimen name="grid_margin_bottom">14dp</dimen>
-
     <!-- Media -->
-    <dimen name="media_item_margin_bottom">5.5dp</dimen>
-    <dimen name="media_item_margin_left">6.5dp</dimen>
-    <dimen name="media_item_margin_right">6.5dp</dimen>
-    <dimen name="media_item_margin_top">5.5dp</dimen>
+    <!-- Grid list -->
+    <dimen name="media_grid_margin_horizontal">6.5dp</dimen>
+    <dimen name="media_grid_margin_top">14dp</dimen>
+    <dimen name="media_grid_margin_bottom">14dp</dimen>
+
+    <dimen name="media_item_grid_margin_bottom">5.5dp</dimen>
+    <dimen name="media_item_grid_margin_left">6.5dp</dimen>
+    <dimen name="media_item_grid_margin_right">6.5dp</dimen>
+    <dimen name="media_item_grid_margin_top">5.5dp</dimen>
+
+    <!-- Vertical list -->
+    <dimen name="media_item_list_margin_bottom">0dp</dimen>
+    <dimen name="media_item_list_margin_left">0dp</dimen>
+    <dimen name="media_item_list_margin_right">0dp</dimen>
+    <dimen name="media_item_list_margin_top">0dp</dimen>
+
+    <dimen name="media_item_list_padding_bottom">6.5dp</dimen>
+    <dimen name="media_item_list_padding_left">4dp</dimen>
+    <dimen name="media_item_list_padding_right">12dp</dimen>
+    <dimen name="media_item_list_padding_top">6.5dp</dimen>
 
     <dimen name="media_item_corner_radius">13dp</dimen>
 

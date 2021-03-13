@@ -35,4 +35,10 @@ open class Multimedia constructor(
     open val thumbnail: Bitmap? = null,
     open val folderId: Long? = null,
     open val folderDisplayName: String? = null
-)
+) {
+
+    override fun toString(): String {
+        return "${Multimedia::class.java.simpleName}(id=$id, uri=$uri, path=$path, title=$title, displayName=$displayName, mimeType=$mimeType, extension=$extension, size=$size, dateAdded=$dateAdded, dateCreated=$dateCreated, dateModified=$dateModified, thumbnail=$thumbnail, folderId=$folderId, folderDisplayName=$folderDisplayName)"
+    }
+
+}

@@ -53,10 +53,10 @@ internal class VisualMediaAdapterManager constructor(
 
         recyclerView.addItemDecoration(
             SpacingItemDecoration(
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_left),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_top),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_right),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_margin_bottom)
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_left),
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_top),
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_right),
+                context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_bottom)
             )
         )
     }

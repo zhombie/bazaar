@@ -10,8 +10,10 @@
         android:maxSdkVersion="28"
         tools:ignore="ScopedStorage" />
 
+    <!-- Reduce size (extractNativeLibs = false). Source: https://github.com/massoudss/waveformSeekBar -->
     <application
         android:allowBackup="false"
+        android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"

@@ -1,12 +1,12 @@
 package kz.zhombie.bazaar.ui.components.view
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.utils.dp2Px
@@ -55,7 +55,7 @@ internal class HeaderViewTitleButton @JvmOverloads constructor(
         textView.maxLines = 1
         textView.isAllCaps = false
         textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-        textView.setTextColor(Color.parseColor("#333333"))
+        textView.setTextColor(ContextCompat.getColor(context, R.color.black))
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17F)
         return textView
     }
@@ -73,7 +73,7 @@ internal class HeaderViewTitleButton @JvmOverloads constructor(
         textView.includeFontPadding = false
         textView.isAllCaps = false
         textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
-        textView.setTextColor(Color.parseColor("#8290A0"))
+        textView.setTextColor(ContextCompat.getColor(context, R.color.metal))
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11F)
         textView.text = "Текущий альбом"
         return textView

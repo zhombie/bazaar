@@ -14,29 +14,11 @@
         app:shapeAppearance="@style/ItemShapeAppearance"
         tools:src="@tools:sample/backgrounds/scenic" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/checkbox"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+    <include
+        layout="@layout/view_checkbox"
         android:layout_width="43dp"
         android:layout_height="43dp"
         android:layout_gravity="top|end"
-        android:layout_margin="2dp"
-        android:backgroundTint="@color/bg_button_gray"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:insetBottom="0dp"
-        android:insetLeft="0dp"
-        android:insetRight="0dp"
-        android:insetTop="0dp"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:text="@null"
-        app:icon="@drawable/ic_checked"
-        app:iconGravity="textEnd"
-        app:iconPadding="0dp"
-        app:iconSize="33dp"
-        app:iconTint="@null"
-        app:rippleColor="?attr/colorControlHighlight"
-        app:shapeAppearance="@style/CircularShapeAppearance" />
+        android:layout_margin="2.5dp" />
 
 </kz.zhombie.bazaar.ui.components.view.SquareFrameLayout>

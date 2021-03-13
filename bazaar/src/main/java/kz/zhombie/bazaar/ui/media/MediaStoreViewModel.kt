@@ -177,20 +177,22 @@ internal class MediaStoreViewModel : ViewModel() {
             // Selected
             var selectedMediaSize = 0
             with(selectedMedia.value?.toMutableList() ?: mutableListOf()) {
-                if (uiMultimedia is UIMedia) {
-                    val index = indexOfFirst {
+                val index = indexOfFirst {
+                    if (uiMultimedia is UIMedia) {
                         if (it is UIMedia) {
                             it.media.id == uiMultimedia.media.id
                         } else {
                             false
                         }
-                    }
-                    Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] index: $index")
-                    if (index > -1) {
-                        removeAt(index)
                     } else {
-                        add(uiMultimedia)
+                        it.multimedia.id == uiMultimedia.multimedia.id
                     }
+                }
+                Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] index: $index")
+                if (index > -1) {
+                    removeAt(index)
+                } else {
+                    add(uiMultimedia)
                 }
                 selectedMediaSize = size
                 Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] selectedMediaSize: $selectedMediaSize")
@@ -199,39 +201,42 @@ internal class MediaStoreViewModel : ViewModel() {
 
             // All
             with(displayedMedia.value?.toMutableList() ?: mutableListOf()) {
-                if (uiMultimedia is UIMedia) {
-                    indexOfFirst {
+                indexOfFirst {
+                    if (uiMultimedia is UIMedia) {
                         if (it is UIMedia) {
                             it.media.id == uiMultimedia.media.id
                         } else {
                             false
                         }
+                    } else {
+                        it.multimedia.id == uiMultimedia.multimedia.id
                     }
-                        .takeIf { index -> index > -1 }
-                        ?.let { index ->
-                            Logger.d(TAG, "onMediaCheckboxClicked() -> [ALL] index: $index")
+                }
+                    .takeIf { index -> index > -1 }
+                    ?.let { index ->
+                        Logger.d(TAG, "onMediaCheckboxClicked() -> [ALL] index: $index")
 
-                            this[index] = this[index].copy(isSelected = !this[index].isSelected)
+                        this[index] = this[index].copy(isSelected = !this[index].isSelected)
 
-                            if (selectedMediaSize >= settings.maxSelectionCount) {
-                                forEachIndexed { eachIndex, eachUIMedia ->
-                                    if (eachUIMedia.isSelected) {
-                                        // Ignored
-                                    } else {
-                                        this[eachIndex] = this[eachIndex].copy(isSelectable = false)
-                                    }
-                                }
-                            } else {
-                                if (any { !it.isSelectable }) {
-                                    forEachIndexed { eachIndex, _ ->
-                                        this[eachIndex] = this[eachIndex].copy(isSelectable = true)
-                                    }
+                        if (selectedMediaSize >= settings.maxSelectionCount) {
+                            forEachIndexed { eachIndex, eachUIMedia ->
+                                if (eachUIMedia.isSelected) {
+                                    // Ignored
+                                } else {
+                                    this[eachIndex] = this[eachIndex].copy(isSelectable = false)
                                 }
                             }
-
-                            displayedMedia.postValue(this)
+                        } else {
+                            if (any { !it.isSelectable }) {
+                                forEachIndexed { eachIndex, _ ->
+                                    this[eachIndex] = this[eachIndex].copy(isSelectable = true)
+                                }
+                            }
                         }
-                }
+
+                        displayedMedia.postValue(this)
+                    }
+
             }
         }
     }

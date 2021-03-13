@@ -72,4 +72,8 @@ internal open class UIMultimedia constructor(
         return super.hashCode()
     }
 
+    override fun toString(): String {
+        return "${UIMultimedia::class.java.simpleName}(multimedia=$multimedia, isSelectable=$isSelectable, isSelected=$isSelected, isVisible=$isVisible)"
+    }
+
 }

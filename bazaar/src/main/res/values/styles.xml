@@ -84,7 +84,7 @@
 
     <style name="Alert.TitleText" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textAppearance">@style/Alert.TitleTextAppearance</item>
-        <item name="android:textColor">#333333</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="Alert.BodyText" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
@@ -93,7 +93,7 @@
         <item name="android:letterSpacing">0.0</item>
         <item name="android:lineSpacingExtra">3dp</item>
         <item name="android:textAppearance">@style/Alert.BodyTextAppearance</item>
-        <item name="android:textColor">#333333</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="Alert.TitleTextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
