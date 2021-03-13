@@ -5,4 +5,9 @@
     <color name="gray">#BDBDBD</color>
     <color name="metal">#8290A0</color>
     <color name="black">#333333</color>
+    <color name="dark_black_alpha_50">#50000000</color>
+    <color name="dark_black_alpha_60">#60000000</color>
+    <color name="dark_black_alpha_80">#80000000</color>
+    <color name="dark_black_alpha_90">#90000000</color>
+    <color name="dark_black">#000000</color>
 </resources>

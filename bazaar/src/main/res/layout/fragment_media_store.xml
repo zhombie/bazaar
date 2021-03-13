@@ -55,11 +55,13 @@
         tools:listitem="@layout/cell_folder"
         tools:visibility="visible" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/progressView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#BBF6F6F6"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/selectButton"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,7 +72,6 @@
             style="@style/Widget.MaterialComponents.CircularProgressIndicator"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_gravity="center"
             android:background="@drawable/bg_rounded_alpha_light_black"
             android:indeterminate="true"
             android:indeterminateTint="@android:color/white"
@@ -82,7 +83,32 @@
             app:trackCornerRadius="13dp"
             app:trackThickness="4dp" />
 
-    </FrameLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancelButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/dark_black_alpha_90"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:singleLine="true"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            app:cornerRadius="@dimen/media_item_corner_radius"
+            app:rippleColor="?attr/colorControlHighlight" />
+
+    </LinearLayout>
     
     <View
         android:id="@+id/backgroundView"

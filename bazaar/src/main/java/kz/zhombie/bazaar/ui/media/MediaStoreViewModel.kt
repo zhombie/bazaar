@@ -7,9 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alexvasilkov.gestures.animation.ViewPosition
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.model.*
 import kz.zhombie.bazaar.core.logging.Logger
@@ -56,6 +54,8 @@ internal class MediaStoreViewModel : ViewModel() {
 
     private var takePictureInput: Image? = null
     private var takeVideoInput: Video? = null
+
+    private var selectionJob: Job? = null
 
     init {
         Logger.d(TAG, "created")
@@ -420,7 +420,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onPictureTaken() -> isSuccess: $isSuccess")
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (!isSuccess) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 var image = takePictureInput
@@ -441,7 +441,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onVideoTaken() -> bitmap: $bitmap")
         if (settings.cameraSettings.isAnyCameraActionEnabled) {
             if (bitmap == null) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val video = takeVideoInput
@@ -460,7 +460,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaImageSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val image = mediaScanManager.loadSelectedLocalMediaImage(Dispatchers.IO, uri)
@@ -480,7 +480,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaImagesSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val allowedUris = uris.take(settings.maxSelectionCount)
@@ -501,7 +501,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaVideoSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val video = mediaScanManager.loadSelectedLocalMediaVideo(Dispatchers.IO, uri)
@@ -521,7 +521,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaVideosSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val allowedUris = uris.take(settings.maxSelectionCount)
@@ -542,7 +542,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaImageOrVideoSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val media = mediaScanManager.loadSelectedLocalMediaImageOrVideo(Dispatchers.IO, uri)
@@ -561,7 +561,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaImagesAndVideosSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val allowedUris = uris.take(settings.maxSelectionCount)
@@ -581,7 +581,7 @@ internal class MediaStoreViewModel : ViewModel() {
         Logger.d(TAG, "onLocalMediaAudioSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
-            viewModelScope.launch(Dispatchers.IO) {
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val audio = mediaScanManager.loadSelectedLocalMediaAudio(Dispatchers.IO, uri)
@@ -600,7 +600,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onSubmitSelectMediaRequested() {
-        viewModelScope.launch(Dispatchers.IO) {
+        selectionJob = viewModelScope.launch(Dispatchers.IO) {
             screenState.postValue(MediaStoreScreen.State.LOADING)
 
             if (settings.isVisualMediaMode()) {
@@ -641,6 +641,16 @@ internal class MediaStoreViewModel : ViewModel() {
                 action.postValue(MediaStoreScreen.Action.SubmitSelectedMultimedia(selectedMedia))
             }
 
+            screenState.postValue(MediaStoreScreen.State.CONTENT)
+        }
+    }
+
+    fun onCancelMediaSelectionRequested() {
+        viewModelScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.IO) {
+                selectionJob?.cancelAndJoin()
+                selectionJob = null
+            }
             screenState.postValue(MediaStoreScreen.State.CONTENT)
         }
     }

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -17,6 +17,7 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import kz.zhombie.bazaar.R
@@ -32,8 +33,8 @@ import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapter
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaHeaderAdapter
-import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.ui.model.UIMedia
+import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
@@ -63,7 +64,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     private lateinit var headerView: HeaderView
     private lateinit var selectButton: SelectButton
-    private lateinit var progressView: FrameLayout
+    private lateinit var progressView: LinearLayout
+    private lateinit var cancelButton: MaterialButton
 
     private lateinit var viewModel: MediaStoreViewModel
 
@@ -174,6 +176,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         selectButton = view.findViewById(R.id.selectButton)
         val foldersView = view.findViewById<RecyclerView>(R.id.foldersView)
         progressView = view.findViewById(R.id.progressView)
+        cancelButton = view.findViewById(R.id.cancelButton)
 
         setupHeaderView()
 
@@ -261,6 +264,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     private fun setupProgressView() {
         progressView.visibility = View.GONE
+        cancelButton.setOnClickListener { viewModel.onCancelMediaSelectionRequested() }
     }
 
     private fun observeScreenState() {

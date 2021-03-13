@@ -5,4 +5,6 @@
 
     <string name="take_picture">Take picture</string>
     <string name="take_video">Take video</string>
+
+    <string name="cancel">Cancel</string>
 </resources>

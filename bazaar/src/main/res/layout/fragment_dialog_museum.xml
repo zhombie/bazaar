@@ -9,7 +9,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#60000000"
+        android:background="@color/dark_black_alpha_60"
         android:elevation="0dp"
         android:fitsSystemWindows="true">
 
@@ -27,7 +27,7 @@
         android:id="@+id/backgroundView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"
+        android:background="@color/dark_black"
         android:visibility="invisible"
         tools:visibility="visible" />
 
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="#60000000"
+        android:background="@color/dark_black_alpha_60"
         android:gravity="center_vertical"
         android:minHeight="70dp"
         android:orientation="vertical">
