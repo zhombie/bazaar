@@ -2,9 +2,11 @@ package kz.zhombie.bazaar.ui.media.audible
 
 import android.content.Context
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
@@ -41,7 +43,12 @@ internal class AudiosAdapterManager  constructor(
 
         recyclerView.setHasFixedSize(true)
 
-        recyclerView.itemAnimator = null
+        recyclerView.itemAnimator = SlideInUpAnimator(OvershootInterpolator(1f)).apply {
+            addDuration = 125L
+            changeDuration = 125L
+            moveDuration = 125L
+            removeDuration = 125L
+        }
 
         recyclerView.addItemDecoration(
             SpacingItemDecoration(

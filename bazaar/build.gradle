@@ -60,4 +60,5 @@ dependencies {
 
     // FORK
     implementation 'com.alexvasilkov:gesture-views:2.7.1'
+    implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
 }
