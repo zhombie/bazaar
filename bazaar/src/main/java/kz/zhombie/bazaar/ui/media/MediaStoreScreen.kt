@@ -3,10 +3,7 @@ package kz.zhombie.bazaar.ui.media
 import android.net.Uri
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
-import kz.zhombie.bazaar.api.model.Audio
-import kz.zhombie.bazaar.api.model.Image
-import kz.zhombie.bazaar.api.model.Media
-import kz.zhombie.bazaar.api.model.Video
+import kz.zhombie.bazaar.api.model.*
 import java.io.Serializable
 
 internal object MediaStoreScreen {
@@ -44,6 +41,7 @@ internal object MediaStoreScreen {
 
     sealed class Action {
         data class SubmitSelectedMedia(val media: List<Media>) : Action()
+        data class SubmitSelectedMultimedia(val multimedia: List<Multimedia>) : Action()
 
         object ChooseBetweenTakePictureOrVideo : Action()
 

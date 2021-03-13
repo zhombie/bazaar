@@ -289,6 +289,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     resultCallback?.onMediaGallerySelectResult(action.media)
                     dismiss()
                 }
+                is MediaStoreScreen.Action.SubmitSelectedMultimedia -> {
+                    resultCallback?.onMultimediaGallerySelectResult(action.multimedia)
+                    dismiss()
+                }
                 is MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo -> {
                     MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
                         .setTitle("Выбор действия")

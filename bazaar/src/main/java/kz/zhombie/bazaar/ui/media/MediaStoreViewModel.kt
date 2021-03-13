@@ -603,23 +603,44 @@ internal class MediaStoreViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             screenState.postValue(MediaStoreScreen.State.LOADING)
 
-            val selectedMedia = (selectedMedia.value ?: emptyList())
-                .take(settings.maxSelectionCount)
-                .mapNotNull {
-                    if (it is UIMedia) {
-                        when (it.media) {
-                            is Image ->
-                                mediaScanManager.loadSelectedLocalMediaImage(Dispatchers.IO, it.media.uri)
-                            is Video ->
-                                mediaScanManager.loadSelectedLocalMediaVideo(Dispatchers.IO, it.media.uri)
+            if (settings.isVisualMediaMode()) {
+                val selectedMedia: List<Media> = (selectedMedia.value ?: emptyList())
+                    .take(settings.maxSelectionCount)
+                    .mapNotNull {
+                        if (it is UIMedia) {
+                            when (it.media) {
+                                is Image -> {
+                                    val image = mediaScanManager.loadSelectedLocalMediaImage(Dispatchers.IO, it.media.uri)
+                                    it.media.complete(image)
+                                }
+                                is Video -> {
+                                    val video = mediaScanManager.loadSelectedLocalMediaVideo(Dispatchers.IO, it.media.uri)
+                                    it.media.complete(video)
+                                }
+                                else -> null
+                            }
+                        } else {
+                            null
+                        }
+                    }
+
+                action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(selectedMedia))
+            } else if (settings.isAudibleMediaMode()) {
+                val selectedMedia = (selectedMedia.value ?: emptyList())
+                    .take(settings.maxSelectionCount)
+                    .mapNotNull {
+                        when (it.multimedia) {
+                            is Audio -> {
+                                val audio = mediaScanManager.loadSelectedLocalMediaAudio(Dispatchers.IO, it.multimedia.uri)
+                                it.multimedia.complete(audio)
+                            }
                             else -> null
                         }
-                    } else {
-                        null
                     }
-                }
 
-            action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(selectedMedia))
+                action.postValue(MediaStoreScreen.Action.SubmitSelectedMultimedia(selectedMedia))
+            }
+
             screenState.postValue(MediaStoreScreen.State.CONTENT)
         }
     }

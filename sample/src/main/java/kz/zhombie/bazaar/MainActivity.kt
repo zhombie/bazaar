@@ -188,4 +188,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         adapter.media = media
     }
 
+    override fun onMultimediaGallerySelectResult(multimedia: List<Multimedia>) {
+        Log.d(TAG, "multimedia: $multimedia")
+    }
+
 }
