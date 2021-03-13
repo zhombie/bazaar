@@ -180,6 +180,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         cancelButton = view.findViewById(R.id.cancelButton)
 
         setupHeaderView()
+        setupInfoView()
 
         if (viewModel.getSettings().isVisualMediaMode()) {
             setupVisualMediaView(contentView)
@@ -223,6 +224,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         }
 
         headerView.setOnCloseButtonClickListener { dismiss() }
+    }
+
+    private fun setupInfoView() {
+//        infoView.text = "* Максимально количество файлов для выбора - " + viewModel.getSettings().maxSelectionCount
     }
 
     private fun setupVisualMediaView(recyclerView: RecyclerView) {
