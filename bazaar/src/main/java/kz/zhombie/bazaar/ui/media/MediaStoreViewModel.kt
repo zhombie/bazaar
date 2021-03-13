@@ -12,9 +12,9 @@ import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.model.*
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
-import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.ui.model.UIFolder
 import kz.zhombie.bazaar.ui.model.UIMedia
+import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kotlin.reflect.KClass
 
 internal class MediaStoreViewModel : ViewModel() {
@@ -246,11 +246,18 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
+        Logger.d(TAG, "onVisibilityChange() -> id: $id, isVisible: $isVisible")
         viewModelScope.launch(Dispatchers.IO) {
             delay(delayDuration)
 
             with(displayedMedia.value?.toMutableList() ?: mutableListOf()) {
-                indexOfFirst { it.multimedia.id == id }
+                indexOfFirst {
+                    if (it is UIMedia) {
+                        id == it.media.id
+                    } else {
+                        id == it.multimedia.id
+                    }
+                }
                     .takeIf { index -> index > -1 }
                     ?.let { index ->
                         this[index] = this[index].copy(isVisible = isVisible)
