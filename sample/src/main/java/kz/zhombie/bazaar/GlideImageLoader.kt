@@ -21,7 +21,14 @@ class GlideImageLoader : ImageLoader {
     }
 
     override fun loadGridItemImage(context: Context, imageView: ImageView, bitmap: Bitmap) {
-        imageView.setImageBitmap(bitmap)
+        Glide.with(context)
+            .load(bitmap)
+            .centerCrop()
+            .error(R.drawable.bg_rounded_white_with_stroke)
+            .fallback(R.drawable.bg_rounded_white_with_stroke)
+            .override(300, 300)
+            .placeholder(R.drawable.bg_rounded_white_with_stroke)
+            .into(imageView)
     }
 
     override fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri) {

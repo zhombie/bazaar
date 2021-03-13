@@ -1,18 +1,18 @@
 package kz.zhombie.bazaar.api.result
 
-import kz.zhombie.bazaar.api.model.Entity
+import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.model.Media
 
 /**
  * [ResultCallback] implementation
  */
 interface AbstractResultCallback : ResultCallback {
-    override fun onCameraResult(media: Media) = onMediaGalleryResult(listOf(media))
-    override fun onLocalMediaGalleryResult(media: Media) = onMediaGalleryResult(listOf(media))
-    override fun onLocalMediaGalleryResult(media: List<Media>) = onMediaGalleryResult(media)
-    override fun onLocalEntityResult(entity: Entity) = onLocalEntityResult(listOf(entity))
-    override fun onMediaGallerySelectResult(media: List<Media>) = onMediaGalleryResult(media)
+    override fun onCameraResult(media: Media) = onMediaSelectResult(listOf(media))
+    override fun onLocalMediaStoreResult(media: Media) = onMediaSelectResult(listOf(media))
+    override fun onLocalMediaStoreResult(media: List<Media>) = onMediaSelectResult(media)
+    override fun onLocalMediaStoreResult(multimedia: Multimedia) = onMultimediaSelectResult(listOf(multimedia))
+    override fun onMediaGallerySelectResult(media: List<Media>) = onMediaSelectResult(media)
 
-    fun onLocalEntityResult(entity: List<Entity>)
-    fun onMediaGalleryResult(media: List<Media>)
+    fun onMultimediaSelectResult(multimedia: List<Multimedia>)
+    fun onMediaSelectResult(media: List<Media>)
 }

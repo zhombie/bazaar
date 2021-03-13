@@ -25,7 +25,7 @@ open class Media constructor(
 
     open val width: Int,
     open val height: Int
-) : Entity(
+) : Multimedia(
     id = id,
     uri = uri,
     path = path,

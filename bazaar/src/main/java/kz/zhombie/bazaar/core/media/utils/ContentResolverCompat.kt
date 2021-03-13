@@ -33,6 +33,15 @@ internal class ContentResolverCompat {
                     MediaStore.Video.VideoColumns.WIDTH,
                     MediaStore.Video.VideoColumns.HEIGHT
                 )
+                Type.AUDIO -> mutableListOf(
+                    MediaStore.Audio.AudioColumns._ID,
+                    MediaStore.Audio.AudioColumns.TITLE,
+                    MediaStore.Audio.AudioColumns.DISPLAY_NAME,
+                    MediaStore.Audio.AudioColumns.DATE_ADDED,
+                    MediaStore.Audio.AudioColumns.DATE_MODIFIED,
+                    MediaStore.Audio.AudioColumns.MIME_TYPE,
+                    MediaStore.Audio.AudioColumns.SIZE
+                )
                 Type.FILE -> mutableListOf(
                     MediaStore.Files.FileColumns._ID,
                     MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -61,6 +70,13 @@ internal class ContentResolverCompat {
                         projection.add(MediaStore.Video.VideoColumns.DURATION)
                         projection.add(MediaStore.Video.VideoColumns.VOLUME_NAME)
                     }
+                    Type.AUDIO -> {
+                        projection.add(MediaStore.Audio.AudioColumns.BUCKET_ID)
+                        projection.add(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME)
+                        projection.add(MediaStore.Audio.AudioColumns.DATE_TAKEN)
+                        projection.add(MediaStore.Audio.AudioColumns.DURATION)
+                        projection.add(MediaStore.Audio.AudioColumns.VOLUME_NAME)
+                    }
                     Type.FILE -> {
                         projection.add(MediaStore.Files.FileColumns.BUCKET_ID)
                         projection.add(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME)
@@ -84,6 +100,7 @@ internal class ContentResolverCompat {
     enum class Type {
         IMAGE,
         VIDEO,
+        AUDIO,
         FILE
     }
 

@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.gallery
+package kz.zhombie.bazaar.ui.media.visual
 
 import android.view.LayoutInflater
 import android.view.View
@@ -17,13 +17,13 @@ import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MediaGalleryAdapter constructor(
+internal class VisualMediaAdapter constructor(
     private val imageLoader: ImageLoader,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        private val TAG: String = MediaGalleryAdapter::class.java.simpleName
+        private val TAG: String = VisualMediaAdapter::class.java.simpleName
 
         private val diffCallback = object : DiffUtil.ItemCallback<UIMedia>() {
             override fun areItemsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =
@@ -62,9 +62,7 @@ internal class MediaGalleryAdapter constructor(
     }
 
     fun setListListener(callback: () -> Unit) {
-        asyncListDiffer.addListListener { _, _ ->
-            callback()
-        }
+        asyncListDiffer.addListListener { _, _ -> callback() }
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
@@ -85,16 +83,16 @@ internal class MediaGalleryAdapter constructor(
             ViewType.IMAGE -> {
                 ViewHolder(
                     view = LayoutInflater
-                            .from(parent.context)
-                            .inflate(R.layout.cell_image, parent, false),
+                        .from(parent.context)
+                        .inflate(R.layout.cell_image, parent, false),
                     viewType = viewType
                 )
             }
             ViewType.VIDEO -> {
                 ViewHolder(
                     view = LayoutInflater
-                            .from(parent.context)
-                            .inflate(R.layout.cell_video, parent, false),
+                        .from(parent.context)
+                        .inflate(R.layout.cell_video, parent, false),
                     viewType = viewType
                 )
             }
@@ -105,8 +103,9 @@ internal class MediaGalleryAdapter constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        when (holder) {
-            is ViewHolder -> holder.bind(item)
+        when {
+            item.isImage() -> if (holder is ViewHolder) holder.bind(item)
+            item.isVideo() -> if (holder is ViewHolder) holder.bind(item)
         }
     }
 
@@ -120,41 +119,31 @@ internal class MediaGalleryAdapter constructor(
             super.onBindViewHolder(holder, position, payloads)
         } else {
             var isProcessed = false
+            val item = getItem(position)
+            if (!item.isImageOrVideo()) {
+                super.onBindViewHolder(holder, position, payloads)
+                return
+            }
+            if (holder !is ViewHolder) {
+                super.onBindViewHolder(holder, position, payloads)
+                return
+            }
             payloads.forEach {
                 when (it) {
                     PayloadKey.TOGGLE_SELECTION_ABILITY -> {
-                        when (holder) {
-                            is ViewHolder -> {
-                                if (!isProcessed) {
-                                    isProcessed = true
-                                }
-                                holder.toggleSelectionAbility(getItem(position))
-                            }
-                        }
+                        if (!isProcessed) isProcessed = true
+                        holder.toggleSelectionAbility(item)
                     }
                     PayloadKey.TOGGLE_SELECTION -> {
-                        when (holder) {
-                            is ViewHolder -> {
-                                if (!isProcessed) {
-                                    isProcessed = true
-                                }
-                                holder.toggleSelection(getItem(position))
-                            }
-                        }
+                        if (!isProcessed) isProcessed = true
+                        holder.toggleSelection(item)
                     }
                     PayloadKey.TOGGLE_VISIBILITY -> {
-                        when (holder) {
-                            is ViewHolder -> {
-                                if (!isProcessed) {
-                                    isProcessed = true
-                                }
-                                holder.toggleVisibility(getItem(position))
-                            }
-                        }
+                        if (!isProcessed) isProcessed = true
+                        holder.toggleVisibility(item)
                     }
                 }
             }
-            Logger.d(TAG, "isProcessed: $isProcessed")
             if (!isProcessed) {
                 super.onBindViewHolder(holder, position, payloads)
             }

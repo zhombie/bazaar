@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.gallery
+package kz.zhombie.bazaar.ui.media.visual
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +11,14 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 
-internal class MediaGalleryHeaderAdapter constructor(
+internal class VisualMediaHeaderAdapter constructor(
     isCameraEnabled: Boolean,
     isExplorerEnabled: Boolean,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        private val TAG: String = MediaGalleryHeaderAdapter::class.java.simpleName
+        private val TAG: String = VisualMediaHeaderAdapter::class.java.simpleName
     }
 
     private object ViewType {

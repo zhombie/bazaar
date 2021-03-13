@@ -13,7 +13,7 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
-import kz.zhombie.bazaar.api.model.Entity
+import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
@@ -121,11 +121,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         showButton.setOnClickListener {
             if (checkPermissions()) {
                 Bazaar.Builder(object : AbstractResultCallback {
-                    override fun onLocalEntityResult(entity: List<Entity>) {
-                        Log.d(TAG, "entity: $entity")
+                    override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
+                        Log.d(TAG, "multimedia: $multimedia")
                     }
 
-                    override fun onMediaGalleryResult(media: List<Media>) {
+                    override fun onMediaSelectResult(media: List<Media>) {
                         Log.d(TAG, "media: $media")
                         adapter.media = media
                     }
@@ -169,18 +169,18 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         adapter.media = listOf(media)
     }
 
-    override fun onLocalMediaGalleryResult(media: Media) {
+    override fun onLocalMediaStoreResult(media: Media) {
         Log.d(TAG, "media: $media")
         adapter.media = listOf(media)
     }
 
-    override fun onLocalMediaGalleryResult(media: List<Media>) {
+    override fun onLocalMediaStoreResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
         adapter.media = media
     }
 
-    override fun onLocalEntityResult(entity: Entity) {
-        Log.d(TAG, "entity: $entity")
+    override fun onLocalMediaStoreResult(multimedia: Multimedia) {
+        Log.d(TAG, "multimedia: $multimedia")
     }
 
     override fun onMediaGallerySelectResult(media: List<Media>) {

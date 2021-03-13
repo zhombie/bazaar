@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/mediaGalleryView"
+        android:id="@+id/contentView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -116,8 +116,8 @@
         android:textAllCaps="false"
         android:textSize="18sp"
         app:cornerRadius="13dp"
-        app:layout_constraintEnd_toEndOf="@+id/mediaGalleryView"
-        app:layout_constraintStart_toStartOf="@+id/mediaGalleryView"
+        app:layout_constraintEnd_toEndOf="@+id/contentView"
+        app:layout_constraintStart_toStartOf="@+id/contentView"
         app:layout_constraintTop_toTopOf="parent"
         app:rippleColor="?attr/colorControlHighlight"
         tools:layout_marginTop="500dp"

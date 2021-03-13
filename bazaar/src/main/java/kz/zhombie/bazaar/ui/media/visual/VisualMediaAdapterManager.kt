@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.gallery
+package kz.zhombie.bazaar.ui.media.visual
 
 import android.content.Context
 import android.view.View
@@ -8,33 +8,34 @@ import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
+import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MediaGalleryAdapterManager constructor(
+internal class VisualMediaAdapterManager constructor(
     private val context: Context,
     private val recyclerView: RecyclerView
 ) {
 
-    private var mediaGalleryHeaderAdapter: MediaGalleryHeaderAdapter? = null
-    private var mediaGalleryAdapter: MediaGalleryAdapter? = null
+    private var visualMediaHeaderAdapter: VisualMediaHeaderAdapter? = null
+    private var visualMediaAdapter: VisualMediaAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
 
     fun create(
         imageLoader: ImageLoader,
         isCameraEnabled: Boolean,
         isExplorerEnabled: Boolean,
-        mediaGalleryHeaderAdapterCallback: MediaGalleryHeaderAdapter.Callback,
-        mediaGalleryAdapterCallback: MediaGalleryAdapter.Callback
+        visualMediaHeaderAdapterCallback: VisualMediaHeaderAdapter.Callback,
+        visualMediaAdapterCallback: VisualMediaAdapter.Callback
     ) {
-        mediaGalleryHeaderAdapter = MediaGalleryHeaderAdapter(
+        visualMediaHeaderAdapter = VisualMediaHeaderAdapter(
             isCameraEnabled = isCameraEnabled,
             isExplorerEnabled = isExplorerEnabled,
-            callback = mediaGalleryHeaderAdapterCallback
+            callback = visualMediaHeaderAdapterCallback
         )
 
-        mediaGalleryAdapter = MediaGalleryAdapter(imageLoader, mediaGalleryAdapterCallback)
+        visualMediaAdapter = VisualMediaAdapter(imageLoader, visualMediaAdapterCallback)
 
-        concatAdapter = ConcatAdapter(mediaGalleryHeaderAdapter, mediaGalleryAdapter)
+        concatAdapter = ConcatAdapter(visualMediaHeaderAdapter, visualMediaAdapter)
         recyclerView.adapter = concatAdapter
 
         val layoutManager = GridLayoutManager(
@@ -61,11 +62,11 @@ internal class MediaGalleryAdapterManager constructor(
     }
 
     fun setCameraEnabled(isEnabled: Boolean) {
-        mediaGalleryHeaderAdapter?.isCameraEnabled = isEnabled
+        visualMediaHeaderAdapter?.isCameraEnabled = isEnabled
     }
 
     fun setExplorerEnabled(isEnabled: Boolean) {
-        mediaGalleryHeaderAdapter?.isExplorerEnabled = isEnabled
+        visualMediaHeaderAdapter?.isExplorerEnabled = isEnabled
     }
 
     fun show() {
@@ -90,8 +91,8 @@ internal class MediaGalleryAdapterManager constructor(
         )
     }
 
-    fun submitList(uiMedia: List<UIMedia>) {
-        mediaGalleryAdapter?.submitList(uiMedia)
+    fun submitList(uiMultimedia: List<UIMultimedia>) {
+        visualMediaAdapter?.submitList(uiMultimedia.filterIsInstance<UIMedia>())
     }
 
     fun scrollToTop() {
@@ -99,10 +100,10 @@ internal class MediaGalleryAdapterManager constructor(
     }
 
     fun destroy() {
-        mediaGalleryHeaderAdapter?.let { concatAdapter?.removeAdapter(it) }
-        mediaGalleryAdapter?.let { concatAdapter?.removeAdapter(it) }
-        mediaGalleryHeaderAdapter = null
-        mediaGalleryAdapter = null
+        visualMediaHeaderAdapter?.let { concatAdapter?.removeAdapter(it) }
+        visualMediaAdapter?.let { concatAdapter?.removeAdapter(it) }
+        visualMediaHeaderAdapter = null
+        visualMediaAdapter = null
         concatAdapter = null
     }
 

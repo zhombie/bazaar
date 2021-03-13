@@ -5,7 +5,7 @@ import android.net.Uri
 data class Folder constructor(
     val id: Long,
     val displayName: String,
-    val items: List<Media>
+    val items: List<Multimedia>
 ) {
 
     val cover: Uri?

@@ -11,17 +11,20 @@ internal data class UIMedia constructor(
     override val isSelectable: Boolean,
     override val isSelected: Boolean,
     override val isVisible: Boolean
-) : Controllable, Serializable {
+) : UIMultimedia(
+    multimedia = media,
+    isSelectable = isSelectable,
+    isSelected = isSelected,
+    isVisible = isVisible
+), Serializable {
 
-    fun isImage(): Boolean {
-        return media is Image
-    }
+    fun isImage(): Boolean = media is Image
 
-    fun isVideo(): Boolean {
-        return media is Video
-    }
+    fun isVideo(): Boolean = media is Video
 
-    fun getDisplayDuration(): String? {
+    fun isImageOrVideo(): Boolean = isImage() || isVideo()
+
+    override fun getDisplayDuration(): String? {
         return if (media is Video) {
             if (media.duration == null) return null
             try {

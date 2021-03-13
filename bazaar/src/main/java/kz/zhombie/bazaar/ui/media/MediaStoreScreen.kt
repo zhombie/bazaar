@@ -20,11 +20,19 @@ internal object MediaStoreScreen {
     ) : Serializable {
 
         fun isCameraShouldBeAvailable(): Boolean {
-            return if (mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO) {
+            return if (isVisualMediaMode()) {
                 cameraSettings.isAnyCameraActionEnabled
             } else {
                 false
             }
+        }
+
+        fun isVisualMediaMode(): Boolean {
+            return mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO
+        }
+
+        fun isAudibleMediaMode(): Boolean {
+            return mode == Mode.AUDIO
         }
 
     }
@@ -45,26 +53,26 @@ internal object MediaStoreScreen {
         data class TakeVideo constructor(val input: Uri) : Action()
         data class TakenVideoResult constructor(val video: Video): Action()
 
-        object SelectLocalMediaGalleryImage : Action()
-        data class SelectedLocalMediaGalleryImageResult constructor(val image: Image) : Action()
+        object SelectLocalMediaImage : Action()
+        data class SelectedLocalMediaImageResult constructor(val image: Image) : Action()
 
-        object SelectLocalMediaGalleryImages : Action()
-        data class SelectedLocalMediaGalleryImagesResult constructor(val images: List<Image>) : Action()
+        object SelectLocalMediaImages : Action()
+        data class SelectedLocalMediaImagesResult constructor(val images: List<Image>) : Action()
 
-        object SelectLocalMediaGalleryVideo : Action()
-        data class SelectedLocalMediaGalleryVideoResult constructor(val video: Video) : Action()
+        object SelectLocalMediaVideo : Action()
+        data class SelectedLocalMediaVideoResult constructor(val video: Video) : Action()
 
-        object SelectLocalMediaGalleryVideos : Action()
-        data class SelectedLocalMediaGalleryVideosResult constructor(val videos: List<Video>) : Action()
+        object SelectLocalMediaVideos : Action()
+        data class SelectedLocalMediaVideosResult constructor(val videos: List<Video>) : Action()
 
-        object SelectLocalMediaGalleryImageOrVideo : Action()
-        data class SelectedLocalMediaGalleryImageOrVideoResult constructor(val media: Media) : Action()
+        object SelectLocalMediaImageOrVideo : Action()
+        data class SelectedLocalMediaImageOrVideoResult constructor(val media: Media) : Action()
 
-        object SelectLocalMediaGalleryImagesOrVideos : Action()
-        data class SelectedLocalMediaGalleryImagesOrVideosResult constructor(val media: List<Media>) : Action()
+        object SelectLocalMediaImagesAndVideos : Action()
+        data class SelectedLocalMediaImagesAndVideosResult constructor(val media: List<Media>) : Action()
 
-        object SelectLocalAudio : Action()
-        data class SelectedLocalAudio constructor(val audio: Audio) : Action()
+        object SelectLocalMediaAudio : Action()
+        data class SelectedLocalMediaAudio constructor(val audio: Audio) : Action()
 
         object Empty : Action()
     }

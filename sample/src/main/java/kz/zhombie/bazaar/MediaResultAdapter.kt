@@ -42,15 +42,40 @@ class MediaResultAdapter constructor(
         private val textView = view.findViewById<MaterialTextView>(R.id.textView)
 
         fun bind(media: Media) {
-            imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
-            val type = when (media) {
-                is Image -> "Фото"
-                is Video -> "Видео"
-                else -> "Неизвестно"
-            }
-            textView.text = """
+            when (media) {
+                is Image -> {
+                    val thumbnail = media.thumbnail ?: media.source
+                    if (thumbnail == null) {
+                        imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
+                    } else {
+                        imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
+                    }
+
+                    textView.text = """
 Название: ${media.displayName}
-Тип: $type
+Тип: "Фото"
+Размер: ${media.size}
+Папка: ${media.folderDisplayName}
+Расширение: ${media.extension}
+Ширина x Высота: ${media.width}x${media.height} 
+Ссылка: ${media.uri}
+Путь: ${media.path}
+MIME type: ${media.mimeType},
+Оригинальное фото: ${if (media.source != null) "Есть" else "Нет"}
+Ярлык: ${if (media.thumbnail != null) "Есть" else "Нет"}
+                    """.trim()
+                }
+                is Video -> {
+                    val thumbnail = media.thumbnail
+                    if (thumbnail == null) {
+                        imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
+                    } else {
+                        imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
+                    }
+
+                    textView.text = """
+Название: ${media.displayName}
+Тип: "Видео"
 Размер: ${media.size}
 Продолжительность: ${getDuration(media)}, ${getDisplayDuration(media)}
 Папка: ${media.folderDisplayName}
@@ -58,7 +83,13 @@ class MediaResultAdapter constructor(
 Ширина x Высота: ${media.width}x${media.height} 
 Ссылка: ${media.uri}
 Путь: ${media.path}
-            """.trim()
+MIME type: ${media.mimeType},
+Обложка: ${if (media.thumbnail != null) "Есть" else "Нет"}
+                    """.trim()
+                }
+                else -> {
+                }
+            }
         }
 
     }

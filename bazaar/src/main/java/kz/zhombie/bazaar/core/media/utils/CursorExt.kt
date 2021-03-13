@@ -78,14 +78,14 @@ internal fun Cursor.readVideo(): Video? {
         val displayName = getString(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DISPLAY_NAME))
         val size = getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.SIZE))
 
-        var dateAdded = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_ADDED))
+        var dateAdded = getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DATE_ADDED))
         dateAdded = TimeUnit.SECONDS.toMillis(dateAdded)
 
-        var dateModified = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_MODIFIED))
+        var dateModified = getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DATE_MODIFIED))
         dateModified = TimeUnit.SECONDS.toMillis(dateModified)
 
         val dateTaken = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN))
+            getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DATE_TAKEN))
         } else {
             -1L
         }
@@ -97,8 +97,8 @@ internal fun Cursor.readVideo(): Video? {
         var bucketId: Long? = null
         var bucketDisplayName: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            bucketId = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_ID))
-            bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
+            bucketId = getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.BUCKET_ID))
+            bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME))
         }
 
         val duration = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -138,6 +138,65 @@ internal fun Cursor.readFile(): Media? {
         MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> readImage()
         MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> readVideo()
         else -> null
+    }
+}
+
+
+internal fun Cursor.readAudio(): Audio? {
+    return try {
+        val id = getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns._ID))
+        val externalContentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+        val title = getString(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.TITLE))
+        val displayName = getString(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DISPLAY_NAME))
+        val size = getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.SIZE))
+
+        var dateAdded = getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATE_ADDED))
+        dateAdded = TimeUnit.SECONDS.toMillis(dateAdded)
+
+        var dateModified = getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATE_MODIFIED))
+        dateModified = TimeUnit.SECONDS.toMillis(dateModified)
+
+        val dateTaken = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATE_TAKEN))
+        } else {
+            -1L
+        }
+
+        val mimeType = getString(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.MIME_TYPE))
+
+        var bucketId: Long? = null
+        var bucketDisplayName: String? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            bucketId = getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.BUCKET_ID))
+            bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME))
+        }
+
+        val duration = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION))
+        } else {
+            null
+        }
+
+        Audio(
+            id = id,
+            uri = externalContentUri,
+            path = null,
+            title = title,
+            displayName = displayName,
+            mimeType = mimeType,
+            extension = getExtension(filename = displayName, mimeType = mimeType),
+            size = size,
+            dateAdded = dateAdded,
+            dateModified = dateModified,
+            dateCreated = dateTaken,
+            thumbnail = null,
+            folderId = bucketId,
+            folderDisplayName = bucketDisplayName,
+            duration = duration
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 }
 

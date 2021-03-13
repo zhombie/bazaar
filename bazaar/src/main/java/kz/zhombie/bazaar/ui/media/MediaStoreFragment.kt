@@ -26,10 +26,12 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
+import kz.zhombie.bazaar.ui.media.audible.AudiosAdapterManager
 import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
-import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapter
-import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryAdapterManager
-import kz.zhombie.bazaar.ui.media.gallery.MediaGalleryHeaderAdapter
+import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapter
+import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
+import kz.zhombie.bazaar.ui.media.visual.VisualMediaHeaderAdapter
+import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.contract.GetContentContract
@@ -39,8 +41,8 @@ import java.util.*
 import kotlin.math.roundToInt
 
 internal class MediaStoreFragment : BottomSheetDialogFragment(),
-    MediaGalleryAdapter.Callback,
-    MediaGalleryHeaderAdapter.Callback {
+    VisualMediaAdapter.Callback,
+    VisualMediaHeaderAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -65,7 +67,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private lateinit var viewModel: MediaStoreViewModel
 
     private var foldersAdapterManager: FoldersAdapterManager? = null
-    private var mediaGalleryAdapterManager: MediaGalleryAdapterManager? = null
+    private var visualMediaAdapterManager: VisualMediaAdapterManager? = null
+    private var audiosAdapterManager: AudiosAdapterManager? = null
 
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
@@ -124,7 +127,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     topMargin = collapsedMargin
                 }
 
-                mediaGalleryAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+                if (viewModel.getSettings().isVisualMediaMode()) {
+                    visualMediaAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+                } else if (viewModel.getSettings().isAudibleMediaMode()){
+                    audiosAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+                }
 
                 foldersAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
@@ -162,13 +169,19 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         super.onViewCreated(view, savedInstanceState)
 
         headerView = view.findViewById(R.id.headerView)
-        val mediaGalleryView = view.findViewById<RecyclerView>(R.id.mediaGalleryView)
+        val contentView = view.findViewById<RecyclerView>(R.id.contentView)
         selectButton = view.findViewById(R.id.selectButton)
         val foldersView = view.findViewById<RecyclerView>(R.id.foldersView)
         progressView = view.findViewById(R.id.progressView)
 
         setupHeaderView()
-        setupMediaGalleryView(mediaGalleryView)
+
+        if (viewModel.getSettings().isVisualMediaMode()) {
+            setupVisualMediaView(contentView)
+        } else if (viewModel.getSettings().isAudibleMediaMode()) {
+            setupAudiosView(contentView)
+        }
+
         setupSelectButton(selectedMediaCount = 0)
         setupFoldersView(foldersView)
         setupProgressView()
@@ -186,8 +199,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         foldersAdapterManager?.destroy()
         foldersAdapterManager = null
 
-        mediaGalleryAdapterManager?.destroy()
-        mediaGalleryAdapterManager = null
+        visualMediaAdapterManager?.destroy()
+        visualMediaAdapterManager = null
 
         selectButton.setOnClickListener(null)
 
@@ -204,15 +217,26 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         headerView.setOnCloseButtonClickListener { dismiss() }
     }
 
-    private fun setupMediaGalleryView(recyclerView: RecyclerView) {
-        mediaGalleryAdapterManager = MediaGalleryAdapterManager(requireContext(), recyclerView)
-        mediaGalleryAdapterManager?.create(
-            imageLoader = Settings.getImageLoader(),
-            isCameraEnabled = viewModel.getSettings().isCameraShouldBeAvailable(),
-            isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
-            mediaGalleryHeaderAdapterCallback = this,
-            mediaGalleryAdapterCallback = this
-        )
+    private fun setupVisualMediaView(recyclerView: RecyclerView) {
+        if (visualMediaAdapterManager == null) {
+            visualMediaAdapterManager = VisualMediaAdapterManager(requireContext(), recyclerView)
+            visualMediaAdapterManager?.create(
+                imageLoader = Settings.getImageLoader(),
+                isCameraEnabled = viewModel.getSettings().isCameraShouldBeAvailable(),
+                isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                visualMediaHeaderAdapterCallback = this,
+                visualMediaAdapterCallback = this
+            )
+        }
+    }
+
+    private fun setupAudiosView(recyclerView: RecyclerView) {
+        if (audiosAdapterManager == null) {
+            audiosAdapterManager = AudiosAdapterManager(requireContext(), recyclerView)
+            audiosAdapterManager?.create(
+                imageLoader = Settings.getImageLoader()
+            )
+        }
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
@@ -241,12 +265,15 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.getScreenState().observe(viewLifecycleOwner, { state ->
             when (state) {
                 MediaStoreScreen.State.LOADING -> {
+                    selectButton.isEnabled = false
                     progressView.visibility = View.VISIBLE
                 }
                 MediaStoreScreen.State.CONTENT -> {
+                    selectButton.isEnabled = true
                     progressView.visibility = View.GONE
                 }
                 else -> {
+                    selectButton.isEnabled = true
                     progressView.visibility = View.GONE
                 }
             }
@@ -289,61 +316,63 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     resultCallback?.onCameraResult(action.video)
                     dismiss()
                 }
-                // Media gallery image selection
-                is MediaStoreScreen.Action.SelectLocalMediaGalleryImage -> {
-                    getLocalMediaGalleryImage.launch("image/*")
+                // Local media image selection
+                is MediaStoreScreen.Action.SelectLocalMediaImage -> {
+                    getLocalMediaImage.launch("image/*")
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImageResult -> {
-                    resultCallback?.onLocalMediaGalleryResult(action.image)
+                is MediaStoreScreen.Action.SelectedLocalMediaImageResult -> {
+                    resultCallback?.onLocalMediaStoreResult(action.image)
                     dismiss()
                 }
-                // Multiple media gallery images selection
-                is MediaStoreScreen.Action.SelectLocalMediaGalleryImages -> {
-                    getLocalMediaGalleryImages.launch("image/*")
+                // Multiple local media images selection
+                is MediaStoreScreen.Action.SelectLocalMediaImages -> {
+                    getLocalMediaImages.launch("image/*")
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesResult -> {
-                    resultCallback?.onLocalMediaGalleryResult(action.images)
+                is MediaStoreScreen.Action.SelectedLocalMediaImagesResult -> {
+                    resultCallback?.onLocalMediaStoreResult(action.images)
                     dismiss()
                 }
-                // Media media gallery video selection
-                is MediaStoreScreen.Action.SelectLocalMediaGalleryVideo -> {
-                    getLocalMediaGalleryVideo.launch("video/*")
+                // Local media video selection
+                is MediaStoreScreen.Action.SelectLocalMediaVideo -> {
+                    getLocalMediaVideo.launch("video/*")
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaGalleryVideoResult -> {
-                    resultCallback?.onLocalMediaGalleryResult(action.video)
+                is MediaStoreScreen.Action.SelectedLocalMediaVideoResult -> {
+                    resultCallback?.onLocalMediaStoreResult(action.video)
                     dismiss()
                 }
-                // Multiple media gallery videos selection
-                is MediaStoreScreen.Action.SelectLocalMediaGalleryVideos -> {
-                    getLocalMediaGalleryVideos.launch("video/*")
+                // Multiple local media videos selection
+                is MediaStoreScreen.Action.SelectLocalMediaVideos -> {
+                    getLocalMediaVideos.launch("video/*")
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaGalleryVideosResult -> {
-                    resultCallback?.onLocalMediaGalleryResult(action.videos)
+                is MediaStoreScreen.Action.SelectedLocalMediaVideosResult -> {
+                    resultCallback?.onLocalMediaStoreResult(action.videos)
                     dismiss()
                 }
-                // Media gallery image or video selection
-                is MediaStoreScreen.Action.SelectLocalMediaGalleryImageOrVideo -> {
-                    getLocalMediaGalleryImageOrVideo.launch(arrayOf("image/*, video/*"))
+                // Local media image or video selection
+                is MediaStoreScreen.Action.SelectLocalMediaImageOrVideo -> {
+                    getLocalMediaImageOrVideo.launch(arrayOf("image/*, video/*"))
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImageOrVideoResult -> {
-                    resultCallback?.onLocalMediaGalleryResult(action.media)
+                is MediaStoreScreen.Action.SelectedLocalMediaImageOrVideoResult -> {
+                    resultCallback?.onLocalMediaStoreResult(action.media)
                     dismiss()
                 }
-                // Multiple media gallery images or videos selection
-                is MediaStoreScreen.Action.SelectLocalMediaGalleryImagesOrVideos -> {
-                    getLocalMediaGalleryImagesOrVideos.launch(arrayOf("image/*, video/*"))
+                // Multiple local media images and videos selection
+                is MediaStoreScreen.Action.SelectLocalMediaImagesAndVideos -> {
+                    getLocalMediaImagesAndVideos.launch(arrayOf("image/*, video/*"))
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaGalleryImagesOrVideosResult -> {
-                    resultCallback?.onLocalMediaGalleryResult(action.media)
+                is MediaStoreScreen.Action.SelectedLocalMediaImagesAndVideosResult -> {
+                    resultCallback?.onLocalMediaStoreResult(action.media)
                     dismiss()
                 }
-                is MediaStoreScreen.Action.SelectLocalAudio -> {
-                    getLocalAudio.launch(arrayOf("audio/*"))
+                // Local media audio selection
+                is MediaStoreScreen.Action.SelectLocalMediaAudio -> {
+                    getLocalMediaAudio.launch(arrayOf("audio/*"))
                 }
-                is MediaStoreScreen.Action.SelectedLocalAudio -> {
-                    resultCallback?.onLocalEntityResult(action.audio)
+                is MediaStoreScreen.Action.SelectedLocalMediaAudio -> {
+                    resultCallback?.onLocalMediaStoreResult(action.audio)
                     dismiss()
                 }
+                // Empty value
                 is MediaStoreScreen.Action.Empty -> {
                     Toast.makeText(context, "Произошла ошибка при выборе медиафайлов", Toast.LENGTH_SHORT).show()
                     dismiss()
@@ -362,8 +391,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun observeDisplayedMedia() {
-        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { media ->
-            mediaGalleryAdapterManager?.submitList(media)
+        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { uiMultimedia: List<UIMultimedia> ->
+            if (viewModel.getSettings().isVisualMediaMode()) {
+                visualMediaAdapterManager?.submitList(uiMultimedia)
+            } else if (viewModel.getSettings().isAudibleMediaMode()) {
+                audiosAdapterManager?.submitList(uiMultimedia)
+            }
         })
     }
 
@@ -384,7 +417,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 headerView.toggleIcon(false)
                 foldersAdapterManager?.hide()
 
-                mediaGalleryAdapterManager?.scrollToTop()
+                if (viewModel.getSettings().isVisualMediaMode()) {
+                    visualMediaAdapterManager?.scrollToTop()
+                } else if (viewModel.getSettings().isAudibleMediaMode()) {
+                    audiosAdapterManager?.scrollToTop()
+                }
             }
         })
     }
@@ -396,7 +433,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     /**
-     * [MediaGalleryHeaderAdapter.Callback] implementation
+     * [VisualMediaHeaderAdapter.Callback] implementation
      */
 
     override fun onCameraClicked() {
@@ -404,11 +441,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onExplorerClicked() {
-        viewModel.onSelectLocalMediaGalleryRequested()
+        viewModel.onSelectLocalMediaRequested()
     }
 
     /**
-     * [MediaGalleryAdapter.Callback] implementation
+     * [VisualMediaAdapter.Callback] implementation
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
@@ -450,36 +487,36 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.onVideoTaken(bitmap)
     }
 
-    private val getLocalMediaGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        viewModel.onLocalMediaGalleryImageSelected(uri)
+    private val getLocalMediaImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.onLocalMediaImageSelected(uri)
     }
 
-    private val getLocalMediaGalleryImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        viewModel.onLocalMediaGalleryImagesSelected(uris)
+    private val getLocalMediaImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+        viewModel.onLocalMediaImagesSelected(uris)
     }
 
-    private val getLocalMediaGalleryVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        viewModel.onLocalMediaGalleryVideoSelected(uri)
+    private val getLocalMediaVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.onLocalMediaVideoSelected(uri)
     }
 
-    private val getLocalMediaGalleryVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        viewModel.onLocalMediaGalleryVideosSelected(uris)
+    private val getLocalMediaVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
+        viewModel.onLocalMediaVideosSelected(uris)
     }
 
-    private val getLocalMediaGalleryImageOrVideo = registerForActivityResult(GetContentContract()) { uri ->
-        viewModel.onLocalMediaGalleryImageOrVideoSelected(uri)
+    private val getLocalMediaImageOrVideo = registerForActivityResult(GetContentContract()) { uri ->
+        viewModel.onLocalMediaImageOrVideoSelected(uri)
     }
 
-    private val getLocalMediaGalleryImagesOrVideos = registerForActivityResult(GetMultipleContentsContract()) { uris ->
-        viewModel.onLocalMediaGalleryImagesOrVideosSelected(uris)
+    private val getLocalMediaImagesAndVideos = registerForActivityResult(GetMultipleContentsContract()) { uris ->
+        viewModel.onLocalMediaImagesAndVideosSelected(uris)
     }
 
-    private val getLocalAudio = registerForActivityResult(GetContentContract()) { uri ->
-        viewModel.onLocalAudioSelected(uri)
+    private val getLocalMediaAudio = registerForActivityResult(GetContentContract()) { uri ->
+        viewModel.onLocalMediaAudioSelected(uri)
     }
 
-    private val getLocalAudios = registerForActivityResult(GetMultipleContentsContract()) { uris ->
-        viewModel.onLocalAudiosSelected(uris)
+    private val getLocalMediaAudios = registerForActivityResult(GetMultipleContentsContract()) { uris ->
+        viewModel.onLocalMediaAudiosSelected(uris)
     }
 
 }

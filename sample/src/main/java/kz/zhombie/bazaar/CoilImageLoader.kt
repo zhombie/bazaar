@@ -32,7 +32,21 @@ class CoilImageLoader : ImageLoader {
     }
 
     override fun loadGridItemImage(context: Context, imageView: ImageView, bitmap: Bitmap) {
-        imageView.setImageBitmap(bitmap)
+        val request = ImageRequest.Builder(context)
+            .bitmapConfig(Bitmap.Config.ARGB_8888)
+            .crossfade(true)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .data(bitmap)
+            .error(R.drawable.bg_rounded_white_with_stroke)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .placeholder(R.drawable.bg_rounded_white_with_stroke)
+            .precision(Precision.AUTOMATIC)
+            .scale(Scale.FIT)
+            .size(300, 300)
+            .target(imageView)
+            .build()
+
+        Coil.enqueue(request)
     }
 
     override fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri) {

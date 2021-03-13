@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/playOrPauseButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:text="@null"
+        app:icon="@drawable/ic_play"
+        app:iconGravity="textEnd"
+        app:iconPadding="0dp"
+        app:iconSize="25dp"
+        app:iconTint="@null"
+        app:rippleColor="?attr/colorControlHighlight"
+        app:shapeAppearance="@style/CircularShapeAppearance" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/titleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:letterSpacing="0.0"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:textColor="@android:color/black"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="Audio display name" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider"
+            style="@style/Widget.MaterialComponents.Slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="0dp"
+            android:enabled="false"
+            android:minHeight="0dp"
+            android:paddingBottom="0dp"
+            android:paddingTop="0dp"
+            app:labelBehavior="gone"
+            app:thumbColor="@android:color/holo_blue_dark"
+            app:thumbElevation="0dp"
+            app:thumbRadius="7.5dp"
+            app:thumbStrokeWidth="0dp"
+            app:trackColorActive="@android:color/black"
+            app:trackColorInactive="@android:color/darker_gray"
+            app:trackHeight="2dp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/durationView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:letterSpacing="0.0"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="10sp"
+            android:textStyle="normal"
+            tools:text="Audio display name" />
+
+    </LinearLayout>
+
+</LinearLayout>

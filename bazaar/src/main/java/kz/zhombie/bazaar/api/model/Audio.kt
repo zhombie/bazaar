@@ -23,7 +23,7 @@ data class Audio constructor(
     override val folderDisplayName: String? = null,
 
     val duration: Long? = null
-) : Entity(
+) : Multimedia(
     id = id,
     uri = uri,
     path = path,
