@@ -12,6 +12,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.SquareImageView
 import kz.zhombie.bazaar.ui.model.UIFolder
+import kz.zhombie.bazaar.utils.inflate
 
 internal class FoldersAdapter constructor(
     private val imageLoader: ImageLoader,
@@ -44,11 +45,7 @@ internal class FoldersAdapter constructor(
     private fun getItem(position: Int): UIFolder = asyncListDiffer.currentList[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ViewHolder(
-            LayoutInflater
-                .from(parent.context)
-                .inflate(R.layout.cell_folder, parent, false)
-        )
+        return ViewHolder(parent.inflate(R.layout.cell_folder))
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

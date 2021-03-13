@@ -2,6 +2,7 @@ package kz.zhombie.bazaar.ui.media.audible
 
 import android.content.Context
 import android.view.View
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
@@ -14,15 +15,21 @@ internal class AudiosAdapterManager  constructor(
     private val recyclerView: RecyclerView
 ) {
 
+    private var audiosHeaderAdapter: AudiosHeaderAdapter? = null
     private var audiosAdapter: AudiosAdapter? = null
+    private var concatAdapter: ConcatAdapter? = null
 
     fun create(
         imageLoader: ImageLoader,
-        callback: AudiosAdapter.Callback
+        isExplorerEnabled: Boolean,
+        audiosHeaderAdapterCallback: AudiosHeaderAdapter.Callback,
+        audiosAdapterCallback: AudiosAdapter.Callback
     ) {
-        audiosAdapter = AudiosAdapter(imageLoader, callback)
+        audiosHeaderAdapter = AudiosHeaderAdapter(isExplorerEnabled, audiosHeaderAdapterCallback)
+        audiosAdapter = AudiosAdapter(imageLoader, audiosAdapterCallback)
 
-        recyclerView.adapter = audiosAdapter
+        concatAdapter = ConcatAdapter(audiosHeaderAdapter, audiosAdapter)
+        recyclerView.adapter = concatAdapter
 
         val layoutManager = LinearLayoutManager(
             context,
@@ -77,7 +84,11 @@ internal class AudiosAdapterManager  constructor(
     }
 
     fun destroy() {
+        audiosHeaderAdapter?.let { concatAdapter?.removeAdapter(it) }
+        audiosAdapter?.let { concatAdapter?.removeAdapter(it) }
+        audiosHeaderAdapter = null
         audiosAdapter = null
+        concatAdapter = null
     }
 
 }

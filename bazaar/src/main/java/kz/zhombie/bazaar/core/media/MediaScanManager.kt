@@ -366,6 +366,15 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
+    suspend fun loadSelectedLocalMediaAudios(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        uris: List<Uri>
+    ): List<Audio> = withContext(dispatcher) {
+        return@withContext uris.mapNotNull { uri ->
+            loadSelectedLocalMediaAudio(dispatcher, uri)
+        }
+    }
+
     suspend fun loadSelectedLocalMediaAudio(
         dispatcher: CoroutineDispatcher,
         uri: Uri

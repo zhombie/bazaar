@@ -12,7 +12,8 @@ interface ResultCallback {
     fun onLocalMediaStoreResult(media: List<Media>)
 
     // Other types, not visual media. For example, Audio
-    fun onLocalMediaStoreResult(multimedia: Multimedia)
+    fun onMultimediaLocalMediaStoreResult(multimedia: Multimedia)
+    fun onMultimediaLocalMediaStoreResult(multimedia: List<Multimedia>)
 
     // Media selected from offered custom media gallery
     fun onMediaGallerySelectResult(media: List<Media>)

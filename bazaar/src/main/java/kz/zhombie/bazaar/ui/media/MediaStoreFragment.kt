@@ -29,6 +29,7 @@ import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapterManager
+import kz.zhombie.bazaar.ui.media.audible.AudiosHeaderAdapter
 import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapter
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
@@ -44,7 +45,7 @@ import kotlin.math.roundToInt
 
 internal class MediaStoreFragment : BottomSheetDialogFragment(),
     VisualMediaAdapter.Callback,
-    VisualMediaHeaderAdapter.Callback, AudiosAdapter.Callback {
+    VisualMediaHeaderAdapter.Callback, AudiosAdapter.Callback, AudiosHeaderAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -206,6 +207,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         visualMediaAdapterManager?.destroy()
         visualMediaAdapterManager = null
 
+        audiosAdapterManager?.destroy()
+        audiosAdapterManager = null
+
         selectButton.setOnClickListener(null)
 
         super.onDestroy()
@@ -239,7 +243,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             audiosAdapterManager = AudiosAdapterManager(requireContext(), recyclerView)
             audiosAdapterManager?.create(
                 imageLoader = Settings.getImageLoader(),
-                callback = this
+                isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                audiosHeaderAdapterCallback = this,
+                audiosAdapterCallback = this
             )
         }
     }
@@ -379,7 +385,15 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaAudio.launch(arrayOf("audio/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaAudio -> {
-                    resultCallback?.onLocalMediaStoreResult(action.audio)
+                    resultCallback?.onMultimediaLocalMediaStoreResult(action.audio)
+                    dismiss()
+                }
+                // Multiple local media audio selection
+                is MediaStoreScreen.Action.SelectLocalMediaAudios -> {
+                    getLocalMediaAudios.launch(arrayOf("audio/*"))
+                }
+                is MediaStoreScreen.Action.SelectedLocalMediaAudios -> {
+                    resultCallback?.onMultimediaLocalMediaStoreResult(action.audios)
                     dismiss()
                 }
                 // Empty value

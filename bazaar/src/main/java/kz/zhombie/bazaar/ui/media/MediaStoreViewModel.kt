@@ -409,6 +409,8 @@ internal class MediaStoreViewModel : ViewModel() {
                     Mode.AUDIO -> {
                         if (settings.maxSelectionCount == 1) {
                             action.postValue(MediaStoreScreen.Action.SelectLocalMediaAudio)
+                        } else {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaAudios)
                         }
                     }
                 }
@@ -597,6 +599,23 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaAudiosSelected(uris: List<Uri>?) {
+        Logger.d(TAG, "onLocalMediaAudiosSelected() -> uris: $uris")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uris.isNullOrEmpty()) return
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                val allowedUris = uris.take(settings.maxSelectionCount)
+                val audios = mediaScanManager.loadSelectedLocalMediaAudios(Dispatchers.IO, allowedUris)
+                if (audios.isNullOrEmpty()) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalMediaAudios(audios))
+                }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
+            }
+        }
     }
 
     fun onSubmitSelectMediaRequested() {

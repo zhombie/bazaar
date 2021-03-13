@@ -14,6 +14,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.utils.inflate
 
 internal class AudiosAdapter constructor(
     private val imageLoader: ImageLoader,
@@ -72,13 +73,8 @@ internal class AudiosAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ViewType.AUDIO -> {
-                ViewHolder(
-                    view = LayoutInflater
-                        .from(parent.context)
-                        .inflate(R.layout.cell_audio, parent, false)
-                )
-            }
+            ViewType.AUDIO ->
+                ViewHolder(parent.inflate(R.layout.cell_audio))
             else ->
                 throw ViewHolderException(viewType)
         }

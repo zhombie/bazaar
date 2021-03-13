@@ -180,9 +180,14 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         adapter.multimedia = media
     }
 
-    override fun onLocalMediaStoreResult(multimedia: Multimedia) {
+    override fun onMultimediaLocalMediaStoreResult(multimedia: Multimedia) {
         Log.d(TAG, "multimedia: $multimedia")
         adapter.multimedia = listOf(multimedia)
+    }
+
+    override fun onMultimediaLocalMediaStoreResult(multimedia: List<Multimedia>) {
+        Log.d(TAG, "multimedia: $multimedia")
+        adapter.multimedia = multimedia
     }
 
     override fun onMediaGallerySelectResult(media: List<Media>) {

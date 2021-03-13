@@ -16,6 +16,7 @@ import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMedia
+import kz.zhombie.bazaar.utils.inflate
 
 internal class VisualMediaAdapter constructor(
     private val imageLoader: ImageLoader,
@@ -80,22 +81,10 @@ internal class VisualMediaAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ViewType.IMAGE -> {
-                ViewHolder(
-                    view = LayoutInflater
-                        .from(parent.context)
-                        .inflate(R.layout.cell_image, parent, false),
-                    viewType = viewType
-                )
-            }
-            ViewType.VIDEO -> {
-                ViewHolder(
-                    view = LayoutInflater
-                        .from(parent.context)
-                        .inflate(R.layout.cell_video, parent, false),
-                    viewType = viewType
-                )
-            }
+            ViewType.IMAGE ->
+                ViewHolder(view = parent.inflate(R.layout.cell_image), viewType = viewType)
+            ViewType.VIDEO ->
+                ViewHolder(view = parent.inflate(R.layout.cell_video), viewType = viewType)
             else ->
                 throw ViewHolderException(viewType)
         }
