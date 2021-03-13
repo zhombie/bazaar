@@ -123,11 +123,12 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 Bazaar.Builder(object : AbstractResultCallback {
                     override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
                         Log.d(TAG, "multimedia: $multimedia")
+                        adapter.multimedia = multimedia
                     }
 
                     override fun onMediaSelectResult(media: List<Media>) {
                         Log.d(TAG, "media: $media")
-                        adapter.media = media
+                        adapter.multimedia = media
                     }
                 })
                     .setTag(Bazaar.TAG)
@@ -166,30 +167,32 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     override fun onCameraResult(media: Media) {
         Log.d(TAG, "media: $media")
-        adapter.media = listOf(media)
+        adapter.multimedia = listOf(media)
     }
 
     override fun onLocalMediaStoreResult(media: Media) {
         Log.d(TAG, "media: $media")
-        adapter.media = listOf(media)
+        adapter.multimedia = listOf(media)
     }
 
     override fun onLocalMediaStoreResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
-        adapter.media = media
+        adapter.multimedia = media
     }
 
     override fun onLocalMediaStoreResult(multimedia: Multimedia) {
         Log.d(TAG, "multimedia: $multimedia")
+        adapter.multimedia = listOf(multimedia)
     }
 
     override fun onMediaGallerySelectResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
-        adapter.media = media
+        adapter.multimedia = media
     }
 
     override fun onMultimediaGallerySelectResult(multimedia: List<Multimedia>) {
         Log.d(TAG, "multimedia: $multimedia")
+        adapter.multimedia = multimedia
     }
 
 }

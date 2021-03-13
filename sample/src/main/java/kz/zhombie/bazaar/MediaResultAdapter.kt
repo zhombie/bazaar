@@ -7,22 +7,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.api.model.Image
-import kz.zhombie.bazaar.api.model.Media
-import kz.zhombie.bazaar.api.model.Video
+import kz.zhombie.bazaar.api.model.*
 import java.util.concurrent.TimeUnit
 
 class MediaResultAdapter constructor(
     var imageLoader: ImageLoader
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var media: List<Media> = emptyList()
+    var multimedia: List<Multimedia> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    override fun getItemCount(): Int = media.size
+    override fun getItemCount(): Int = multimedia.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ViewHolder(
@@ -33,7 +31,7 @@ class MediaResultAdapter constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ViewHolder) {
-            holder.bind(media[position])
+            holder.bind(multimedia[position])
         }
     }
 
@@ -41,50 +39,74 @@ class MediaResultAdapter constructor(
         private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
         private val textView = view.findViewById<MaterialTextView>(R.id.textView)
 
-        fun bind(media: Media) {
-            when (media) {
+        fun bind(multimedia: Multimedia) {
+            when (multimedia) {
                 is Image -> {
-                    val thumbnail = media.thumbnail ?: media.source
+                    val thumbnail = multimedia.thumbnail ?: multimedia.source
                     if (thumbnail == null) {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
+                        imageLoader.loadGridItemImage(itemView.context, imageView, multimedia.uri)
                     } else {
                         imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
                     }
 
                     textView.text = """
-Название: ${media.displayName}
+id: ${multimedia.id}
+Название: ${multimedia.displayName}
 Тип: "Фото"
-Размер: ${media.size}
-Папка: ${media.folderDisplayName}
-Расширение: ${media.extension}
-Ширина x Высота: ${media.width}x${media.height} 
-Ссылка: ${media.uri}
-Путь: ${media.path}
-MIME type: ${media.mimeType},
-Оригинальное фото: ${if (media.source != null) "Есть" else "Нет"}
-Ярлык: ${if (media.thumbnail != null) "Есть" else "Нет"}
+Размер: ${multimedia.size}
+Папка: ${multimedia.folderDisplayName}
+Расширение: ${multimedia.extension}
+Ширина x Высота: ${multimedia.width}x${multimedia.height} 
+Ссылка: ${multimedia.uri}
+Путь: ${multimedia.path}
+MIME type: ${multimedia.mimeType},
+Оригинальное фото: ${if (multimedia.source != null) "Есть" else "Нет"}
+Ярлык: ${if (multimedia.thumbnail != null) "Есть" else "Нет"}
                     """.trim()
                 }
                 is Video -> {
-                    val thumbnail = media.thumbnail
+                    val thumbnail = multimedia.thumbnail
                     if (thumbnail == null) {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, media.uri)
+                        imageLoader.loadGridItemImage(itemView.context, imageView, multimedia.uri)
                     } else {
                         imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
                     }
 
                     textView.text = """
-Название: ${media.displayName}
+id: ${multimedia.id}
+Название: ${multimedia.displayName}
 Тип: "Видео"
-Размер: ${media.size}
-Продолжительность: ${getDuration(media)}, ${getDisplayDuration(media)}
-Папка: ${media.folderDisplayName}
-Расширение: ${media.extension}
-Ширина x Высота: ${media.width}x${media.height} 
-Ссылка: ${media.uri}
-Путь: ${media.path}
-MIME type: ${media.mimeType},
-Обложка: ${if (media.thumbnail != null) "Есть" else "Нет"}
+Размер: ${multimedia.size}
+Продолжительность: ${getDuration(multimedia)}, ${getDisplayDuration(multimedia)}
+Папка: ${multimedia.folderDisplayName}
+Расширение: ${multimedia.extension}
+Ширина x Высота: ${multimedia.width}x${multimedia.height} 
+Ссылка: ${multimedia.uri}
+Путь: ${multimedia.path}
+MIME type: ${multimedia.mimeType},
+Обложка: ${if (multimedia.thumbnail != null) "Есть" else "Нет"}
+                    """.trim()
+                }
+                is Audio -> {
+                    val thumbnail = multimedia.thumbnail
+                    if (thumbnail == null) {
+                        imageLoader.loadGridItemImage(itemView.context, imageView, multimedia.uri)
+                    } else {
+                        imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
+                    }
+
+                    textView.text = """
+id: ${multimedia.id}
+Название: ${multimedia.displayName}
+Тип: "Аудио"
+Размер: ${multimedia.size}
+Продолжительность: ${getDuration(multimedia)}, ${getDisplayDuration(multimedia)}
+Папка: ${multimedia.folderDisplayName}
+Расширение: ${multimedia.extension}
+Ссылка: ${multimedia.uri}
+Путь: ${multimedia.path}
+MIME type: ${multimedia.mimeType},
+Обложка: ${if (multimedia.thumbnail != null) "Есть" else "Нет"}
                     """.trim()
                 }
                 else -> {
@@ -94,29 +116,51 @@ MIME type: ${media.mimeType},
 
     }
 
-    private fun getDuration(media: Media): Long? {
-        return if (media is Video) {
-            media.duration
-        } else {
-            null
+    private fun getDuration(multimedia: Multimedia): Long? {
+        return when (multimedia) {
+            is Video -> {
+                multimedia.duration
+            }
+            is Audio -> {
+                multimedia.duration
+            }
+            else -> {
+                null
+            }
         }
     }
 
-    private fun getDisplayDuration(media: Media): String? {
-        return if (media is Video) {
-            val duration = media.duration ?: return null
-            try {
-                val minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
-                val seconds = duration % minutes.toInt()
+    private fun getDisplayDuration(multimedia: Multimedia): String? {
+        return when (multimedia) {
+            is Video -> {
+                val duration = multimedia.duration ?: return null
+                try {
+                    val minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
+                    val seconds = duration % minutes.toInt()
 
-                "${String.format("%02d", minutes)}:${String.format("%02d", seconds)}"
-            } catch (exception: ArithmeticException) {
-                val seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
+                    "${String.format("%02d", minutes)}:${String.format("%02d", seconds)}"
+                } catch (exception: ArithmeticException) {
+                    val seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
 
-                String.format("00:%02d", seconds)
+                    String.format("00:%02d", seconds)
+                }
             }
-        } else {
-            null
+            is Audio -> {
+                val duration = multimedia.duration ?: return null
+                try {
+                    val minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
+                    val seconds = duration % minutes.toInt()
+
+                    "${String.format("%02d", minutes)}:${String.format("%02d", seconds)}"
+                } catch (exception: ArithmeticException) {
+                    val seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
+
+                    String.format("00:%02d", seconds)
+                }
+            }
+            else -> {
+                null
+            }
         }
     }
 
