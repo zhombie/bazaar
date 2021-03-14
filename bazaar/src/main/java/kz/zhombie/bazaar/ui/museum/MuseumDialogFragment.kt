@@ -141,17 +141,20 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_mu
 
             titleView.text = uiMedia.media.displayName
 
-            val createdAt: String? = null
+            var subtitle: String? = null
             try {
 //                val simpleDateFormat = SimpleDateFormat("dd-mm-yyyy", Locale.ROOT)
 //                createdAt = simpleDateFormat.format(uiMedia.media.dateCreated ?: uiMedia.media.dateAdded)
             } catch (e: Exception) {
+                if (!uiMedia.media.folderDisplayName.isNullOrBlank()) {
+                    subtitle = uiMedia.media.folderDisplayName
+                }
             }
 
-            if (createdAt.isNullOrBlank()) {
+            if (subtitle.isNullOrBlank()) {
                 subtitleView.visibility = View.GONE
             } else {
-                subtitleView.text = createdAt
+                subtitleView.text = subtitle
                 subtitleView.visibility = View.VISIBLE
             }
         }

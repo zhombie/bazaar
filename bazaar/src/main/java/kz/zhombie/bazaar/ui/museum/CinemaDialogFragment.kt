@@ -153,17 +153,20 @@ internal class CinemaDialogFragment : DialogFragment(R.layout.fragment_dialog_ci
 
             titleView.text = uiMedia.media.displayName
 
-            val createdAt: String? = null
+            var subtitle: String? = null
             try {
 //                val simpleDateFormat = SimpleDateFormat("dd-mm-yyyy", Locale.ROOT)
 //                createdAt = simpleDateFormat.format(uiMedia.media.dateCreated ?: uiMedia.media.dateAdded)
             } catch (e: Exception) {
+                if (!uiMedia.media.folderDisplayName.isNullOrBlank()) {
+                    subtitle = uiMedia.media.folderDisplayName
+                }
             }
 
-            if (createdAt.isNullOrBlank()) {
+            if (subtitle.isNullOrBlank()) {
                 subtitleView.visibility = View.GONE
             } else {
-                subtitleView.text = createdAt
+                subtitleView.text = subtitle
                 subtitleView.visibility = View.VISIBLE
             }
         }
@@ -309,12 +312,7 @@ internal class CinemaDialogFragment : DialogFragment(R.layout.fragment_dialog_ci
             if (player?.isPlaying == true) {
                 player?.pause()
             } else {
-                if (player?.playbackState == Player.STATE_IDLE) {
-                    player?.play()
-                } else {
-                    player?.seekTo(0)
-                    player?.play()
-                }
+                player?.play()
             }
         }
     }
@@ -352,7 +350,7 @@ internal class CinemaDialogFragment : DialogFragment(R.layout.fragment_dialog_ci
                 }
             controllerViewAnimation?.start()
         } else {
-            playOrPauseButton.setIconResource(R.drawable.ic_play)
+            playOrPauseButton.setIconResource(R.drawable.exo_icon_play)
         }
     }
 

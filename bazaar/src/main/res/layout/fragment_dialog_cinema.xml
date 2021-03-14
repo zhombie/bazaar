@@ -66,10 +66,10 @@
             android:minWidth="0dp"
             android:padding="10dp"
             android:text="@null"
-            app:icon="@drawable/ic_play"
+            app:icon="@drawable/exo_icon_play"
             app:iconGravity="textEnd"
             app:iconPadding="0dp"
-            app:iconSize="17dp"
+            app:iconSize="24dp"
             app:iconTint="@null"
             app:rippleColor="?attr/colorControlHighlight"
             app:shapeAppearance="@style/CircularShapeAppearance" />
