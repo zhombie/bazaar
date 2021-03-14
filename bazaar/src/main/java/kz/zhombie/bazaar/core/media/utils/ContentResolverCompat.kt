@@ -40,7 +40,10 @@ internal class ContentResolverCompat {
                     MediaStore.Audio.AudioColumns.DATE_ADDED,
                     MediaStore.Audio.AudioColumns.DATE_MODIFIED,
                     MediaStore.Audio.AudioColumns.MIME_TYPE,
-                    MediaStore.Audio.AudioColumns.SIZE
+                    MediaStore.Audio.AudioColumns.SIZE,
+                    MediaStore.Audio.AudioColumns.ALBUM_ID,
+                    MediaStore.Audio.AudioColumns.ALBUM,
+                    MediaStore.Audio.AudioColumns.ALBUM_ARTIST,
                 )
                 Type.FILE -> mutableListOf(
                     MediaStore.Files.FileColumns._ID,

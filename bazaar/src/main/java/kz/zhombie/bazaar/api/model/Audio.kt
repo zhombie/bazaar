@@ -22,6 +22,7 @@ data class Audio constructor(
     override val folderId: Long? = null,
     override val folderDisplayName: String? = null,
 
+    val album: Album? = null,
     val duration: Long? = null
 ) : Multimedia(
     id = id,
@@ -38,4 +39,12 @@ data class Audio constructor(
     thumbnail = thumbnail,
     folderId = folderId,
     folderDisplayName = folderDisplayName
-)
+) {
+
+    data class Album constructor(
+        val id: Long?,
+        val title: String?,
+        val artist: String?
+    )
+
+}

@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.core.database.getLongOrNull
+import androidx.core.database.getStringOrNull
 import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
@@ -171,6 +173,10 @@ internal fun Cursor.readAudio(): Audio? {
             bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME))
         }
 
+        val albumId = getLongOrNull(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM_ID))
+        val albumTitle = getStringOrNull(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM))
+        val albumArtist = getStringOrNull(getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ARTIST))
+
         val duration = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION))
         } else {
@@ -192,6 +198,7 @@ internal fun Cursor.readAudio(): Audio? {
             thumbnail = null,
             folderId = bucketId,
             folderDisplayName = bucketDisplayName,
+            album = Audio.Album(id = albumId, title = albumTitle, artist = albumArtist),
             duration = duration
         )
     } catch (e: Exception) {

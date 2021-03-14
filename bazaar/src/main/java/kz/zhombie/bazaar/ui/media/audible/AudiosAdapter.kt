@@ -11,6 +11,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMultimedia
@@ -167,7 +168,14 @@ internal class AudiosAdapter constructor(
                 checkbox.visibility = View.INVISIBLE
             }
 
-            titleView.text = uiMultimedia.multimedia.displayName
+            var title = uiMultimedia.multimedia.displayName
+            if (uiMultimedia.multimedia is Audio) {
+                if (!uiMultimedia.multimedia.album?.artist.isNullOrBlank()) {
+                    title = uiMultimedia.multimedia.album?.artist + " - " + uiMultimedia.multimedia.displayName
+                }
+            }
+
+            titleView.text = title
 
             val folderDisplayName = uiMultimedia.multimedia.folderDisplayName
             if (folderDisplayName.isNullOrBlank()) {
