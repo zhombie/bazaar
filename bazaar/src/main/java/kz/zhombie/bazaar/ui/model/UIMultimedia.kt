@@ -15,6 +15,16 @@ internal open class UIMultimedia constructor(
 
     fun isAudio(): Boolean = multimedia is Audio
 
+    fun getDisplayTitle(): String {
+        var title = multimedia.displayName
+        if (multimedia is Audio) {
+            if (!multimedia.album?.artist.isNullOrBlank()) {
+                title = multimedia.album?.artist + " - " + multimedia.displayName
+            }
+        }
+        return title
+    }
+
     open fun getDisplayDuration(): String? {
         return if (multimedia is Audio) {
             if (multimedia.duration == null) return null

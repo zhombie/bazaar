@@ -98,6 +98,10 @@ internal class AudiosAdapterManager  constructor(
         audiosAdapter?.submitList(uiMultimedia)
     }
 
+    fun setPlaying(uiMultimedia: UIMultimedia, isPlaying: Boolean) {
+        audiosAdapter?.setPlaying(uiMultimedia, isPlaying)
+    }
+
     fun scrollToTop() {
         recyclerView.scrollToPosition(0)
     }

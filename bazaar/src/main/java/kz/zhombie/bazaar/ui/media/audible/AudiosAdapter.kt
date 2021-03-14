@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.ui.media.audible
 
+import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -11,7 +12,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.model.UIMultimedia
@@ -50,6 +50,7 @@ internal class AudiosAdapter constructor(
         const val TOGGLE_SELECTION_ABILITY = "toggle_selection_ability"
         const val TOGGLE_SELECTION = "toggle_selection"
         const val TOGGLE_VISIBILITY = "toggle_visibility"
+        const val TOGGLE_PLAYING = "toggle_playing"
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIMultimedia> by lazy {
@@ -64,9 +65,29 @@ internal class AudiosAdapter constructor(
             }
         }
 
+    private var currentPlayingAudioIndex: Int = -1
+
     fun submitList(uiMultimedia: List<UIMultimedia>) {
         Logger.d(TAG, "submitList() -> ${uiMultimedia.size}")
         asyncListDiffer.submitList(uiMultimedia)
+    }
+
+    fun setPlaying(uiMultimedia: UIMultimedia, isPlaying: Boolean) {
+        Logger.d(TAG, "setPlaying() -> uiMultimedia: $uiMultimedia, isPlaying: $isPlaying")
+
+        if (uiMultimedia.isAudio()) {
+            val index = asyncListDiffer.currentList.indexOfFirst { it.multimedia.id == uiMultimedia.multimedia.id }
+
+            currentPlayingAudioIndex = if (isPlaying) {
+                index
+            } else {
+                -1
+            }
+
+            notifyItemChanged(index, Bundle().apply {
+                putBoolean(PayloadKey.TOGGLE_PLAYING, isPlaying)
+            })
+        }
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
@@ -117,18 +138,23 @@ internal class AudiosAdapter constructor(
                 return
             }
             payloads.forEach {
-                when (it) {
-                    PayloadKey.TOGGLE_SELECTION_ABILITY -> {
-                        if (!isProcessed) isProcessed = true
-                        holder.toggleSelectionAbility(item)
-                    }
-                    PayloadKey.TOGGLE_SELECTION -> {
-                        if (!isProcessed) isProcessed = true
-                        holder.toggleSelection(item)
-                    }
-                    PayloadKey.TOGGLE_VISIBILITY -> {
-                        if (!isProcessed) isProcessed = true
-                        holder.toggleVisibility(item)
+                if (it is Bundle) {
+                    if (!isProcessed) isProcessed = true
+                    holder.togglePlaying(item, it.getBoolean(PayloadKey.TOGGLE_PLAYING))
+                } else {
+                    when (it) {
+                        PayloadKey.TOGGLE_SELECTION_ABILITY -> {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleSelectionAbility(item)
+                        }
+                        PayloadKey.TOGGLE_SELECTION -> {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleSelection(item)
+                        }
+                        PayloadKey.TOGGLE_VISIBILITY -> {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleVisibility(item)
+                        }
                     }
                 }
             }
@@ -139,6 +165,7 @@ internal class AudiosAdapter constructor(
     }
 
     private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+        private val playOrPauseButton = view.findViewById<MaterialButton>(R.id.playOrPauseButton)
         private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
         private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
@@ -146,7 +173,7 @@ internal class AudiosAdapter constructor(
         private val durationView = view.findViewById<MaterialTextView>(R.id.durationView)
 
         fun bind(uiMultimedia: UIMultimedia) {
-            Logger.d(TAG, "uiMultimedia: $uiMultimedia")
+//            Logger.d(TAG, "uiMultimedia: $uiMultimedia")
 
             if (leftOffset == null) {
                 contentView.post {
@@ -155,6 +182,12 @@ internal class AudiosAdapter constructor(
             }
 
             toggleSelectionAbility(uiMultimedia)
+
+            if (currentPlayingAudioIndex == bindingAdapterPosition) {
+                playOrPauseButton.setIconResource(R.drawable.exo_icon_pause)
+            } else {
+                playOrPauseButton.setIconResource(R.drawable.exo_icon_play)
+            }
 
             if (uiMultimedia.isSelected) {
                 checkbox.scaleX = 1.0F
@@ -168,14 +201,7 @@ internal class AudiosAdapter constructor(
                 checkbox.visibility = View.INVISIBLE
             }
 
-            var title = uiMultimedia.multimedia.displayName
-            if (uiMultimedia.multimedia is Audio) {
-                if (!uiMultimedia.multimedia.album?.artist.isNullOrBlank()) {
-                    title = uiMultimedia.multimedia.album?.artist + " - " + uiMultimedia.multimedia.displayName
-                }
-            }
-
-            titleView.text = title
+            titleView.text = uiMultimedia.getDisplayTitle()
 
             val folderDisplayName = uiMultimedia.multimedia.folderDisplayName
             if (folderDisplayName.isNullOrBlank()) {
@@ -195,7 +221,17 @@ internal class AudiosAdapter constructor(
                 durationView.visibility = View.VISIBLE
             }
 
-            itemView.setOnClickListener { callback.onAudioClicked(uiMultimedia) }
+            playOrPauseButton.setOnClickListener {
+                if (uiMultimedia.isAudio()) {
+                    callback.onAudioPlayOrPauseClicked(uiMultimedia)
+                }
+            }
+
+            itemView.setOnClickListener {
+                if (uiMultimedia.isAudio()) {
+                    callback.onAudioClicked(uiMultimedia)
+                }
+            }
         }
 
         fun toggleSelectionAbility(uiMultimedia: UIMultimedia) {
@@ -231,11 +267,22 @@ internal class AudiosAdapter constructor(
         }
 
         fun toggleVisibility(uiMultimedia: UIMultimedia) {
+            // Ignored
+        }
+
+        fun togglePlaying(uiMultimedia: UIMultimedia, isPlaying: Boolean) {
+            Logger.d(TAG, "togglePlaying() -> uiMultimedia: $uiMultimedia, isPlaying: $isPlaying")
+            if (isPlaying) {
+                playOrPauseButton.setIconResource(R.drawable.exo_icon_pause)
+            } else {
+                playOrPauseButton.setIconResource(R.drawable.exo_icon_play)
+            }
         }
 
     }
 
     interface Callback {
+        fun onAudioPlayOrPauseClicked(uiMultimedia: UIMultimedia)
         fun onAudioClicked(uiMultimedia: UIMultimedia)
     }
 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/light_blue"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="2.5dp"
+    android:paddingBottom="2.5dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/playOrPauseButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@android:color/transparent"
+        android:gravity="start|center_vertical"
+        android:includeFontPadding="false"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetTop="0dp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:text="@null"
+        app:icon="@drawable/exo_icon_play"
+        app:iconGravity="textEnd"
+        app:iconPadding="0dp"
+        app:iconSize="28dp"
+        app:iconTint="@null"
+        app:rippleColor="?attr/colorControlHighlight"
+        app:shapeAppearance="@style/CircularShapeAppearance" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/titleView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:letterSpacing="0.0"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="Audio display name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/subtitleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:letterSpacing="0.0"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="9sp"
+            android:textStyle="normal"
+            tools:text="Audio folder name" />
+
+    </LinearLayout>
+
+</LinearLayout>

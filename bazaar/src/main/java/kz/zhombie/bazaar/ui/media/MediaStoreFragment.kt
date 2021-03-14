@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewStub
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,11 +21,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
+import kz.zhombie.bazaar.core.player.AudioPlayer
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
@@ -45,8 +49,10 @@ import java.util.*
 import kotlin.math.roundToInt
 
 internal class MediaStoreFragment : BottomSheetDialogFragment(),
+    VisualMediaHeaderAdapter.Callback,
     VisualMediaAdapter.Callback,
-    VisualMediaHeaderAdapter.Callback, AudiosAdapter.Callback, AudiosHeaderAdapter.Callback {
+    AudiosHeaderAdapter.Callback,
+    AudiosAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -64,30 +70,42 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         const val SETTINGS = "settings"
     }
 
+    // UI interface views
     private lateinit var headerView: HeaderView
+    private lateinit var audioPlayerViewStub: ViewStub
+    private var audioPlayerViewStubInflatedView: View? = null
+    private var playOrPauseButton: MaterialButton? = null
+    private var titleView: MaterialTextView? = null
+    private var subtitleView: MaterialTextView? = null
     private lateinit var selectButton: SelectButton
     private lateinit var progressView: LinearLayout
     private lateinit var cancelButton: MaterialButton
 
+    // ViewModel
     private lateinit var viewModel: MediaStoreViewModel
 
+    // RecyclerView Adapters
     private var foldersAdapterManager: FoldersAdapterManager? = null
     private var visualMediaAdapterManager: VisualMediaAdapterManager? = null
     private var audiosAdapterManager: AudiosAdapterManager? = null
 
+    // Audio
+    private var audioPlayer: AudioPlayer? = null
+    private var currentPlayingAudio: UIMultimedia? = null
+
+    // Variables
     private var expandedHeight: Int = 0
     private var buttonHeight: Int = 0
     private var collapsedMargin: Int = 0
 
+    // Callbacks
     private var resultCallback: ResultCallback? = null
 
     fun setResultCallback(resultCallback: ResultCallback) {
         this.resultCallback = resultCallback
     }
 
-    override fun getTheme(): Int {
-        return R.style.BottomSheetDialog
-    }
+    override fun getTheme(): Int = R.style.BottomSheetDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -174,6 +192,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         super.onViewCreated(view, savedInstanceState)
 
         headerView = view.findViewById(R.id.headerView)
+        audioPlayerViewStub = view.findViewById(R.id.audioPlayerViewStub)
         val contentView = view.findViewById<RecyclerView>(R.id.contentView)
         selectButton = view.findViewById(R.id.selectButton)
         val foldersView = view.findViewById<RecyclerView>(R.id.foldersView)
@@ -524,6 +543,103 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     /**
      * [AudiosAdapter.Callback] implementation
      */
+
+    override fun onAudioPlayOrPauseClicked(uiMultimedia: UIMultimedia) {
+        if (uiMultimedia.multimedia !is Audio) return
+
+        fun set() {
+            titleView?.text = uiMultimedia.getDisplayTitle()
+
+            val folderDisplayName = uiMultimedia.multimedia.folderDisplayName
+            if (folderDisplayName.isNullOrBlank()) {
+                subtitleView?.text = null
+                subtitleView?.visibility = View.GONE
+            } else {
+                subtitleView?.text = folderDisplayName
+                subtitleView?.visibility = View.VISIBLE
+            }
+
+            playOrPauseButton?.setOnClickListener { audioPlayer?.playOrPause() }
+        }
+
+        fun playOrPause() {
+            Logger.d(TAG, "playOrPause() -> $uiMultimedia")
+
+            if (audioPlayer == null) {
+                audioPlayer = AudioPlayer(
+                    context = requireContext(),
+                    listener = object : AudioPlayer.Listener {
+                        override fun onPlay() {
+                            Logger.d(TAG, "onPlay() -> $currentPlayingAudio")
+
+                            playOrPauseButton?.setIconResource(R.drawable.exo_icon_pause)
+
+                            val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+
+                            if (currentPlayingAudio == null) {
+                                // Ignored
+                            } else {
+                                audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = true)
+                            }
+                        }
+
+                        override fun onPause() {
+                            Logger.d(TAG, "onPause() -> $currentPlayingAudio")
+
+                            playOrPauseButton?.setIconResource(R.drawable.exo_icon_play)
+
+                            val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+
+                            if (currentPlayingAudio == null) {
+                                // Ignored
+                            } else {
+                                audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
+                            }
+                        }
+
+                        override fun onEnd() {
+                        }
+                    }
+                ).also {
+                    viewLifecycleOwner.lifecycle.addObserver(it)
+                    it.create()
+                }
+            }
+
+            // The same audio required to play
+            if (audioPlayer?.getAudioSource() == uiMultimedia.multimedia.uri) {
+                audioPlayer?.playOrPause()
+            } else {
+                // The other audio required to play
+                val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+                if (currentPlayingAudio == null) {
+                    audioPlayer?.setAudioSource(uiMultimedia.multimedia.uri)
+                } else {
+                    audioPlayer?.release()
+                    audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
+                    audioPlayer?.setAudioSource(uiMultimedia.multimedia.uri)
+                }
+                this@MediaStoreFragment.currentPlayingAudio = uiMultimedia
+            }
+        }
+
+        if (audioPlayerViewStubInflatedView == null) {
+            audioPlayerViewStub.setOnInflateListener { _, inflated ->
+                audioPlayerViewStubInflatedView = inflated
+                playOrPauseButton = inflated?.findViewById(R.id.playOrPauseButton)
+                titleView = inflated?.findViewById(R.id.titleView)
+                subtitleView = inflated?.findViewById(R.id.subtitleView)
+
+                set()
+                playOrPause()
+            }
+
+            audioPlayerViewStub.inflate()
+        } else {
+            set()
+            playOrPause()
+        }
+    }
 
     override fun onAudioClicked(uiMultimedia: UIMultimedia) {
         viewModel.onMediaCheckboxClicked(uiMultimedia)
