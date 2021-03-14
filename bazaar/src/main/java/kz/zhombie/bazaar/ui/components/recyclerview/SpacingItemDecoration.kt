@@ -12,6 +12,8 @@ internal class SpacingItemDecoration constructor(
     private val decoratorWidth: Float = 0F,
     @ColorInt decoratorColor: Int = 0,
     var decoratorLeftOffset: Float = 0F,
+    private val isFirstItemDecoratorEnabled: Boolean = false,
+    private val isLastItemDecoratorEnabled: Boolean = false,
 
     private val spacingLeft: Int = 0,
     private val spacingTop: Int = 0,
@@ -47,7 +49,9 @@ internal class SpacingItemDecoration constructor(
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         paint?.let { paint ->
             if (parent.childCount == 0) return@let
-            for (i in 1 until parent.childCount - 1) {
+            val start = if (isFirstItemDecoratorEnabled) 0 else 1
+            val end = if (isLastItemDecoratorEnabled) parent.childCount else parent.childCount - 1
+            for (i in start until end) {
                 val child: View = parent.getChildAt(i) ?: return@let
                 val layoutParams = child.layoutParams
                 if (layoutParams is RecyclerView.LayoutParams) {

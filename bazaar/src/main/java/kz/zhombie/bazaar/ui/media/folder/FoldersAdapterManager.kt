@@ -2,7 +2,9 @@ package kz.zhombie.bazaar.ui.media.folder
 
 import android.content.Context
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
@@ -18,22 +20,59 @@ internal class FoldersAdapterManager constructor(
         private val TAG = FoldersAdapterManager::class.java.simpleName
     }
 
+    enum class Type {
+        LIST,
+        GRID
+    }
+
     private var foldersAdapter: FoldersAdapter? = null
 
-    fun create(onFolderClicked: (uiFolder: UIFolder) -> Unit) {
+    private var itemDecoration: SpacingItemDecoration? = null
+
+    fun create(
+        type: Type,
+        isCoverEnabled: Boolean,
+        onFolderClicked: (uiFolder: UIFolder) -> Unit
+    ) {
         if (foldersAdapter == null) {
-            foldersAdapter = FoldersAdapter(Settings.getImageLoader()) {
-                onFolderClicked(it)
-            }
+            foldersAdapter = FoldersAdapter(
+                imageLoader = Settings.getImageLoader(),
+                isCoverEnabled = isCoverEnabled,
+                onFolderClicked = { onFolderClicked(it) },
+                onLeftOffsetReadyListener = { itemDecoration?.decoratorLeftOffset = it }
+            )
 
             recyclerView.adapter = foldersAdapter
 
-            val layoutManager = GridLayoutManager(
-                context,
-                2,
-                GridLayoutManager.VERTICAL,
-                false
-            )
+            val layoutManager: RecyclerView.LayoutManager
+
+            when (type) {
+                Type.LIST -> {
+                    layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
+                    itemDecoration = SpacingItemDecoration(
+                        isDecoratorEnabled = true,
+                        decoratorColor = ContextCompat.getColor(context, R.color.gray),
+                        decoratorWidth = context.resources.getDimension(R.dimen.folder_item_list_decorator_width),
+                        isFirstItemDecoratorEnabled = true,
+                        isLastItemDecoratorEnabled = false,
+                        spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.folder_item_list_margin_left),
+                        spacingTop = context.resources.getDimensionPixelOffset(R.dimen.folder_item_list_margin_top),
+                        spacingRight = context.resources.getDimensionPixelOffset(R.dimen.folder_item_list_margin_right),
+                        spacingBottom = context.resources.getDimensionPixelOffset(R.dimen.folder_item_list_margin_bottom)
+                    )
+                }
+                Type.GRID -> {
+                    layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+
+                    itemDecoration = SpacingItemDecoration(
+                        spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.folder_item_grid_margin_left),
+                        spacingTop = context.resources.getDimensionPixelOffset(R.dimen.folder_item_grid_margin_top),
+                        spacingRight = context.resources.getDimensionPixelOffset(R.dimen.folder_item_grid_margin_right),
+                        spacingBottom = context.resources.getDimensionPixelOffset(R.dimen.folder_item_grid_margin_bottom)
+                    )
+                }
+            }
 
             recyclerView.layoutManager = layoutManager
 
@@ -41,14 +80,9 @@ internal class FoldersAdapterManager constructor(
 
             recyclerView.itemAnimator = null
 
-            recyclerView.addItemDecoration(
-                SpacingItemDecoration(
-                    spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_left),
-                    spacingTop = context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_top),
-                    spacingRight = context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_right),
-                    spacingBottom = context.resources.getDimensionPixelOffset(R.dimen.folder_item_margin_bottom)
-                )
-            )
+            itemDecoration?.let { itemDecoration ->
+                recyclerView.addItemDecoration(itemDecoration)
+            }
         }
     }
 

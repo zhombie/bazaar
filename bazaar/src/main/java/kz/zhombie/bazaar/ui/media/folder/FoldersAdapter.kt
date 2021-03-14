@@ -1,8 +1,8 @@
 package kz.zhombie.bazaar.ui.media.folder
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.marginLeft
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +16,9 @@ import kz.zhombie.bazaar.utils.inflate
 
 internal class FoldersAdapter constructor(
     private val imageLoader: ImageLoader,
-    private val onFolderClicked: (uiFolder: UIFolder) -> Unit
+    private val isCoverEnabled: Boolean,
+    private val onFolderClicked: (uiFolder: UIFolder) -> Unit,
+    private val onLeftOffsetReadyListener: ((leftOffset: Float) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -34,6 +36,14 @@ internal class FoldersAdapter constructor(
     private val asyncListDiffer: AsyncListDiffer<UIFolder> by lazy {
         AsyncListDiffer(this, diffCallback)
     }
+
+    private var leftOffset: Float? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                onLeftOffsetReadyListener?.invoke(value)
+            }
+        }
 
     fun submitList(data: List<UIFolder>) {
         Logger.d(TAG, "submitList() -> ${data.size}")
@@ -60,11 +70,27 @@ internal class FoldersAdapter constructor(
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
 
         fun bind(uiFolder: UIFolder) {
-            val cover = uiFolder.folder.cover
-            if (cover == null) {
-                imageView.setImageResource(R.drawable.bg_black)
+            if (leftOffset == null) {
+                titleView.post {
+                    leftOffset = titleView.x + titleView.marginLeft
+                }
+            }
+
+            if (isCoverEnabled) {
+                val cover = uiFolder.folder.cover
+                if (cover == null) {
+                    imageView.setImageResource(R.drawable.bg_black)
+                } else {
+                    imageLoader.loadGridItemImage(itemView.context, imageView, cover)
+                }
+
+                if (imageView.visibility != View.VISIBLE) {
+                    imageView.visibility = View.VISIBLE
+                }
             } else {
-                imageLoader.loadGridItemImage(itemView.context, imageView, cover)
+                if (imageView.visibility != View.GONE) {
+                    imageView.visibility = View.GONE
+                }
             }
 
             titleView.text = uiFolder.folder.displayName

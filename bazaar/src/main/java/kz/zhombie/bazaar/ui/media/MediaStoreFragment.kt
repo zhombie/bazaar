@@ -269,7 +269,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private fun setupFoldersView(recyclerView: RecyclerView) {
         foldersAdapterManager = FoldersAdapterManager(requireContext(), recyclerView)
         foldersAdapterManager?.hide()
-        foldersAdapterManager?.create {
+        foldersAdapterManager?.create(
+            type = if (viewModel.getSettings().isAudibleMediaMode()) {
+                FoldersAdapterManager.Type.LIST
+            } else {
+                FoldersAdapterManager.Type.GRID
+            },
+            isCoverEnabled = viewModel.getSettings().isVisualMediaMode()
+        ) {
             viewModel.onFolderClicked(it)
         }
     }

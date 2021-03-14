@@ -59,6 +59,8 @@ internal class AudiosAdapterManager  constructor(
             isDecoratorEnabled = true,
             decoratorWidth = context.resources.getDimension(R.dimen.media_item_list_decorator_width),
             decoratorColor = ContextCompat.getColor(context, R.color.gray),
+            isFirstItemDecoratorEnabled = false,
+            isLastItemDecoratorEnabled = false,
             spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_left),
             spacingTop = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_top),
             spacingRight = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_right),
