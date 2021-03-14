@@ -21,12 +21,11 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/playOrPauseButton"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
             android:layout_gravity="center"
             android:backgroundTint="@color/light_blue"
-            android:enabled="false"
-            android:gravity="center"
+            android:gravity="start|center_vertical"
             android:includeFontPadding="false"
             android:insetBottom="0dp"
             android:insetLeft="0dp"
@@ -35,10 +34,10 @@
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:text="@null"
-            app:icon="@drawable/ic_play"
+            app:icon="@drawable/exo_icon_play"
             app:iconGravity="textEnd"
             app:iconPadding="0dp"
-            app:iconSize="17dp"
+            app:iconSize="30dp"
             app:iconTint="@null"
             app:rippleColor="?attr/colorControlHighlight"
             app:shapeAppearance="@style/CircularShapeAppearance" />
@@ -70,6 +69,7 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/contentView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"

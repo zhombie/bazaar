@@ -18,9 +18,11 @@
     <dimen name="media_item_list_margin_top">0dp</dimen>
 
     <dimen name="media_item_list_padding_bottom">6.5dp</dimen>
-    <dimen name="media_item_list_padding_left">4dp</dimen>
+    <dimen name="media_item_list_padding_left">6dp</dimen>
     <dimen name="media_item_list_padding_right">12dp</dimen>
     <dimen name="media_item_list_padding_top">6.5dp</dimen>
+
+    <dimen name="media_item_list_decorator_width">0.5dp</dimen>
 
     <dimen name="media_item_corner_radius">13dp</dimen>
 

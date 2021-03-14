@@ -1,8 +1,8 @@
 package kz.zhombie.bazaar.ui.media.audible
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -18,7 +18,8 @@ import kz.zhombie.bazaar.utils.inflate
 
 internal class AudiosAdapter constructor(
     private val imageLoader: ImageLoader,
-    private val callback: Callback
+    private val callback: Callback,
+    private val onLeftOffsetReadyListener: ((leftOffset: Float) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -53,6 +54,14 @@ internal class AudiosAdapter constructor(
     private val asyncListDiffer: AsyncListDiffer<UIMultimedia> by lazy {
         AsyncListDiffer(this, diffCallback)
     }
+
+    private var leftOffset: Float? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                onLeftOffsetReadyListener?.invoke(value)
+            }
+        }
 
     fun submitList(uiMultimedia: List<UIMultimedia>) {
         Logger.d(TAG, "submitList() -> ${uiMultimedia.size}")
@@ -130,12 +139,19 @@ internal class AudiosAdapter constructor(
 
     private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
+        private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
         private val durationView = view.findViewById<MaterialTextView>(R.id.durationView)
 
         fun bind(uiMultimedia: UIMultimedia) {
             Logger.d(TAG, "uiMultimedia: $uiMultimedia")
+
+            if (leftOffset == null) {
+                contentView.post {
+                    leftOffset = contentView.x
+                }
+            }
 
             toggleSelectionAbility(uiMultimedia)
 

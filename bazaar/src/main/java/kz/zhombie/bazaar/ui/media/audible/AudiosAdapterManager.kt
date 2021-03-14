@@ -3,6 +3,7 @@ package kz.zhombie.bazaar.ui.media.audible
 import android.content.Context
 import android.view.View
 import android.view.animation.OvershootInterpolator
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,8 @@ internal class AudiosAdapterManager  constructor(
     private var audiosAdapter: AudiosAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
 
+    private var itemDecoration: SpacingItemDecoration? = null
+
     fun create(
         imageLoader: ImageLoader,
         isExplorerEnabled: Boolean,
@@ -28,7 +31,9 @@ internal class AudiosAdapterManager  constructor(
         audiosAdapterCallback: AudiosAdapter.Callback
     ) {
         audiosHeaderAdapter = AudiosHeaderAdapter(isExplorerEnabled, audiosHeaderAdapterCallback)
-        audiosAdapter = AudiosAdapter(imageLoader, audiosAdapterCallback)
+        audiosAdapter = AudiosAdapter(imageLoader, audiosAdapterCallback) { leftOffset ->
+            itemDecoration?.decoratorLeftOffset = leftOffset
+        }
 
         concatAdapter = ConcatAdapter(audiosHeaderAdapter, audiosAdapter)
         recyclerView.adapter = concatAdapter
@@ -50,14 +55,19 @@ internal class AudiosAdapterManager  constructor(
             removeDuration = 125L
         }
 
-        recyclerView.addItemDecoration(
-            SpacingItemDecoration(
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_left),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_top),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_right),
-                context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_bottom)
-            )
+        itemDecoration = SpacingItemDecoration(
+            isDecoratorEnabled = true,
+            decoratorWidth = context.resources.getDimension(R.dimen.media_item_list_decorator_width),
+            decoratorColor = ContextCompat.getColor(context, R.color.gray),
+            spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_left),
+            spacingTop = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_top),
+            spacingRight = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_right),
+            spacingBottom = context.resources.getDimensionPixelOffset(R.dimen.media_item_list_margin_bottom)
         )
+
+        itemDecoration?.let { itemDecoration ->
+            recyclerView.addItemDecoration(itemDecoration)
+        }
     }
 
     fun show() {
