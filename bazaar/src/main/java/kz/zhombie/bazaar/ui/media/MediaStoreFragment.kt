@@ -36,6 +36,7 @@ import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.museum.CinemaDialogFragment
 import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
@@ -496,6 +497,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
+        fun onLayoutChange(imageView: ShapeableImageView) {
+            val position = ViewPosition.from(imageView)
+            viewModel.onLayoutChange(position)
+        }
+
+        if (imageView.viewTreeObserver.isAlive) {
+            imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
+        }
+
+        CinemaDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
+            .show(childFragmentManager, CinemaDialogFragment::class.java.simpleName)
     }
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
