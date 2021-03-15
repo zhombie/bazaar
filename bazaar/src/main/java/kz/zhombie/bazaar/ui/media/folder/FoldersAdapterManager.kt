@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
+import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIFolder
 
 internal class FoldersAdapterManager constructor(

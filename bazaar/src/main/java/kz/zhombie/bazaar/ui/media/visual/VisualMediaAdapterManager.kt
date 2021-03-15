@@ -6,12 +6,12 @@ import android.view.animation.OvershootInterpolator
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.ui.components.recyclerview.SpacingItemDecoration
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.components.recyclerview.animator.SlideInUpAnimator
+import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIMedia
+import kz.zhombie.bazaar.ui.model.UIMultimedia
 
 internal class VisualMediaAdapterManager constructor(
     private val context: Context,

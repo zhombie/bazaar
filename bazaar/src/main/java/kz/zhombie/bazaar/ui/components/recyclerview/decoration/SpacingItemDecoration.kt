@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.components.recyclerview
+package kz.zhombie.bazaar.ui.components.recyclerview.decoration
 
 import android.graphics.Canvas
 import android.graphics.Paint
