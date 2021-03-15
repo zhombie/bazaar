@@ -90,7 +90,7 @@ internal class HeaderView @JvmOverloads constructor(
         closeButton.minWidth = 50F.dp2Px().roundToInt()
         closeButton.minHeight = 50F.dp2Px().roundToInt()
         closeButton.setPadding(10F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt())
-        closeButton.setIconResource(R.drawable.ic_close)
+        closeButton.setIconResource(R.drawable.ic_close_filled)
         closeButton.iconGravity = MaterialButton.ICON_GRAVITY_TEXT_END
         closeButton.iconPadding = 0
         closeButton.iconTint = null

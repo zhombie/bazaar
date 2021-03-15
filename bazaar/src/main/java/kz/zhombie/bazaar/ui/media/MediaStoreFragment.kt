@@ -71,12 +71,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     // UI interface views
+    private lateinit var rootView: ConstraintLayout
     private lateinit var headerView: HeaderView
     private lateinit var audioPlayerViewStub: ViewStub
     private var audioPlayerViewStubInflatedView: View? = null
     private var playOrPauseButton: MaterialButton? = null
     private var titleView: MaterialTextView? = null
     private var subtitleView: MaterialTextView? = null
+    private var closeButton: MaterialButton? = null
     private lateinit var selectButton: SelectButton
     private lateinit var progressView: LinearLayout
     private lateinit var cancelButton: MaterialButton
@@ -191,6 +193,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        rootView = view.findViewById(R.id.rootView)
         headerView = view.findViewById(R.id.headerView)
         audioPlayerViewStub = view.findViewById(R.id.audioPlayerViewStub)
         val contentView = view.findViewById<RecyclerView>(R.id.contentView)
@@ -560,6 +563,26 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             }
 
             playOrPauseButton?.setOnClickListener { audioPlayer?.playOrPause() }
+
+            closeButton?.setOnClickListener {
+                audioPlayer?.release()
+
+                val currentPlayingAudio = currentPlayingAudio
+                if (currentPlayingAudio == null) {
+                    // Ignored
+                } else {
+                    audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
+                    this.currentPlayingAudio = null
+                }
+
+                audioPlayerViewStubInflatedView?.visibility = View.GONE
+
+                audioPlayer?.let { audioPlayer ->
+                    viewLifecycleOwner.lifecycle.removeObserver(audioPlayer)
+                }
+
+                audioPlayer = null
+            }
         }
 
         fun playOrPause() {
@@ -629,6 +652,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 playOrPauseButton = inflated?.findViewById(R.id.playOrPauseButton)
                 titleView = inflated?.findViewById(R.id.titleView)
                 subtitleView = inflated?.findViewById(R.id.subtitleView)
+                closeButton = inflated?.findViewById(R.id.closeButton)
 
                 set()
                 playOrPause()
@@ -636,6 +660,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
             audioPlayerViewStub.inflate()
         } else {
+            if (audioPlayerViewStubInflatedView?.visibility != View.VISIBLE) {
+                audioPlayerViewStubInflatedView?.visibility = View.VISIBLE
+            }
+
             set()
             playOrPause()
         }
