@@ -133,6 +133,9 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 })
                     .setTag(Bazaar.TAG)
                     .setImageLoader(imageLoader)
+                    .setEventListener {
+                        Log.d(TAG, "onDestroy()")
+                    }
                     .setMode(mode)
                     .setMaxSelectionCount(maxSelectionCount)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))

@@ -24,6 +24,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
@@ -104,7 +105,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private var collapsedMargin: Int = 0
 
     // Callbacks
+    private var eventListener: EventListener? = null
     private var resultCallback: ResultCallback? = null
+
+    fun setEventListener(eventListener: EventListener) {
+        this.eventListener = eventListener
+    }
 
     fun setResultCallback(resultCallback: ResultCallback) {
         this.resultCallback = resultCallback
@@ -240,6 +246,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         selectButton.setOnClickListener(null)
 
         super.onDestroy()
+
+        eventListener?.onDestroy()
     }
 
     private fun setupHeaderView() {

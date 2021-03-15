@@ -5,6 +5,7 @@ import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
 import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.ui.media.MediaStoreFragment
 import kz.zhombie.bazaar.ui.media.MediaStoreScreen
@@ -28,6 +29,7 @@ class Bazaar private constructor() {
         )
         private var isLocalMediaSearchAndSelectEnabled: Boolean = false
         private var isFolderBasedInterfaceEnabled: Boolean = false
+        private var eventListener: EventListener? = null
 
         fun setTag(tag: String): Builder {
             this.tag = tag
@@ -64,6 +66,11 @@ class Bazaar private constructor() {
             return this
         }
 
+        fun setEventListener(listener: EventListener): Builder {
+            this.eventListener = listener
+            return this
+        }
+
         fun setResultCallback(callback: ResultCallback): Builder {
             this.resultCallback = callback
             return this
@@ -83,6 +90,7 @@ class Bazaar private constructor() {
                     isFolderBasedInterfaceEnabled = isFolderBasedInterfaceEnabled
                 )
             )
+            eventListener?.let { fragment.setEventListener(it) }
             fragment.setResultCallback(requireNotNull(resultCallback) { "It makes no sense without a resultant callback." })
             fragment.show(fragmentManager, tag)
             return tag
