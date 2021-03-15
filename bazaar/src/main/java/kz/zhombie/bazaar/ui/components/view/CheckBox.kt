@@ -10,7 +10,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.shape.ShapeAppearanceModel
 import kz.zhombie.bazaar.R
 
-class CheckBox @JvmOverloads constructor(
+internal class CheckBox @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.materialButtonStyle

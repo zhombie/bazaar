@@ -91,9 +91,8 @@ internal class VisualMediaAdapter constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        when {
-            item.isImage() -> if (holder is ViewHolder) holder.bind(item)
-            item.isVideo() -> if (holder is ViewHolder) holder.bind(item)
+        if (item.isImageOrVideo()) {
+            if (holder is ViewHolder) holder.bind(item)
         }
     }
 
