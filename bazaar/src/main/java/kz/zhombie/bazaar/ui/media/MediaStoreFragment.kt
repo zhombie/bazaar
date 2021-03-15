@@ -586,6 +586,15 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
                 audioPlayer = null
             }
+
+            audioPlayerViewStubInflatedView?.setOnClickListener {
+                val currentPlayingAudio = currentPlayingAudio
+                if (currentPlayingAudio == null) {
+                    return@setOnClickListener
+                } else {
+                    audiosAdapterManager?.smoothScrollTo(currentPlayingAudio)
+                }
+            }
         }
 
         fun playOrPause() {
@@ -687,6 +696,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private fun getBottomSheetDialogDefaultHeight(): Int {
         return requireView().windowHeight * 90 / 100
     }
+
+    /**
+     * [ActivityResultContracts]
+     */
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
         viewModel.onPictureTaken(isSuccess)

@@ -54,7 +54,18 @@ internal class AudiosAdapter constructor(
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIMultimedia> by lazy {
-        AsyncListDiffer(this, diffCallback)
+        AsyncListDiffer(this, diffCallback).also { asyncListDiffer ->
+            asyncListDiffer.addListListener { previousList, currentList ->
+                if (currentPlayingAudioPosition < 0) return@addListListener
+                if (previousList.isNullOrEmpty()) return@addListListener
+                if (currentPlayingAudioPosition > previousList.size) return@addListListener
+                if (currentList.isNullOrEmpty()) return@addListListener
+
+                val uiMultimedia = previousList[currentPlayingAudioPosition]
+                val index = currentList.indexOfFirst { it.multimedia.id == uiMultimedia.multimedia.id }
+                currentPlayingAudioPosition = index
+            }
+        }
     }
 
     private var leftOffset: Float? = null
@@ -65,7 +76,9 @@ internal class AudiosAdapter constructor(
             }
         }
 
-    private var currentPlayingAudioIndex: Int = -1
+    private var currentPlayingAudioPosition: Int = -1
+
+    fun getList(): List<UIMultimedia> = asyncListDiffer.currentList
 
     fun submitList(uiMultimedia: List<UIMultimedia>) {
         Logger.d(TAG, "submitList() -> ${uiMultimedia.size}")
@@ -78,7 +91,7 @@ internal class AudiosAdapter constructor(
         if (uiMultimedia.isAudio()) {
             val index = asyncListDiffer.currentList.indexOfFirst { it.multimedia.id == uiMultimedia.multimedia.id }
 
-            currentPlayingAudioIndex = if (isPlaying) {
+            currentPlayingAudioPosition = if (isPlaying) {
                 index
             } else {
                 -1
@@ -183,7 +196,7 @@ internal class AudiosAdapter constructor(
 
             toggleSelectionAbility(uiMultimedia)
 
-            if (currentPlayingAudioIndex == bindingAdapterPosition) {
+            if (currentPlayingAudioPosition == bindingAdapterPosition) {
                 playOrPauseButton.setIconResource(R.drawable.exo_icon_pause)
             } else {
                 playOrPauseButton.setIconResource(R.drawable.exo_icon_play)

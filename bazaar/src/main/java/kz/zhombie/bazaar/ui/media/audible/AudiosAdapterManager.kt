@@ -6,6 +6,7 @@ import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kz.zhombie.bazaar.R
@@ -102,6 +103,17 @@ internal class AudiosAdapterManager  constructor(
         audiosAdapter?.setPlaying(uiMultimedia, isPlaying)
     }
 
+    fun smoothScrollTo(uiMultimedia: UIMultimedia) {
+        val position = audiosAdapter?.getList()?.indexOfFirst { it.multimedia.id == uiMultimedia.multimedia.id }
+        if (position != null) {
+            if (position >= 0) {
+                if (position <= (recyclerView.adapter?.itemCount ?: -1)) {
+                    recyclerView.smoothSnapToPosition(position)
+                }
+            }
+        }
+    }
+
     fun scrollToTop() {
         recyclerView.scrollToPosition(0)
     }
@@ -112,6 +124,18 @@ internal class AudiosAdapterManager  constructor(
         audiosHeaderAdapter = null
         audiosAdapter = null
         concatAdapter = null
+    }
+
+    private fun RecyclerView.smoothSnapToPosition(
+        position: Int,
+        snapMode: Int = LinearSmoothScroller.SNAP_TO_START
+    ) {
+        val smoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int = snapMode
+            override fun getHorizontalSnapPreference(): Int = snapMode
+        }
+        smoothScroller.targetPosition = position
+        layoutManager?.startSmoothScroll(smoothScroller)
     }
 
 }
