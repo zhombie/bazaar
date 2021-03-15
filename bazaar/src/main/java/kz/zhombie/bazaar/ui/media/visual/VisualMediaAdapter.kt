@@ -6,7 +6,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
@@ -14,6 +13,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.ui.components.view.CheckBox
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.utils.inflate
 
@@ -140,7 +140,7 @@ internal class VisualMediaAdapter constructor(
 
     private inner class ViewHolder constructor(view: View, viewType: Int) : RecyclerView.ViewHolder(view) {
         private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
-        private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
+        private val checkBox = view.findViewById<CheckBox>(R.id.checkBox)
         private val textView = if (viewType == ViewType.VIDEO) {
             view.findViewById<MaterialTextView>(R.id.textView)
         } else {
@@ -156,12 +156,12 @@ internal class VisualMediaAdapter constructor(
                 imageView.scaleX = 0.9F
                 imageView.scaleY = 0.9F
 
-                checkbox.setIconResource(R.drawable.ic_checked)
+                checkBox.setCheckedDrawable()
             } else {
                 imageView.scaleX = 1.0F
                 imageView.scaleY = 1.0F
 
-                checkbox.setIconResource(R.drawable.ic_unchecked)
+                checkBox.setUncheckedDrawable()
             }
 
             toggleVisibility(uiMedia)
@@ -183,7 +183,7 @@ internal class VisualMediaAdapter constructor(
                 }
             }
 
-            checkbox.setOnClickListener {
+            checkBox.setOnClickListener {
                 if (uiMedia.isImage()) {
                     callback.onImageCheckboxClicked(uiMedia)
                 } else if (uiMedia.isVideo()) {
@@ -194,13 +194,13 @@ internal class VisualMediaAdapter constructor(
 
         fun toggleSelectionAbility(uiMedia: UIMedia) {
             if (uiMedia.isSelectable) {
-                if (checkbox.visibility != View.VISIBLE) {
-                    checkbox.visibility = View.VISIBLE
+                if (checkBox.visibility != View.VISIBLE) {
+                    checkBox.visibility = View.VISIBLE
                 }
                 imageView.foreground = null
             } else {
-                if (checkbox.visibility != View.GONE) {
-                    checkbox.visibility = View.GONE
+                if (checkBox.visibility != View.GONE) {
+                    checkBox.visibility = View.GONE
                 }
                 imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
             }
@@ -213,7 +213,7 @@ internal class VisualMediaAdapter constructor(
                     .scaleX(0.9F)
                     .scaleY(0.9F)
                     .withStartAction {
-                        checkbox.setIconResource(R.drawable.ic_checked)
+                        checkBox.setCheckedDrawable()
                     }
                     .start()
             } else {
@@ -222,7 +222,7 @@ internal class VisualMediaAdapter constructor(
                     .scaleX(1.0F)
                     .scaleY(1.0F)
                     .withStartAction {
-                        checkbox.setIconResource(R.drawable.ic_unchecked)
+                        checkBox.setUncheckedDrawable()
                     }
                     .start()
             }

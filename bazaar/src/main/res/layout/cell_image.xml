@@ -14,11 +14,15 @@
         app:shapeAppearance="@style/ItemShapeAppearance"
         tools:src="@tools:sample/backgrounds/scenic" />
 
-    <include
-        layout="@layout/view_checkbox"
-        android:layout_width="43dp"
-        android:layout_height="43dp"
+    <kz.zhombie.bazaar.ui.components.view.CheckBox
+        android:id="@+id/checkBox"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="@dimen/big_checkbox_size"
+        android:layout_height="@dimen/big_checkbox_size"
         android:layout_gravity="top|end"
-        android:layout_margin="2.5dp" />
+        android:layout_margin="2.5dp"
+        android:minHeight="@dimen/big_checkbox_min_size"
+        android:minWidth="@dimen/big_checkbox_min_size"
+        app:iconSize="@dimen/big_checkbox_icon_size" />
 
 </kz.zhombie.bazaar.ui.components.view.SquareFrameLayout>

@@ -14,6 +14,7 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.ui.components.view.CheckBox
 import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.utils.inflate
 
@@ -179,7 +180,7 @@ internal class AudiosAdapter constructor(
 
     private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         private val playOrPauseButton = view.findViewById<MaterialButton>(R.id.playOrPauseButton)
-        private val checkbox = view.findViewById<MaterialButton>(R.id.checkbox)
+        private val checkBox = view.findViewById<CheckBox>(R.id.checkBox)
         private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
@@ -203,15 +204,11 @@ internal class AudiosAdapter constructor(
             }
 
             if (uiMultimedia.isSelected) {
-                checkbox.scaleX = 1.0F
-                checkbox.scaleY = 1.0F
-
-                checkbox.visibility = View.VISIBLE
+                checkBox.setShownState()
+                checkBox.show(false)
             } else {
-                checkbox.scaleX = 0.0F
-                checkbox.scaleY = 0.0F
-
-                checkbox.visibility = View.INVISIBLE
+                checkBox.setHiddenState()
+                checkBox.hide(false)
             }
 
             titleView.text = uiMultimedia.getDisplayTitle()
@@ -259,23 +256,9 @@ internal class AudiosAdapter constructor(
 
         fun toggleSelection(uiMultimedia: UIMultimedia) {
             if (uiMultimedia.isSelected) {
-                checkbox.animate()
-                    .setDuration(100L)
-                    .scaleX(1.0F)
-                    .scaleY(1.0F)
-                    .withStartAction {
-                        checkbox.visibility = View.VISIBLE
-                    }
-                    .start()
+                checkBox.show(true)
             } else {
-                checkbox.animate()
-                    .setDuration(100L)
-                    .scaleX(0.0F)
-                    .scaleY(0.0F)
-                    .withEndAction {
-                        checkbox.visibility = View.INVISIBLE
-                    }
-                    .start()
+                checkBox.hide(true)
             }
         }
 
