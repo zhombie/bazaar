@@ -10,6 +10,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
@@ -81,9 +82,9 @@ internal class VisualMediaAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.IMAGE ->
-                ViewHolder(view = parent.inflate(R.layout.cell_image), viewType = viewType)
+                ImageViewHolder(view = parent.inflate(R.layout.cell_image))
             ViewType.VIDEO ->
-                ViewHolder(view = parent.inflate(R.layout.cell_video), viewType = viewType)
+                VideoViewHolder(view = parent.inflate(R.layout.cell_video))
             else ->
                 throw ViewHolderException(viewType)
         }
@@ -91,8 +92,9 @@ internal class VisualMediaAdapter constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        if (item.isImageOrVideo()) {
-            if (holder is ViewHolder) holder.bind(item)
+        when (holder) {
+            is ImageViewHolder -> holder.bind(item)
+            is VideoViewHolder -> holder.bind(item)
         }
     }
 
@@ -111,23 +113,34 @@ internal class VisualMediaAdapter constructor(
                 super.onBindViewHolder(holder, position, payloads)
                 return
             }
-            if (holder !is ViewHolder) {
-                super.onBindViewHolder(holder, position, payloads)
-                return
-            }
             payloads.forEach {
                 when (it) {
                     PayloadKey.TOGGLE_SELECTION_ABILITY -> {
-                        if (!isProcessed) isProcessed = true
-                        holder.toggleSelectionAbility(item)
+                        if (holder is ImageViewHolder) {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleSelectionAbility(item)
+                        } else if (holder is VideoViewHolder) {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleSelectionAbility(item)
+                        }
                     }
                     PayloadKey.TOGGLE_SELECTION -> {
-                        if (!isProcessed) isProcessed = true
-                        holder.toggleSelection(item)
+                        if (holder is ImageViewHolder) {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleSelection(item, animate = true)
+                        } else if (holder is VideoViewHolder) {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleSelection(item, animate = true)
+                        }
                     }
                     PayloadKey.TOGGLE_VISIBILITY -> {
-                        if (!isProcessed) isProcessed = true
-                        holder.toggleVisibility(item)
+                        if (holder is ImageViewHolder) {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleVisibility(item)
+                        } else if (holder is VideoViewHolder) {
+                            if (!isProcessed) isProcessed = true
+                            holder.toggleVisibility(item)
+                        }
                     }
                 }
             }
@@ -137,57 +150,27 @@ internal class VisualMediaAdapter constructor(
         }
     }
 
-    private inner class ViewHolder constructor(view: View, viewType: Int) : RecyclerView.ViewHolder(view) {
-        private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
-        private val checkBoxButton = view.findViewById<CheckBoxButton>(R.id.checkBoxButton)
-        private val textView = if (viewType == ViewType.VIDEO) {
-            view.findViewById<MaterialTextView>(R.id.textView)
-        } else {
-            null
-        }
+    private open inner class ImageViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+        open val imageView: ShapeableImageView = view.findViewById(R.id.imageView)
+        open val checkBoxButton: CheckBoxButton = view.findViewById(R.id.checkBoxButton)
 
-        fun bind(uiMedia: UIMedia) {
-            imageLoader.loadGridItemImage(itemView.context, imageView, uiMedia.media.uri)
+        open fun bind(uiMedia: UIMedia) {
+            val image: Image = if (uiMedia.media is Image) uiMedia.media else return
+
+            imageLoader.loadGridItemImage(itemView.context, imageView, image.uri)
 
             toggleSelectionAbility(uiMedia)
 
-            if (uiMedia.isSelected) {
-                imageView.scaleX = 0.9F
-                imageView.scaleY = 0.9F
-
-                checkBoxButton.setCheckedDrawable()
-            } else {
-                imageView.scaleX = 1.0F
-                imageView.scaleY = 1.0F
-
-                checkBoxButton.setUncheckedDrawable()
-            }
+            toggleSelection(uiMedia, animate = false)
 
             toggleVisibility(uiMedia)
 
-            if (uiMedia.media is Video) {
-                val displayDuration = uiMedia.getDisplayDuration()
-                textView?.text = if (displayDuration.isNullOrBlank()) {
-                    "Видео"
-                } else {
-                    displayDuration
-                }
-            }
-
             imageView.setOnClickListener {
-                if (uiMedia.isImage()) {
-                    callback.onImageClicked(imageView, uiMedia)
-                } else if (uiMedia.isVideo()) {
-                    callback.onVideoClicked(imageView, uiMedia)
-                }
+                callback.onImageClicked(imageView, uiMedia)
             }
 
             checkBoxButton.setOnClickListener {
-                if (uiMedia.isImage()) {
-                    callback.onImageCheckboxClicked(uiMedia)
-                } else if (uiMedia.isVideo()) {
-                    callback.onVideoCheckboxClicked(uiMedia)
-                }
+                callback.onImageCheckboxClicked(uiMedia)
             }
         }
 
@@ -205,25 +188,39 @@ internal class VisualMediaAdapter constructor(
             }
         }
 
-        fun toggleSelection(uiMedia: UIMedia) {
-            if (uiMedia.isSelected) {
-                imageView.animate()
-                    .setDuration(100L)
-                    .scaleX(0.9F)
-                    .scaleY(0.9F)
-                    .withStartAction {
-                        checkBoxButton.setCheckedDrawable()
-                    }
-                    .start()
+        fun toggleSelection(uiMedia: UIMedia, animate: Boolean) {
+            if (animate) {
+                if (uiMedia.isSelected) {
+                    imageView.animate()
+                        .setDuration(100L)
+                        .scaleX(0.9F)
+                        .scaleY(0.9F)
+                        .withStartAction {
+                            checkBoxButton.setCheckedDrawable()
+                        }
+                        .start()
+                } else {
+                    imageView.animate()
+                        .setDuration(100L)
+                        .scaleX(1.0F)
+                        .scaleY(1.0F)
+                        .withStartAction {
+                            checkBoxButton.setUncheckedDrawable()
+                        }
+                        .start()
+                }
             } else {
-                imageView.animate()
-                    .setDuration(100L)
-                    .scaleX(1.0F)
-                    .scaleY(1.0F)
-                    .withStartAction {
-                        checkBoxButton.setUncheckedDrawable()
-                    }
-                    .start()
+                if (uiMedia.isSelected) {
+                    imageView.scaleX = 0.9F
+                    imageView.scaleY = 0.9F
+
+                    checkBoxButton.setCheckedDrawable()
+                } else {
+                    imageView.scaleX = 1.0F
+                    imageView.scaleY = 1.0F
+
+                    checkBoxButton.setUncheckedDrawable()
+                }
             }
         }
 
@@ -236,6 +233,37 @@ internal class VisualMediaAdapter constructor(
                 if (imageView.visibility != View.INVISIBLE) {
                     imageView.visibility = View.INVISIBLE
                 }
+            }
+        }
+    }
+
+    private inner class VideoViewHolder constructor(view: View) : ImageViewHolder(view) {
+        private val textView = view.findViewById<MaterialTextView>(R.id.textView)
+
+        override fun bind(uiMedia: UIMedia) {
+            val video: Video = if (uiMedia.media is Video) uiMedia.media else return
+
+            imageLoader.loadGridItemImage(itemView.context, imageView, video.uri)
+
+            toggleSelectionAbility(uiMedia)
+
+            toggleSelection(uiMedia, animate = true)
+
+            toggleVisibility(uiMedia)
+
+            val displayDuration = uiMedia.getDisplayDuration()
+            textView?.text = if (displayDuration.isNullOrBlank()) {
+                "Видео"
+            } else {
+                displayDuration
+            }
+
+            imageView.setOnClickListener {
+                callback.onVideoClicked(imageView, uiMedia)
+            }
+
+            checkBoxButton.setOnClickListener {
+                callback.onVideoCheckboxClicked(uiMedia)
             }
         }
     }
