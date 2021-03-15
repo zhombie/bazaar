@@ -7,6 +7,10 @@ internal object Settings {
 
     private var imageLoader: ImageLoader? = null
 
+    fun hasImageLoader(): Boolean {
+        return imageLoader != null
+    }
+
     fun getImageLoader(): ImageLoader {
         return requireNotNull(imageLoader) { ImageLoaderNullException() }
     }

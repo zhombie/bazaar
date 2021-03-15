@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         imageLoader = DEFAULT_IMAGE_LOADER.second
         imageLoaderView.text = DEFAULT_IMAGE_LOADER.first
 
+        Bazaar.init(imageLoader)
+
         mode = Mode.IMAGE_AND_VIDEO
         modeView.text = mode.toString()
 
@@ -132,7 +134,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                     }
                 })
                     .setTag(Bazaar.TAG)
-                    .setImageLoader(imageLoader)
+//                    .setImageLoader(imageLoader)
                     .setEventListener {
                         Log.d(TAG, "onDestroy()")
                     }

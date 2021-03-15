@@ -14,6 +14,10 @@ class Bazaar private constructor() {
 
     companion object {
         val TAG: String = Bazaar::class.java.simpleName
+
+        fun init(imageLoader: ImageLoader) {
+            Settings.setImageLoader(imageLoader)
+        }
     }
 
     class Builder constructor(private var resultCallback: ResultCallback? = null) {
@@ -77,7 +81,13 @@ class Bazaar private constructor() {
         }
 
         fun show(fragmentManager: FragmentManager): String? {
-            Settings.setImageLoader(requireNotNull(imageLoader) { ImageLoaderNullException() })
+            if (Settings.hasImageLoader()) {
+                imageLoader?.let { imageLoader ->
+                    Settings.setImageLoader(imageLoader)
+                }
+            } else {
+                Settings.setImageLoader(requireNotNull(imageLoader) { ImageLoaderNullException() })
+            }
 
             require(maxSelectionCount in 1..10) { "Max selection count MUST be between 1 & 10" }
 
