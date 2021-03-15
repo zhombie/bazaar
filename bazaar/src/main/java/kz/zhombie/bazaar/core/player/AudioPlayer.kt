@@ -5,10 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 
 internal class AudioPlayer constructor(
@@ -95,10 +92,15 @@ internal class AudioPlayer constructor(
         }
     }
 
+    override fun onPlayerError(error: ExoPlaybackException) {
+        listener.onPlayerError()
+    }
+
     interface Listener {
         fun onPlay()
         fun onPause()
         fun onEnd()
+        fun onPlayerError()
     }
 
 }

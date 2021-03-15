@@ -7,4 +7,6 @@
     <string name="take_video">Take video</string>
 
     <string name="cancel">Cancel</string>
+
+    <string name="error_player">Error occurred. Unable to play</string>
 </resources>

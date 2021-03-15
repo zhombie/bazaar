@@ -86,6 +86,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     // ViewModel
     private lateinit var viewModel: MediaStoreViewModel
 
+    // UI interface floating messages
+    private var toast: Toast? = null
+
     // RecyclerView Adapters
     private var foldersAdapterManager: FoldersAdapterManager? = null
     private var visualMediaAdapterManager: VisualMediaAdapterManager? = null
@@ -621,6 +624,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         }
 
                         override fun onEnd() {
+                        }
+
+                        override fun onPlayerError() {
+                            toast?.cancel()
+                            toast = null
+                            toast = Toast.makeText(context, R.string.error_player, Toast.LENGTH_SHORT)
+                            toast?.show()
                         }
                     }
                 ).also {
