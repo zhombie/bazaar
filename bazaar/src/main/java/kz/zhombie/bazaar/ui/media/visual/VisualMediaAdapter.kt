@@ -1,6 +1,5 @@
 package kz.zhombie.bazaar.ui.media.visual
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
