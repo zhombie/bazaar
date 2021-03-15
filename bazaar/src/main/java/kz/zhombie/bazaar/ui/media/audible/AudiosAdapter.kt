@@ -14,7 +14,7 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
-import kz.zhombie.bazaar.ui.components.view.CheckBox
+import kz.zhombie.bazaar.ui.components.view.CheckBoxButton
 import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.utils.inflate
 
@@ -180,7 +180,7 @@ internal class AudiosAdapter constructor(
 
     private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         private val playOrPauseButton = view.findViewById<MaterialButton>(R.id.playOrPauseButton)
-        private val checkBox = view.findViewById<CheckBox>(R.id.checkBox)
+        private val checkBoxButton = view.findViewById<CheckBoxButton>(R.id.checkBoxButton)
         private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
@@ -204,11 +204,11 @@ internal class AudiosAdapter constructor(
             }
 
             if (uiMultimedia.isSelected) {
-                checkBox.setShownState()
-                checkBox.show(false)
+                checkBoxButton.setShownState()
+                checkBoxButton.show(false)
             } else {
-                checkBox.setHiddenState()
-                checkBox.hide(false)
+                checkBoxButton.setHiddenState()
+                checkBoxButton.hide(false)
             }
 
             titleView.text = uiMultimedia.getDisplayTitle()
@@ -256,9 +256,9 @@ internal class AudiosAdapter constructor(
 
         fun toggleSelection(uiMultimedia: UIMultimedia) {
             if (uiMultimedia.isSelected) {
-                checkBox.show(true)
+                checkBoxButton.show(true)
             } else {
-                checkBox.hide(true)
+                checkBoxButton.hide(true)
             }
         }
 

@@ -40,8 +40,8 @@
         android:textStyle="normal"
         tools:text="10:23" />
 
-    <kz.zhombie.bazaar.ui.components.view.CheckBox
-        android:id="@+id/checkBox"
+    <kz.zhombie.bazaar.ui.components.view.CheckBoxButton
+        android:id="@+id/checkBoxButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="@dimen/big_checkbox_size"
         android:layout_height="@dimen/big_checkbox_size"
