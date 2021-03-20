@@ -152,7 +152,7 @@ internal class VisualMediaAdapter constructor(
 
     private open inner class ImageViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         open val imageView: ShapeableImageView = view.findViewById(R.id.imageView)
-        open val checkBoxButton: CheckBoxButton = view.findViewById(R.id.checkBoxButton)
+        open val checkBoxButton: CheckBoxButton? = view.findViewById(R.id.checkBoxButton)
 
         open fun bind(uiMedia: UIMedia) {
             val image: Image = if (uiMedia.media is Image) uiMedia.media else return
@@ -169,20 +169,20 @@ internal class VisualMediaAdapter constructor(
                 callback.onImageClicked(imageView, uiMedia)
             }
 
-            checkBoxButton.setOnClickListener {
+            checkBoxButton?.setOnClickListener {
                 callback.onImageCheckboxClicked(uiMedia)
             }
         }
 
         fun toggleSelectionAbility(uiMedia: UIMedia) {
             if (uiMedia.isSelectable) {
-                if (checkBoxButton.visibility != View.VISIBLE) {
-                    checkBoxButton.visibility = View.VISIBLE
+                if (checkBoxButton?.visibility != View.VISIBLE) {
+                    checkBoxButton?.visibility = View.VISIBLE
                 }
                 imageView.foreground = null
             } else {
-                if (checkBoxButton.visibility != View.GONE) {
-                    checkBoxButton.visibility = View.GONE
+                if (checkBoxButton?.visibility != View.GONE) {
+                    checkBoxButton?.visibility = View.GONE
                 }
                 imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
             }
@@ -196,7 +196,7 @@ internal class VisualMediaAdapter constructor(
                         .scaleX(0.9F)
                         .scaleY(0.9F)
                         .withStartAction {
-                            checkBoxButton.setCheckedDrawable()
+                            checkBoxButton?.setCheckedDrawable()
                         }
                         .start()
                 } else {
@@ -205,7 +205,7 @@ internal class VisualMediaAdapter constructor(
                         .scaleX(1.0F)
                         .scaleY(1.0F)
                         .withStartAction {
-                            checkBoxButton.setUncheckedDrawable()
+                            checkBoxButton?.setUncheckedDrawable()
                         }
                         .start()
                 }
@@ -214,12 +214,12 @@ internal class VisualMediaAdapter constructor(
                     imageView.scaleX = 0.9F
                     imageView.scaleY = 0.9F
 
-                    checkBoxButton.setCheckedDrawable()
+                    checkBoxButton?.setCheckedDrawable()
                 } else {
                     imageView.scaleX = 1.0F
                     imageView.scaleY = 1.0F
 
-                    checkBoxButton.setUncheckedDrawable()
+                    checkBoxButton?.setUncheckedDrawable()
                 }
             }
         }
@@ -262,7 +262,7 @@ internal class VisualMediaAdapter constructor(
                 callback.onVideoClicked(imageView, uiMedia)
             }
 
-            checkBoxButton.setOnClickListener {
+            checkBoxButton?.setOnClickListener {
                 callback.onVideoCheckboxClicked(uiMedia)
             }
         }
