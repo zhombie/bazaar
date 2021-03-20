@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import com.google.android.material.imageview.ShapeableImageView
 
-internal class SquareImageView @JvmOverloads constructor(
+class SquareImageView @JvmOverloads internal constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0

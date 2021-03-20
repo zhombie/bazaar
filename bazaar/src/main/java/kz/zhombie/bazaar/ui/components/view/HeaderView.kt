@@ -14,7 +14,7 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.utils.dp2Px
 import kotlin.math.roundToInt
 
-internal class HeaderView @JvmOverloads constructor(
+class HeaderView @JvmOverloads internal constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
