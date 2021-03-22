@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         imageLoader = DEFAULT_IMAGE_LOADER.second
         imageLoaderView.text = DEFAULT_IMAGE_LOADER.first
 
-        Bazaar.init(imageLoader)
+        Bazaar.init(imageLoader, true)
 
         mode = Mode.IMAGE_AND_VIDEO
         modeView.text = mode.toString()

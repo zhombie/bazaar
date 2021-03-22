@@ -15,8 +15,9 @@ class Bazaar private constructor() {
     companion object {
         val TAG: String = Bazaar::class.java.simpleName
 
-        fun init(imageLoader: ImageLoader) {
+        fun init(imageLoader: ImageLoader, isLoggingEnabled: Boolean) {
             Settings.setImageLoader(imageLoader)
+            Settings.setLoggingEnabled(isLoggingEnabled)
         }
     }
 
