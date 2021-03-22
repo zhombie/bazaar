@@ -34,6 +34,7 @@ internal class AudiosAdapterManager  constructor(
         audiosHeaderAdapter = AudiosHeaderAdapter(isExplorerEnabled, audiosHeaderAdapterCallback)
         audiosAdapter = AudiosAdapter(imageLoader, audiosAdapterCallback) { leftOffset ->
             itemDecoration?.decoratorLeftOffset = leftOffset
+            recyclerView.invalidateItemDecorations()
         }
 
         concatAdapter = ConcatAdapter(audiosHeaderAdapter, audiosAdapter)

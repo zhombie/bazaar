@@ -2,10 +2,12 @@ package kz.zhombie.bazaar.ui.media.folder
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.view.marginLeft
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
@@ -16,6 +18,7 @@ import kz.zhombie.bazaar.utils.inflate
 
 internal class FoldersAdapter constructor(
     private val imageLoader: ImageLoader,
+    private val type: Type,
     private val isCoverEnabled: Boolean,
     private val onFolderClicked: (uiFolder: UIFolder) -> Unit,
     private val onLeftOffsetReadyListener: ((leftOffset: Float) -> Unit)? = null
@@ -33,15 +36,25 @@ internal class FoldersAdapter constructor(
         }
     }
 
+    enum class Type {
+        SQUARE,
+        RECTANGLE
+    }
+
     private val asyncListDiffer: AsyncListDiffer<UIFolder> by lazy {
         AsyncListDiffer(this, diffCallback)
     }
 
     private var leftOffset: Float? = null
         set(value) {
-            field = value
-            if (value != null) {
-                onLeftOffsetReadyListener?.invoke(value)
+            if (value == null) {
+                field = value
+            } else {
+                if (field != value) {
+                    field = value
+                    Logger.d(TAG, "leftOffset: $value")
+                    onLeftOffsetReadyListener?.invoke(value)
+                }
             }
         }
 
@@ -55,16 +68,21 @@ internal class FoldersAdapter constructor(
     private fun getItem(position: Int): UIFolder = asyncListDiffer.currentList[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ViewHolder(parent.inflate(R.layout.cell_folder))
+        return when (type) {
+            Type.SQUARE -> SquareViewHolder(parent.inflate(R.layout.cell_folder_square))
+            Type.RECTANGLE -> RectangleViewHolder(parent.inflate(R.layout.cell_folder_rectangle))
+        }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ViewHolder) {
+        if (holder is SquareViewHolder) {
+            holder.bind(getItem(position))
+        } else if (holder is RectangleViewHolder) {
             holder.bind(getItem(position))
         }
     }
 
-    private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+    private inner class SquareViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         private val imageView = view.findViewById<SquareImageView>(R.id.imageView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
@@ -90,6 +108,28 @@ internal class FoldersAdapter constructor(
             } else {
                 if (imageView.visibility != View.GONE) {
                     imageView.visibility = View.GONE
+                }
+            }
+
+            titleView.text = uiFolder.folder.displayName
+
+            subtitleView.text = "Элементы: ${uiFolder.folder.size}"
+
+            itemView.setOnClickListener { onFolderClicked(uiFolder) }
+        }
+
+    }
+
+    private inner class RectangleViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
+        private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
+        private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
+        private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
+        private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
+
+        fun bind(uiFolder: UIFolder) {
+            if (leftOffset == null) {
+                contentView.post {
+                    leftOffset = contentView.x
                 }
             }
 

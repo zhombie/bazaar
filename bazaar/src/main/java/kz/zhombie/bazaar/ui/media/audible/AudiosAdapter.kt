@@ -71,9 +71,14 @@ internal class AudiosAdapter constructor(
 
     private var leftOffset: Float? = null
         set(value) {
-            field = value
-            if (value != null) {
-                onLeftOffsetReadyListener?.invoke(value)
+            if (value == null) {
+                field = value
+            } else {
+                if (field != value) {
+                    field = value
+                    Logger.d(TAG, "leftOffset: $value")
+                    onLeftOffsetReadyListener?.invoke(value)
+                }
             }
         }
 

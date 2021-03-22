@@ -53,7 +53,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerView"
         app:spanCount="2"
-        tools:listitem="@layout/cell_folder"
+        tools:listitem="@layout/cell_folder_square"
         tools:visibility="visible" />
 
     <ViewStub

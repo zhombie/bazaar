@@ -20,7 +20,7 @@ internal class FunctionalButton private constructor(
         }
 
         fun explorer(): FunctionalButton {
-            return FunctionalButton(Type.EXPLORER, R.drawable.ic_folder, R.string.explorer)
+            return FunctionalButton(Type.EXPLORER, R.drawable.ic_folder_yellow, R.string.explorer)
         }
     }
 

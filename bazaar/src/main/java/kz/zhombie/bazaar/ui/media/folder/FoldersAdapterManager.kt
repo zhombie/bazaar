@@ -37,14 +37,23 @@ internal class FoldersAdapterManager constructor(
         if (foldersAdapter == null) {
             foldersAdapter = FoldersAdapter(
                 imageLoader = Settings.getImageLoader(),
+                type = if (type == Type.LIST) {
+                    FoldersAdapter.Type.RECTANGLE
+                } else {
+                    FoldersAdapter.Type.SQUARE
+                },
                 isCoverEnabled = isCoverEnabled,
                 onFolderClicked = { onFolderClicked(it) },
-                onLeftOffsetReadyListener = { itemDecoration?.decoratorLeftOffset = it }
+                onLeftOffsetReadyListener = { leftOffset ->
+                    itemDecoration?.decoratorLeftOffset = leftOffset
+                    recyclerView.invalidateItemDecorations()
+                }
             )
 
             recyclerView.adapter = foldersAdapter
 
             val layoutManager: RecyclerView.LayoutManager
+            val itemDecoration: SpacingItemDecoration
 
             when (type) {
                 Type.LIST -> {
@@ -80,9 +89,8 @@ internal class FoldersAdapterManager constructor(
 
             recyclerView.itemAnimator = null
 
-            itemDecoration?.let { itemDecoration ->
-                recyclerView.addItemDecoration(itemDecoration)
-            }
+            recyclerView.addItemDecoration(itemDecoration)
+            this.itemDecoration = itemDecoration
         }
     }
 
