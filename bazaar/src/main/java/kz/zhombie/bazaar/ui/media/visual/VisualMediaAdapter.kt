@@ -93,8 +93,8 @@ internal class VisualMediaAdapter constructor(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is ImageViewHolder -> holder.bind(item)
             is VideoViewHolder -> holder.bind(item)
+            is ImageViewHolder -> holder.bind(item)
         }
     }
 
@@ -157,7 +157,14 @@ internal class VisualMediaAdapter constructor(
         open fun bind(uiMedia: UIMedia) {
             val image: Image = if (uiMedia.media is Image) uiMedia.media else return
 
-            imageLoader.loadGridItemImage(itemView.context, imageView, image.uri)
+            when {
+                image.thumbnail != null ->
+                    imageLoader.loadGridItemImage(itemView.context, imageView, image.thumbnail)
+                image.source != null ->
+                    imageLoader.loadGridItemImage(itemView.context, imageView, image.source)
+                else ->
+                    imageLoader.loadGridItemImage(itemView.context, imageView, image.uri)
+            }
 
             toggleSelectionAbility(uiMedia)
 
@@ -243,7 +250,12 @@ internal class VisualMediaAdapter constructor(
         override fun bind(uiMedia: UIMedia) {
             val video: Video = if (uiMedia.media is Video) uiMedia.media else return
 
-            imageLoader.loadGridItemImage(itemView.context, imageView, video.uri)
+            when {
+                video.thumbnail != null ->
+                    imageLoader.loadGridItemImage(itemView.context, imageView, video.thumbnail)
+                else ->
+                    imageLoader.loadGridItemImage(itemView.context, imageView, video.uri)
+            }
 
             toggleSelectionAbility(uiMedia)
 

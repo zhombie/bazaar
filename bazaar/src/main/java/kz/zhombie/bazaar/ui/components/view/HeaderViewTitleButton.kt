@@ -12,7 +12,7 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.utils.dp2Px
 import kotlin.math.roundToInt
 
-class HeaderViewTitleButton @JvmOverloads internal constructor(
+class HeaderViewTitleButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

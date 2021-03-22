@@ -12,7 +12,7 @@ import androidx.core.text.buildSpannedString
 import com.google.android.material.button.MaterialButton
 import kz.zhombie.bazaar.R
 
-class SelectButton @JvmOverloads internal constructor(
+class SelectButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.materialButtonStyle
