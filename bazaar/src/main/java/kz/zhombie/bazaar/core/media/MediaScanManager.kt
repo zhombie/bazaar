@@ -10,7 +10,9 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.*
+import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.model.*
+import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.model.ImageBitmap
 import kz.zhombie.bazaar.core.media.utils.*
@@ -30,6 +32,43 @@ internal class MediaScanManager constructor(private val context: Context) {
         private const val DEFAULT_MIME_TYPE_VIDEO = "video/mp4"
 
         private const val REQUIRED_IMAGE_WIDTH = 512
+
+        suspend fun preload(context: Context, mode: Mode) {
+            Logger.d(TAG, "preload()")
+            val mediaScanManager = MediaScanManager(context)
+            if (mode == Mode.AUDIO) {
+                val multimedia = when (mode) {
+                    Mode.AUDIO -> mediaScanManager.loadLocalMediaAudios()
+                    else -> null
+                }
+                Logger.d(TAG, "preload() -> multimedia: ${multimedia?.size}")
+                if (!multimedia.isNullOrEmpty()) {
+                    Cache.getInstance().setMultimedia(multimedia)
+                }
+            } else {
+                val media = when (mode) {
+                    Mode.IMAGE -> mediaScanManager.loadLocalMediaImages()
+                    Mode.VIDEO -> mediaScanManager.loadLocalMediaVideos()
+                    Mode.IMAGE_AND_VIDEO -> mediaScanManager.loadLocalMediaImagesAndVideos()
+                    else ->
+                        null
+                }
+                Logger.d(TAG, "preload() -> media: ${media?.size}")
+                if (!media.isNullOrEmpty()) {
+                    Cache.getInstance().setMedia(media)
+                }
+            }
+        }
+
+        suspend fun clearCache() {
+            Logger.d(TAG, "clearCache()")
+            Cache.getInstance().clear()
+        }
+
+        suspend fun destroyCache() {
+            Logger.d(TAG, "destroyCache()")
+            Cache.getInstance().destroy()
+        }
     }
 
     suspend fun createCameraPictureInputTempFile(dispatcher: CoroutineDispatcher = Dispatchers.IO): Image? =
@@ -212,17 +251,22 @@ internal class MediaScanManager constructor(private val context: Context) {
     private suspend inline fun <reified T> Cursor.mapTo(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): List<T> = withContext(dispatcher) {
-        return@withContext generateSequence { if (moveToNext()) this else null }
-            .mapNotNull {
-                when (T::class.java) {
-                    Image::class.java -> this@mapTo.readImage() as T
-                    Video::class.java -> this@mapTo.readVideo() as T
-                    Media::class.java -> this@mapTo.readFile() as T
-                    Audio::class.java -> this@mapTo.readAudio() as T
+        val list = mutableListOf<T>()
+        if (moveToFirst()) {
+            while (moveToNext()) {
+                val item = when (T::class.java) {
+                    Image::class.java -> this@mapTo.readImage(context)
+                    Video::class.java -> this@mapTo.readVideo(context)
+                    Media::class.java -> this@mapTo.readFile(context)
+                    Audio::class.java -> this@mapTo.readAudio()
                     else -> null
                 }
+                if (item is T) {
+                    list.add(item)
+                }
             }
-            .toList()
+        }
+        return@withContext list
     }
 
     suspend fun loadSelectedLocalMediaImages(

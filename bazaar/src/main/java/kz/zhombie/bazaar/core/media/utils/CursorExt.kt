@@ -1,13 +1,19 @@
 package kz.zhombie.bazaar.core.media.utils
 
 import android.content.ContentUris
+import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.util.Size
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.model.Image
 import kz.zhombie.bazaar.api.model.Media
@@ -15,8 +21,8 @@ import kz.zhombie.bazaar.api.model.Video
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-internal fun Cursor.readImage(): Image? {
-    return try {
+internal suspend fun Cursor.readImage(context: Context): Image? = withContext(Dispatchers.IO) {
+    return@withContext try {
         val id = getLong(getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID))
         val externalContentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
         val title = getString(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.TITLE))
@@ -46,6 +52,21 @@ internal fun Cursor.readImage(): Image? {
             bucketDisplayName = getString(getColumnIndexOrThrow(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
         }
 
+        val thumbnail: Bitmap? = runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val thumbnailSize = Size(125, 125)
+                context.contentResolver.loadThumbnail(externalContentUri, thumbnailSize, null)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Thumbnails.getThumbnail(
+                    context.contentResolver,
+                    id,
+                    MediaStore.Images.Thumbnails.MINI_KIND,
+                    BitmapFactory.Options()
+                )
+            }
+        }.getOrNull()
+
         Image(
             id = id,
             uri = externalContentUri,
@@ -58,7 +79,7 @@ internal fun Cursor.readImage(): Image? {
             dateAdded = dateAdded,
             dateModified = dateModified,
             dateCreated = dateTaken,
-            thumbnail = null,
+            thumbnail = thumbnail,
             folderId = bucketId,
             folderDisplayName = bucketDisplayName,
             width = width,
@@ -72,8 +93,8 @@ internal fun Cursor.readImage(): Image? {
 }
 
 
-internal fun Cursor.readVideo(): Video? {
-    return try {
+internal suspend fun Cursor.readVideo(context: Context): Video? = withContext(Dispatchers.IO) {
+    return@withContext try {
         val id = getLong(getColumnIndexOrThrow(MediaStore.Video.VideoColumns._ID))
         val externalContentUri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
         val title = getString(getColumnIndexOrThrow(MediaStore.Video.VideoColumns.TITLE))
@@ -109,6 +130,21 @@ internal fun Cursor.readVideo(): Video? {
             null
         }
 
+        val thumbnail: Bitmap? = runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val thumbnailSize = Size(125, 125)
+                context.contentResolver.loadThumbnail(externalContentUri, thumbnailSize, null)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Video.Thumbnails.getThumbnail(
+                    context.contentResolver,
+                    id,
+                    MediaStore.Video.Thumbnails.MINI_KIND,
+                    BitmapFactory.Options()
+                )
+            }
+        }.getOrNull()
+
         Video(
             id = id,
             uri = externalContentUri,
@@ -121,7 +157,7 @@ internal fun Cursor.readVideo(): Video? {
             dateAdded = dateAdded,
             dateModified = dateModified,
             dateCreated = dateTaken,
-            thumbnail = null,
+            thumbnail = thumbnail,
             folderId = bucketId,
             folderDisplayName = bucketDisplayName,
             width = width,
@@ -135,17 +171,17 @@ internal fun Cursor.readVideo(): Video? {
 }
 
 
-internal fun Cursor.readFile(): Media? {
+internal suspend fun Cursor.readFile(context: Context): Media? {
     return when (getInt(getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))) {
-        MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> readImage()
-        MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> readVideo()
+        MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> readImage(context)
+        MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> readVideo(context)
         else -> null
     }
 }
 
 
-internal fun Cursor.readAudio(): Audio? {
-    return try {
+internal suspend fun Cursor.readAudio(): Audio? = withContext(Dispatchers.IO) {
+    return@withContext try {
         val id = getLong(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns._ID))
         val externalContentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
         val title = getString(getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.TITLE))

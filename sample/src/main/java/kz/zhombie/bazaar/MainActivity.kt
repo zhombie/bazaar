@@ -2,21 +2,24 @@ package kz.zhombie.bazaar
 
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
-import kz.zhombie.bazaar.api.model.Multimedia
-import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
+import kz.zhombie.bazaar.api.result.ResultCallback
 
 class MainActivity : AppCompatActivity(), ResultCallback {
 
@@ -146,6 +149,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                     .show(supportFragmentManager)
             }
         }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            Bazaar.preload(this@MainActivity, Mode.IMAGE_AND_VIDEO)
+            Bazaar.preload(this@MainActivity, Mode.AUDIO)
+        }
     }
 
     private fun checkPermissions(): Boolean {
@@ -168,6 +176,14 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         if (requestCode == RequestCode.EXTERNAL_STORAGE_ACCESS) {
             checkPermissions()
         }
+    }
+
+    override fun onDestroy() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            Bazaar.destroyCache()
+        }
+
+        super.onDestroy()
     }
 
     override fun onCameraResult(media: Media) {

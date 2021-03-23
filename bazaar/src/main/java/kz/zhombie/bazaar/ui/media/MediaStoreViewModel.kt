@@ -10,6 +10,7 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 import kotlinx.coroutines.*
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.model.*
+import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.model.UIFolder
@@ -81,10 +82,38 @@ internal class MediaStoreViewModel : ViewModel() {
         if (allMedia.isEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
                 val localData = when (settings.mode) {
-                    Mode.IMAGE -> mediaScanManager.loadLocalMediaImages(Dispatchers.IO)
-                    Mode.VIDEO -> mediaScanManager.loadLocalMediaVideos(Dispatchers.IO)
-                    Mode.IMAGE_AND_VIDEO -> mediaScanManager.loadLocalMediaImagesAndVideos(Dispatchers.IO)
-                    Mode.AUDIO -> mediaScanManager.loadLocalMediaAudios(Dispatchers.IO)
+                    Mode.IMAGE -> {
+                        val images = Cache.getInstance().getMedia()?.filterIsInstance<Image>()
+                        if (images.isNullOrEmpty()) {
+                            mediaScanManager.loadLocalMediaImages(Dispatchers.IO)
+                        } else {
+                            images
+                        }
+                    }
+                    Mode.VIDEO -> {
+                        val videos = Cache.getInstance().getMedia()?.filterIsInstance<Video>()
+                        if (videos.isNullOrEmpty()) {
+                            mediaScanManager.loadLocalMediaVideos(Dispatchers.IO)
+                        } else {
+                            videos
+                        }
+                    }
+                    Mode.IMAGE_AND_VIDEO -> {
+                        val imagesAndVideos = Cache.getInstance().getMedia()?.filter { it is Image || it is Video }
+                        if (imagesAndVideos.isNullOrEmpty()) {
+                            mediaScanManager.loadLocalMediaImagesAndVideos(Dispatchers.IO)
+                        } else {
+                            imagesAndVideos
+                        }
+                    }
+                    Mode.AUDIO -> {
+                        val audios = Cache.getInstance().getMultimedia()?.filterIsInstance<Audio>()
+                        if (audios.isNullOrEmpty()) {
+                            mediaScanManager.loadLocalMediaAudios(Dispatchers.IO)
+                        } else {
+                            audios
+                        }
+                    }
                 }
                 if (localData != null) {
                     onLocalDataLoaded(localData)

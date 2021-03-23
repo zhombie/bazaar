@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar
 
+import android.content.Context
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kz.zhombie.bazaar.api.core.ImageLoader
@@ -8,6 +9,7 @@ import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
+import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.media.MediaStoreFragment
 import kz.zhombie.bazaar.ui.media.MediaStoreScreen
 
@@ -19,6 +21,18 @@ class Bazaar private constructor() {
         fun init(imageLoader: ImageLoader, isLoggingEnabled: Boolean) {
             Settings.setImageLoader(imageLoader)
             Settings.setLoggingEnabled(isLoggingEnabled)
+        }
+
+        suspend fun preload(context: Context, mode: Mode) {
+            MediaScanManager.preload(context, mode)
+        }
+
+        suspend fun clearCache() {
+            MediaScanManager.clearCache()
+        }
+
+        suspend fun destroyCache() {
+            MediaScanManager.destroyCache()
         }
     }
 
