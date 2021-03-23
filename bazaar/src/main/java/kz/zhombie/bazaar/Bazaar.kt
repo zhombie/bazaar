@@ -1,9 +1,10 @@
 package kz.zhombie.bazaar
 
 import androidx.fragment.app.FragmentManager
-import kz.zhombie.bazaar.api.core.settings.CameraSettings
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
+import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
@@ -51,8 +52,18 @@ class Bazaar private constructor() {
             return this
         }
 
+        fun setSingleSelection(): Builder {
+            this.maxSelectionCount = 1
+            return this
+        }
+
         fun setMaxSelectionCount(count: Int): Builder {
             this.maxSelectionCount = count
+            return this
+        }
+
+        fun setCameraDisabled(): Builder {
+            this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
             return this
         }
 
@@ -81,7 +92,7 @@ class Bazaar private constructor() {
             return this
         }
 
-        fun show(fragmentManager: FragmentManager): String? {
+        fun show(fragmentManager: FragmentManager): BottomSheetDialogFragment {
             if (Settings.hasImageLoader()) {
                 imageLoader?.let { imageLoader ->
                     Settings.setImageLoader(imageLoader)
@@ -104,7 +115,7 @@ class Bazaar private constructor() {
             eventListener?.let { fragment.setEventListener(it) }
             fragment.setResultCallback(requireNotNull(resultCallback) { "It makes no sense without a resultant callback." })
             fragment.show(fragmentManager, tag)
-            return tag
+            return fragment
         }
     }
 
