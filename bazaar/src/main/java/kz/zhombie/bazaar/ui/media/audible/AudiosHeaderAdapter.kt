@@ -38,7 +38,7 @@ internal class AudiosHeaderAdapter constructor(
     override fun getItemCount(): Int = if (isExplorerEnabled) 1 else 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ViewHolder(parent.inflate(R.layout.cell_functional_button_horizontal))
+        return ViewHolder(parent.inflate(R.layout.bazaar_cell_functional_button_horizontal))
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

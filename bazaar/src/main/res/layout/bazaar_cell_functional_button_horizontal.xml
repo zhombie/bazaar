@@ -4,7 +4,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/ripple_rounded"
+    android:background="@drawable/bazaar_ripple_rounded"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_camera" />
+        android:src="@drawable/bazaar_ic_camera" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/titleView"

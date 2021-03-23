@@ -11,18 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        app:shapeAppearance="@style/ItemShapeAppearance"
+        app:shapeAppearance="@style/Bazaar.ItemShapeAppearance"
         tools:src="@tools:sample/backgrounds/scenic" />
 
     <kz.zhombie.bazaar.ui.components.view.CheckBoxButton
         android:id="@+id/checkBoxButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="@dimen/big_checkbox_size"
-        android:layout_height="@dimen/big_checkbox_size"
+        android:layout_width="@dimen/bazaar_big_checkbox_size"
+        android:layout_height="@dimen/bazaar_big_checkbox_size"
         android:layout_gravity="top|end"
         android:layout_margin="2.5dp"
-        android:minHeight="@dimen/big_checkbox_min_size"
-        android:minWidth="@dimen/big_checkbox_min_size"
-        app:iconSize="@dimen/big_checkbox_icon_size" />
+        android:minHeight="@dimen/bazaar_big_checkbox_min_size"
+        android:minWidth="@dimen/bazaar_big_checkbox_min_size"
+        app:iconSize="@dimen/bazaar_big_checkbox_icon_size" />
 
 </kz.zhombie.bazaar.ui.components.view.SquareFrameLayout>

@@ -21,7 +21,7 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class CinemaDialogFragment : DialogFragment(R.layout.fragment_dialog_cinema),
+internal class CinemaDialogFragment : DialogFragment(R.layout.bazaar_fragment_dialog_cinema),
     Player.EventListener {
 
     companion object {
@@ -63,7 +63,7 @@ internal class CinemaDialogFragment : DialogFragment(R.layout.fragment_dialog_ci
     private var controllerViewAnimation: ViewPropertyAnimator? = null
 
     override fun getTheme(): Int {
-        return R.style.Dialog_Fullscreen
+        return R.style.Bazaar_Dialog_Fullscreen
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

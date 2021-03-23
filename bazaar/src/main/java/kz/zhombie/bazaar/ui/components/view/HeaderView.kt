@@ -58,7 +58,7 @@ class HeaderView @JvmOverloads constructor(
         layoutParams.rightToRight = ConstraintSet.PARENT_ID
         layoutParams.bottomToTop = ViewId.TITLE_BUTTON
         imageView.layoutParams = layoutParams
-        imageView.setImageResource(R.drawable.ic_scroll_indicator)
+        imageView.setImageResource(R.drawable.bazaar_ic_scroll_indicator)
         return imageView
     }
 
@@ -84,18 +84,18 @@ class HeaderView @JvmOverloads constructor(
         closeButtonLayoutParams.rightToRight = ConstraintSet.PARENT_ID
         closeButtonLayoutParams.bottomToBottom = ViewId.TITLE_BUTTON
         closeButton.layoutParams = closeButtonLayoutParams
-        closeButton.backgroundTintList = ContextCompat.getColorStateList(context, R.color.bg_button_gray)
+        closeButton.backgroundTintList = ContextCompat.getColorStateList(context, R.color.bazaar_bg_button_gray)
         closeButton.insetTop = 0
         closeButton.insetBottom = 0
         closeButton.minWidth = 50F.dp2Px().roundToInt()
         closeButton.minHeight = 50F.dp2Px().roundToInt()
         closeButton.setPadding(10F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt(), 10F.dp2Px().roundToInt())
-        closeButton.setIconResource(R.drawable.ic_close_filled)
+        closeButton.setIconResource(R.drawable.bazaar_ic_close_filled)
         closeButton.iconGravity = MaterialButton.ICON_GRAVITY_TEXT_END
         closeButton.iconPadding = 0
         closeButton.iconTint = null
         closeButton.shapeAppearanceModel = ShapeAppearanceModel
-            .builder(context, R.style.CircularShapeAppearance, 0)
+            .builder(context, R.style.Bazaar_CircularShapeAppearance, 0)
             .build()
         return closeButton
     }

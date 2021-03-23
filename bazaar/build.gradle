@@ -18,6 +18,8 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 
+    resourcePrefix 'bazaar_'
+
     buildTypes {
         release {
             minifyEnabled false

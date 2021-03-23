@@ -124,7 +124,7 @@ internal class AudiosAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.AUDIO ->
-                ViewHolder(parent.inflate(R.layout.cell_audio))
+                ViewHolder(parent.inflate(R.layout.bazaar_cell_audio))
             else ->
                 throw ViewHolderException(viewType)
         }
@@ -255,7 +255,7 @@ internal class AudiosAdapter constructor(
                 itemView.foreground = null
             } else {
                 itemView.isEnabled = false
-                itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_alpha_black)
+                itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_alpha_black)
             }
         }
 

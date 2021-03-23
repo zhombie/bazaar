@@ -116,7 +116,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         this.resultCallback = resultCallback
     }
 
-    override fun getTheme(): Int = R.style.BottomSheetDialog
+    override fun getTheme(): Int = R.style.Bazaar_BottomSheetDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -196,7 +196,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_media_store, container, false)
+        return inflater.inflate(R.layout.bazaar_fragment_media_store, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -350,9 +350,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     dismiss()
                 }
                 is MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo -> {
-                    MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
+                    MaterialAlertDialogBuilder(requireContext(), R.style.Bazaar_AlertDialogTheme)
                         .setTitle("Выбор действия")
-                        .setSingleChoiceItems(arrayOf(getString(R.string.take_picture), getString(R.string.take_video)), -1) { dialog, which ->
+                        .setSingleChoiceItems(arrayOf(getString(R.string.bazaar_take_picture), getString(R.string.bazaar_take_video)), -1) { dialog, which ->
                             dialog.dismiss()
                             if (which == 0) {
                                 viewModel.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakePicture::class)
@@ -646,7 +646,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         override fun onPlayerError() {
                             toast?.cancel()
                             toast = null
-                            toast = Toast.makeText(context, R.string.error_player, Toast.LENGTH_SHORT)
+                            toast = Toast.makeText(context, R.string.bazaar_error_player, Toast.LENGTH_SHORT)
                             toast?.show()
                         }
                     }

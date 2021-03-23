@@ -24,7 +24,7 @@ class HeaderViewTitleButton @JvmOverloads constructor(
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        setBackgroundResource(R.drawable.ripple_rounded)
+        setBackgroundResource(R.drawable.bazaar_ripple_rounded)
         isClickable = true
         isFocusable = true
         orientation = VERTICAL
@@ -48,14 +48,14 @@ class HeaderViewTitleButton @JvmOverloads constructor(
         val layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         textView.layoutParams = layoutParams
         textView.letterSpacing = 0F
-        textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_dropdown_down, 0)
+        textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.bazaar_ic_chevron_down, 0)
         textView.compoundDrawablePadding = 10F.dp2Px().roundToInt()
         textView.ellipsize = TextUtils.TruncateAt.END
         textView.setSingleLine()
         textView.maxLines = 1
         textView.isAllCaps = false
         textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-        textView.setTextColor(ContextCompat.getColor(context, R.color.black))
+        textView.setTextColor(ContextCompat.getColor(context, R.color.bazaar_black))
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17F)
         return textView
     }
@@ -73,7 +73,7 @@ class HeaderViewTitleButton @JvmOverloads constructor(
         textView.includeFontPadding = false
         textView.isAllCaps = false
         textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
-        textView.setTextColor(ContextCompat.getColor(context, R.color.metal))
+        textView.setTextColor(ContextCompat.getColor(context, R.color.bazaar_metal))
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11F)
         textView.text = "Текущий альбом"
         return textView
@@ -85,9 +85,9 @@ class HeaderViewTitleButton @JvmOverloads constructor(
 
     fun toggleIcon(isUp: Boolean) {
         if (isUp) {
-            titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_dropdown_up, 0)
+            titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.bazaar_ic_chevron_up, 0)
         } else {
-            titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_dropdown_down, 0)
+            titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.bazaar_ic_chevron_down, 0)
         }
     }
 

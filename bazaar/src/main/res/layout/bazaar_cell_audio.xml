@@ -10,10 +10,10 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingBottom="@dimen/media_item_list_padding_bottom"
-    android:paddingLeft="@dimen/media_item_list_padding_left"
-    android:paddingRight="@dimen/media_item_list_padding_right"
-    android:paddingTop="@dimen/media_item_list_padding_top">
+    android:paddingBottom="@dimen/bazaar_media_item_list_padding_bottom"
+    android:paddingLeft="@dimen/bazaar_media_item_list_padding_left"
+    android:paddingRight="@dimen/bazaar_media_item_list_padding_right"
+    android:paddingTop="@dimen/bazaar_media_item_list_padding_top">
 
     <FrameLayout
         android:layout_width="70dp"
@@ -25,7 +25,7 @@
             android:layout_width="47dp"
             android:layout_height="47dp"
             android:layout_gravity="center"
-            android:backgroundTint="@color/light_blue"
+            android:backgroundTint="@color/bazaar_light_blue"
             android:gravity="start|center_vertical"
             android:includeFontPadding="false"
             android:insetBottom="0dp"
@@ -41,17 +41,17 @@
             app:iconSize="30dp"
             app:iconTint="@null"
             app:rippleColor="?attr/colorControlHighlight"
-            app:shapeAppearance="@style/CircularShapeAppearance" />
+            app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />
 
         <kz.zhombie.bazaar.ui.components.view.CheckBoxButton
             android:id="@+id/checkBoxButton"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="@dimen/small_checkbox_size"
-            android:layout_height="@dimen/small_checkbox_size"
+            android:layout_width="@dimen/bazaar_small_checkbox_size"
+            android:layout_height="@dimen/bazaar_small_checkbox_size"
             android:layout_gravity="bottom|end"
-            android:minHeight="@dimen/small_checkbox_min_size"
-            android:minWidth="@dimen/small_checkbox_min_size"
-            app:iconSize="@dimen/small_checkbox_icon_size" />
+            android:minHeight="@dimen/bazaar_small_checkbox_min_size"
+            android:minWidth="@dimen/bazaar_small_checkbox_min_size"
+            app:iconSize="@dimen/bazaar_small_checkbox_icon_size" />
 
     </FrameLayout>
 
@@ -75,7 +75,7 @@
             android:maxLines="2"
             android:singleLine="false"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/bazaar_black"
             android:textSize="13sp"
             android:textStyle="bold"
             tools:text="Audio display name" />
@@ -92,10 +92,11 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/bazaar_black"
             android:textSize="10sp"
             android:textStyle="normal"
-            tools:text="Audio folder name" />
+            tools:text="Audio folder name"
+            tools:ignore="SmallSp" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/durationView"
@@ -109,10 +110,11 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textAllCaps="false"
-            android:textColor="@color/metal"
+            android:textColor="@color/bazaar_metal"
             android:textSize="10sp"
             android:textStyle="normal"
-            tools:text="Audio display name" />
+            tools:text="Audio display name"
+            tools:ignore="SmallSp" />
 
     </LinearLayout>
 

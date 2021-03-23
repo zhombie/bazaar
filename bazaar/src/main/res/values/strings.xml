@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="camera">Camera</string>
-    <string name="explorer">Explorer</string>
+    <string name="bazaar_camera">Camera</string>
+    <string name="bazaar_explorer">Explorer</string>
 
-    <string name="take_picture">Take picture</string>
-    <string name="take_video">Take video</string>
+    <string name="bazaar_take_picture">Take picture</string>
+    <string name="bazaar_take_video">Take video</string>
 
-    <string name="cancel">Cancel</string>
+    <string name="bazaar_cancel">Cancel</string>
 
-    <string name="error_player">Error occurred. Unable to play</string>
+    <string name="bazaar_error_player">Error occurred. Unable to play</string>
 </resources>

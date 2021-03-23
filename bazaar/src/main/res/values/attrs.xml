@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="itemMarginBottom" format="reference|dimension" />
-    <attr name="itemMarginLeft" format="reference|dimension" />
-    <attr name="itemMarginRight" format="reference|dimension" />
-    <attr name="itemMarginTop" format="reference|dimension" />
+    <attr name="bazaar_itemMarginBottom" format="reference|dimension" />
+    <attr name="bazaar_itemMarginLeft" format="reference|dimension" />
+    <attr name="bazaar_itemMarginRight" format="reference|dimension" />
+    <attr name="bazaar_itemMarginTop" format="reference|dimension" />
 </resources>

@@ -5,7 +5,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/ripple_rounded"
+    android:background="@drawable/bazaar_ripple_rounded"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="centerCrop"
-        app:shapeAppearance="@style/ItemShapeAppearance"
+        app:shapeAppearance="@style/Bazaar.ItemShapeAppearance"
         tools:src="@tools:sample/backgrounds/scenic" />
 
     <com.google.android.material.textview.MaterialTextView

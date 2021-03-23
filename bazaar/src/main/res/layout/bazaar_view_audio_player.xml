@@ -5,7 +5,7 @@
     android:id="@+id/audioPlayerView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/ripple_light_blue"
+    android:background="@drawable/bazaar_ripple_light_blue"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -37,7 +37,7 @@
         app:iconSize="28dp"
         app:iconTint="@null"
         app:rippleColor="?attr/colorControlHighlight"
-        app:shapeAppearance="@style/CircularShapeAppearance" />
+        app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -58,7 +58,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/bazaar_white"
             android:textSize="13sp"
             android:textStyle="bold"
             tools:text="Audio display name" />
@@ -75,9 +75,10 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/bazaar_white"
             android:textSize="9sp"
             android:textStyle="normal"
+            tools:ignore="SmallSp"
             tools:text="Audio folder name" />
 
     </LinearLayout>
@@ -98,12 +99,12 @@
         android:minHeight="0dp"
         android:minWidth="0dp"
         android:text="@null"
-        app:icon="@drawable/ic_close"
+        app:icon="@drawable/bazaar_ic_close"
         app:iconGravity="textEnd"
         app:iconPadding="0dp"
         app:iconSize="35dp"
         app:iconTint="@null"
         app:rippleColor="?attr/colorControlHighlight"
-        app:shapeAppearance="@style/CircularShapeAppearance" />
+        app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />
 
 </LinearLayout>

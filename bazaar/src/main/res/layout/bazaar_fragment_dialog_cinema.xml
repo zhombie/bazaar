@@ -10,7 +10,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/dark_black_alpha_60"
+        android:background="@color/bazaar_dark_black_alpha_60"
         android:elevation="0dp"
         android:fitsSystemWindows="true">
 
@@ -28,7 +28,7 @@
         android:id="@+id/backgroundView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/dark_black"
+        android:background="@color/bazaar_dark_black"
         android:visibility="invisible"
         tools:visibility="visible" />
 
@@ -55,7 +55,7 @@
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_gravity="center"
-            android:backgroundTint="@color/dark_black_alpha_80"
+            android:backgroundTint="@color/bazaar_dark_black_alpha_80"
             android:gravity="center"
             android:includeFontPadding="false"
             android:insetBottom="10dp"
@@ -72,7 +72,7 @@
             app:iconSize="24dp"
             app:iconTint="@null"
             app:rippleColor="?attr/colorControlHighlight"
-            app:shapeAppearance="@style/CircularShapeAppearance" />
+            app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />
 
     </FrameLayout>
 
@@ -81,7 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/dark_black_alpha_60"
+        android:background="@color/bazaar_dark_black_alpha_60"
         android:gravity="center_vertical"
         android:minHeight="70dp"
         android:orientation="vertical">

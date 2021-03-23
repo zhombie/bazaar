@@ -20,7 +20,7 @@ import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_museum) {
+internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_dialog_museum) {
 
     companion object {
         private val TAG: String = MuseumDialogFragment::class.java.simpleName
@@ -54,7 +54,7 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.fragment_dialog_mu
     private var startViewPosition: ViewPosition? = null
 
     override fun getTheme(): Int {
-        return R.style.Dialog_Fullscreen
+        return R.style.Bazaar_Dialog_Fullscreen
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

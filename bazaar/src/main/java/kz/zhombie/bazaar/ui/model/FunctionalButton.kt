@@ -16,11 +16,11 @@ internal class FunctionalButton private constructor(
 
     companion object {
         fun camera(): FunctionalButton {
-            return FunctionalButton(Type.CAMERA, R.drawable.ic_camera, R.string.camera)
+            return FunctionalButton(Type.CAMERA, R.drawable.bazaar_ic_camera, R.string.bazaar_camera)
         }
 
         fun explorer(): FunctionalButton {
-            return FunctionalButton(Type.EXPLORER, R.drawable.ic_folder_yellow, R.string.explorer)
+            return FunctionalButton(Type.EXPLORER, R.drawable.bazaar_ic_folder_yellow, R.string.bazaar_explorer)
         }
     }
 

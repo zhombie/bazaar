@@ -13,10 +13,10 @@ class GlideImageLoader : ImageLoader {
         Glide.with(context)
             .load(uri)
             .centerCrop()
-            .error(R.drawable.bg_rounded_white_with_stroke)
-            .fallback(R.drawable.bg_rounded_white_with_stroke)
+            .error(R.drawable.bazaar_bg_rounded_white_with_stroke)
+            .fallback(R.drawable.bazaar_bg_rounded_white_with_stroke)
             .override(300, 300)
-            .placeholder(R.drawable.bg_rounded_white_with_stroke)
+            .placeholder(R.drawable.bazaar_bg_rounded_white_with_stroke)
             .into(imageView)
     }
 
@@ -24,10 +24,10 @@ class GlideImageLoader : ImageLoader {
         Glide.with(context)
             .load(bitmap)
             .centerCrop()
-            .error(R.drawable.bg_rounded_white_with_stroke)
-            .fallback(R.drawable.bg_rounded_white_with_stroke)
+            .error(R.drawable.bazaar_bg_rounded_white_with_stroke)
+            .fallback(R.drawable.bazaar_bg_rounded_white_with_stroke)
             .override(300, 300)
-            .placeholder(R.drawable.bg_rounded_white_with_stroke)
+            .placeholder(R.drawable.bazaar_bg_rounded_white_with_stroke)
             .into(imageView)
     }
 
@@ -35,10 +35,10 @@ class GlideImageLoader : ImageLoader {
         Glide.with(context)
             .load(uri)
             .centerCrop()
-            .error(R.drawable.bg_black)
-            .fallback(R.drawable.bg_black)
+            .error(R.drawable.bazaar_bg_black)
+            .fallback(R.drawable.bazaar_bg_black)
             .fitCenter()
-            .placeholder(R.drawable.bg_black)
+            .placeholder(R.drawable.bazaar_bg_black)
             .into(imageView)
     }
 

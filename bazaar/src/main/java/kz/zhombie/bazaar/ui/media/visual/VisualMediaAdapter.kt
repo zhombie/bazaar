@@ -83,9 +83,9 @@ internal class VisualMediaAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.IMAGE ->
-                ImageViewHolder(view = parent.inflate(R.layout.cell_image))
+                ImageViewHolder(view = parent.inflate(R.layout.bazaar_cell_image))
             ViewType.VIDEO ->
-                VideoViewHolder(view = parent.inflate(R.layout.cell_video))
+                VideoViewHolder(view = parent.inflate(R.layout.bazaar_cell_video))
             else ->
                 throw ViewHolderException(viewType)
         }
@@ -94,8 +94,8 @@ internal class VisualMediaAdapter constructor(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is VideoViewHolder -> holder.bind(item)
-            is ImageViewHolder -> holder.bind(item)
+            is ImageViewHolder -> if (item.isImage()) holder.bind(item)
+            is VideoViewHolder -> if (item.isVideo()) holder.bind(item)
         }
     }
 
@@ -192,7 +192,7 @@ internal class VisualMediaAdapter constructor(
                 if (checkBoxButton.visibility != View.GONE) {
                     checkBoxButton.visibility = View.GONE
                 }
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
+                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_rounded_alpha_black)
             }
         }
 
@@ -292,7 +292,7 @@ internal class VisualMediaAdapter constructor(
                 if (checkBoxButton.visibility != View.GONE) {
                     checkBoxButton.visibility = View.GONE
                 }
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bg_rounded_alpha_black)
+                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_rounded_alpha_black)
             }
         }
 

@@ -69,8 +69,8 @@ internal class FoldersAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (type) {
-            Type.SQUARE -> SquareViewHolder(parent.inflate(R.layout.cell_folder_square))
-            Type.RECTANGLE -> RectangleViewHolder(parent.inflate(R.layout.cell_folder_rectangle))
+            Type.SQUARE -> SquareViewHolder(parent.inflate(R.layout.bazaar_cell_folder_square))
+            Type.RECTANGLE -> RectangleViewHolder(parent.inflate(R.layout.bazaar_cell_folder_rectangle))
         }
     }
 
@@ -97,7 +97,7 @@ internal class FoldersAdapter constructor(
             if (isCoverEnabled) {
                 val cover = uiFolder.folder.cover
                 if (cover == null) {
-                    imageView.setImageResource(R.drawable.bg_black)
+                    imageView.setImageResource(R.drawable.bazaar_bg_black)
                 } else {
                     imageLoader.loadGridItemImage(itemView.context, imageView, cover)
                 }

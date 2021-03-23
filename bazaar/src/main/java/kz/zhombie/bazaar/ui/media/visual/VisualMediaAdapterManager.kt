@@ -60,10 +60,10 @@ internal class VisualMediaAdapterManager constructor(
 
         recyclerView.addItemDecoration(
             SpacingItemDecoration(
-                spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_left),
-                spacingTop = context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_top),
-                spacingRight = context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_right),
-                spacingBottom = context.resources.getDimensionPixelOffset(R.dimen.media_item_grid_margin_bottom)
+                spacingLeft = context.resources.getDimensionPixelOffset(R.dimen.bazaar_media_item_grid_margin_left),
+                spacingTop = context.resources.getDimensionPixelOffset(R.dimen.bazaar_media_item_grid_margin_top),
+                spacingRight = context.resources.getDimensionPixelOffset(R.dimen.bazaar_media_item_grid_margin_right),
+                spacingBottom = context.resources.getDimensionPixelOffset(R.dimen.bazaar_media_item_grid_margin_bottom)
             )
         )
     }

@@ -71,9 +71,9 @@ internal class VisualMediaHeaderAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.CAMERA ->
-                ViewHolder(parent.inflate(R.layout.cell_functional_button_square))
+                ViewHolder(parent.inflate(R.layout.bazaar_cell_functional_button_square))
             ViewType.EXPLORER ->
-                ViewHolder(parent.inflate(R.layout.cell_functional_button_square))
+                ViewHolder(parent.inflate(R.layout.bazaar_cell_functional_button_square))
             else ->
                 throw ViewHolderException(viewType)
         }

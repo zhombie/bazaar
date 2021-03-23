@@ -22,7 +22,7 @@ class CheckBoxButton @JvmOverloads constructor(
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        backgroundTintList = ContextCompat.getColorStateList(context, R.color.bg_button_gray)
+        backgroundTintList = ContextCompat.getColorStateList(context, R.color.bazaar_bg_button_gray)
 
         gravity = Gravity.CENTER
 
@@ -38,19 +38,19 @@ class CheckBoxButton @JvmOverloads constructor(
         iconPadding = 0
         iconTint = null
 
-        rippleColor = ContextCompat.getColorStateList(context, R.color.ripple)
+        rippleColor = ContextCompat.getColorStateList(context, R.color.bazaar_ripple)
 
         shapeAppearanceModel = ShapeAppearanceModel
-            .builder(context, R.style.CircularShapeAppearance, 0)
+            .builder(context, R.style.Bazaar_CircularShapeAppearance, 0)
             .build()
     }
 
     fun setCheckedDrawable() {
-        setIconResource(R.drawable.ic_checked)
+        setIconResource(R.drawable.bazaar_ic_checked)
     }
 
     fun setUncheckedDrawable() {
-        setIconResource(R.drawable.ic_unchecked)
+        setIconResource(R.drawable.bazaar_ic_unchecked)
     }
 
     fun setShownState() {

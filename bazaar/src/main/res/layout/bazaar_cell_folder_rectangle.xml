@@ -4,7 +4,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/ripple_rounded"
+    android:background="@drawable/bazaar_ripple_rounded"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -18,7 +18,7 @@
         android:id="@+id/imageView"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/ic_folder_blue" />
+        android:src="@drawable/bazaar_ic_folder_blue" />
 
     <LinearLayout
         android:id="@+id/contentView"
@@ -58,10 +58,17 @@
             android:singleLine="true"
             android:textAllCaps="false"
             android:textColor="@android:color/darker_gray"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textStyle="normal"
             tools:text="Folder elements count: 5" />
 
     </LinearLayout>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/chevronView"
+        android:layout_width="12.5dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/bazaar_ic_chevron_right"
+        android:tint="@color/bazaar_gray" />
 
 </LinearLayout>
