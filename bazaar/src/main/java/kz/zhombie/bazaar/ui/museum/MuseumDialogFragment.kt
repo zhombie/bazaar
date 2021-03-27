@@ -1,6 +1,7 @@
 package kz.zhombie.bazaar.ui.museum
 
 import android.content.DialogInterface
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -16,26 +17,83 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_dialog_museum),
+class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaar_fragment_dialog_museum),
     MuseumListener {
 
     companion object {
         private val TAG: String = MuseumDialogFragment::class.java.simpleName
 
-        fun newInstance(uiMedia: UIMedia, startViewPosition: ViewPosition): MuseumDialogFragment {
+        private fun newInstance(
+            uri: Uri,
+            title: String,
+            subtitle: String? = null,
+            startViewPosition: ViewPosition
+        ): MuseumDialogFragment {
             val fragment = MuseumDialogFragment()
             fragment.arguments = Bundle().apply {
-                putSerializable(BundleKey.UI_MEDIA, uiMedia)
+                putSerializable(BundleKey.URI, uri.toString())
+                putSerializable(BundleKey.TITLE, title)
+                if (!subtitle.isNullOrBlank()) putSerializable(BundleKey.SUBTITLE, subtitle)
                 putString(BundleKey.START_VIEW_POSITION, startViewPosition.pack())
             }
             return fragment
         }
     }
 
+    class Builder {
+        private var uri: Uri? = null
+        private var title: String? = null
+        private var subtitle: String? = null
+        private var viewPosition: ViewPosition? = null
+        private var callback: Callback? = null
+
+        fun setUri(uri: Uri): Builder {
+            this.uri = uri
+            return this
+        }
+
+        fun setTitle(title: String): Builder {
+            this.title = title
+            return this
+        }
+
+        fun setSubtitle(subtitle: String?): Builder {
+            this.subtitle = subtitle
+            return this
+        }
+
+        fun setStartViewPosition(view: View): Builder {
+            this.viewPosition = ViewPosition.from(view)
+            return this
+        }
+
+        fun setStartViewPosition(viewPosition: ViewPosition): Builder {
+            this.viewPosition = viewPosition
+            return this
+        }
+
+        fun setCallback(callback: Callback): Builder {
+            this.callback = callback
+            return this
+        }
+
+        fun build(): MuseumDialogFragment {
+            return newInstance(
+                uri = requireNotNull(uri) { "Museum artwork uri is mandatory value" },
+                title = requireNotNull(title) { "Museum artwork title is mandatory value" },
+                subtitle = subtitle,
+                startViewPosition = requireNotNull(viewPosition) {
+                    "Museum artwork needs start view position, in order to make smooth transition animation"
+                }
+            )
+        }
+    }
+
     private object BundleKey {
-        const val UI_MEDIA = "ui_media"
+        const val URI = "uri"
+        const val TITLE = "title"
+        const val SUBTITLE = "subtitle"
         const val START_VIEW_POSITION = "start_view_position"
     }
 
@@ -53,8 +111,10 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
         this.callback = callback
     }
 
-    private var uiMedia: UIMedia? = null
-    private var startViewPosition: ViewPosition? = null
+    private lateinit var uri: Uri
+    private lateinit var title: String
+    private var subtitle: String? = null
+    private lateinit var startViewPosition: ViewPosition
 
     override fun getTheme(): Int {
         return R.style.Bazaar_Dialog_Fullscreen
@@ -67,7 +127,9 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
 
         val arguments = arguments
         require(arguments != null) { "Provide arguments!" }
-        uiMedia = arguments.getSerializable(BundleKey.UI_MEDIA) as UIMedia
+        uri = Uri.parse(requireNotNull(arguments.getString(BundleKey.URI)))
+        title = requireNotNull(arguments.getString(BundleKey.TITLE))
+        subtitle = arguments.getString(BundleKey.SUBTITLE)
         startViewPosition = ViewPosition.unpack(arguments.getString(BundleKey.START_VIEW_POSITION))
     }
 
@@ -92,67 +154,42 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
 
         setupActionBar()
         setupGestureImageView()
+        setupInfo()
 
-        val uiMedia = uiMedia
-        if (uiMedia != null) {
-            Settings.getImageLoader()
-                .loadFullscreenImage(requireContext(), gestureImageView, uiMedia.media.uri)
+        Settings.getImageLoader().loadFullscreenImage(requireContext(), gestureImageView, uri)
 
-            gestureImageView.positionAnimator.addPositionUpdateListener { position, isLeaving ->
-                val isFinished = position == 0F && isLeaving
+        gestureImageView.positionAnimator.addPositionUpdateListener { position, isLeaving ->
+            val isFinished = position == 0F && isLeaving
 
-                appBarLayout.alpha = position
-                backgroundView.alpha = position
-                footerView.alpha = position
+            appBarLayout.alpha = position
+            backgroundView.alpha = position
+            footerView.alpha = position
 
-                if (isFinished) {
-                    appBarLayout.visibility = View.INVISIBLE
-                    backgroundView.visibility = View.INVISIBLE
-                    footerView.visibility = View.INVISIBLE
-                } else {
-                    appBarLayout.visibility = View.VISIBLE
-                    backgroundView.visibility = View.VISIBLE
-                    footerView.visibility = View.VISIBLE
-                }
-
-                gestureImageView.visibility = if (isFinished) {
-                    View.INVISIBLE
-                } else {
-                    View.VISIBLE
-                }
-
-                if (isFinished) {
-                    gestureImageView.controller.settings.disableBounds()
-                    gestureImageView.positionAnimator.setState(0F, false, false)
-
-                    gestureImageView.postDelayed({ super.dismiss() }, 17L)
-                }
-            }
-
-            titleView.text = uiMedia.media.displayName
-
-            var subtitle: String? = null
-            try {
-//                val simpleDateFormat = SimpleDateFormat("dd-mm-yyyy", Locale.ROOT)
-//                createdAt = simpleDateFormat.format(uiMedia.media.dateCreated ?: uiMedia.media.dateAdded)
-            } catch (e: Exception) {
-                if (!uiMedia.media.folderDisplayName.isNullOrBlank()) {
-                    subtitle = uiMedia.media.folderDisplayName
-                }
-            }
-
-            if (subtitle.isNullOrBlank()) {
-                subtitleView.visibility = View.GONE
+            if (isFinished) {
+                appBarLayout.visibility = View.INVISIBLE
+                backgroundView.visibility = View.INVISIBLE
+                footerView.visibility = View.INVISIBLE
             } else {
-                subtitleView.text = subtitle
-                subtitleView.visibility = View.VISIBLE
+                appBarLayout.visibility = View.VISIBLE
+                backgroundView.visibility = View.VISIBLE
+                footerView.visibility = View.VISIBLE
+            }
+
+            gestureImageView.visibility = if (isFinished) {
+                View.INVISIBLE
+            } else {
+                View.VISIBLE
+            }
+
+            if (isFinished) {
+                gestureImageView.controller.settings.disableBounds()
+                gestureImageView.positionAnimator.setState(0F, false, false)
+
+                gestureImageView.postDelayed({ super.dismiss() }, 17L)
             }
         }
 
-        val viewPosition = startViewPosition
-        if (viewPosition != null) {
-            gestureImageView.positionAnimator.enter(viewPosition, savedInstanceState == null)
-        }
+        gestureImageView.positionAnimator.enter(startViewPosition, savedInstanceState == null)
 
         gestureImageView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
@@ -254,9 +291,24 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
         }
     }
 
+    private fun setupInfo() {
+        titleView.text = title
+
+        if (subtitle.isNullOrBlank()) {
+            subtitleView.visibility = View.GONE
+        } else {
+            subtitleView.text = subtitle
+            subtitleView.visibility = View.VISIBLE
+        }
+    }
+
     /**
      * [MuseumListener] implementation
      */
+
+    override fun onTrackViewPosition(view: View) {
+        onTrackViewPosition(ViewPosition.from(view))
+    }
 
     override fun onTrackViewPosition(viewPosition: ViewPosition) {
         if (gestureImageView.positionAnimator.position > 0f) {

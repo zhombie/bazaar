@@ -516,11 +516,15 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        val fragment = MuseumDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
+        val fragment = MuseumDialogFragment.Builder()
+            .setUri(uiMedia.media.uri)
+            .setTitle(uiMedia.getDisplayTitle())
+            .setSubtitle(uiMedia.media.folderDisplayName)
+            .setStartViewPosition(imageView)
+            .build()
 
         val onGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-            val position = ViewPosition.from(imageView)
-            fragment.onTrackViewPosition(position)
+            fragment.onTrackViewPosition(imageView)
         }
 
         if (imageView.viewTreeObserver.isAlive) {
