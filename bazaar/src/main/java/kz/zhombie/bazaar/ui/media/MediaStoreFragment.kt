@@ -3,10 +3,7 @@ package kz.zhombie.bazaar.ui.media
 import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewStub
+import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -519,17 +516,34 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        fun onLayoutChange(imageView: ShapeableImageView) {
+        val fragment = MuseumDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
+
+        val onGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
             val position = ViewPosition.from(imageView)
-            viewModel.onLayoutChange(position)
+            fragment.onTrackViewPosition(position)
         }
 
         if (imageView.viewTreeObserver.isAlive) {
-            imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
+            imageView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
         }
 
-        MuseumDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
-            .show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
+        fragment.setCallback(object : MuseumDialogFragment.Callback {
+            override fun onPictureShow(delay: Long) {
+                viewModel.onPictureVisibilityChange(uiMedia.media.id, true, delay)
+            }
+
+            override fun onPictureHide(delay: Long) {
+                viewModel.onPictureVisibilityChange(uiMedia.media.id, false, delay)
+            }
+
+            override fun onDestroy() {
+                Logger.d(TAG, "onDestroy()")
+
+                imageView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+            }
+        })
+
+        fragment.show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {

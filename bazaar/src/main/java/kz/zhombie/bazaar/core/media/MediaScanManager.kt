@@ -26,7 +26,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     companion object {
         private val TAG: String = MediaScanManager::class.java.simpleName
 
-        private const val DEFAULT_LOCAL_LOAD_LIMIT = 3000
+        private const val DEFAULT_LOCAL_LOAD_LIMIT = 500
 
         private const val DEFAULT_MIME_TYPE_IMAGE = "image/jpeg"
         private const val DEFAULT_MIME_TYPE_VIDEO = "video/mp4"

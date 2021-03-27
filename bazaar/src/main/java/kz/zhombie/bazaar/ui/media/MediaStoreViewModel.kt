@@ -274,7 +274,7 @@ internal class MediaStoreViewModel : ViewModel() {
         activeViewPosition.postValue(viewPosition)
     }
 
-    fun onVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
+    fun onPictureVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
         Logger.d(TAG, "onVisibilityChange() -> id: $id, isVisible: $isVisible")
         viewModelScope.launch(Dispatchers.IO) {
             delay(delayDuration)

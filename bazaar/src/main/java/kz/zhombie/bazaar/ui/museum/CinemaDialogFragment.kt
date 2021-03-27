@@ -142,7 +142,7 @@ internal class CinemaDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
                 }
 
                 if (isFinished) {
-                    viewModel.onVisibilityChange(uiMedia.media.id, true, 0L)
+                    viewModel.onPictureVisibilityChange(uiMedia.media.id, true, 0L)
 
                     gestureFrameLayout.controller.settings.disableBounds()
                     gestureFrameLayout.positionAnimator.setState(0F, false, false)
@@ -180,7 +180,7 @@ internal class CinemaDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
             gestureFrameLayout.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
                 override fun onPreDraw(): Boolean {
                     gestureFrameLayout.viewTreeObserver.removeOnPreDrawListener(this)
-                    viewModel.onVisibilityChange(uiMedia.media.id, false, 17L)
+                    viewModel.onPictureVisibilityChange(uiMedia.media.id, false, 17L)
                     return true
                 }
             })

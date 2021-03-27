@@ -9,7 +9,6 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import com.alexvasilkov.gestures.animation.ViewPosition
 import com.alexvasilkov.gestures.views.GestureImageView
 import com.google.android.material.appbar.AppBarLayout
@@ -17,10 +16,10 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.ui.media.MediaStoreViewModel
 import kz.zhombie.bazaar.ui.model.UIMedia
 
-internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_dialog_museum) {
+internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_dialog_museum),
+    MuseumListener {
 
     companion object {
         private val TAG: String = MuseumDialogFragment::class.java.simpleName
@@ -48,7 +47,11 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
     private lateinit var titleView: MaterialTextView
     private lateinit var subtitleView: MaterialTextView
 
-    private val viewModel: MediaStoreViewModel by activityViewModels()
+    private var callback: Callback? = null
+
+    fun setCallback(callback: Callback) {
+        this.callback = callback
+    }
 
     private var uiMedia: UIMedia? = null
     private var startViewPosition: ViewPosition? = null
@@ -76,16 +79,6 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
         super.onResume()
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        dismiss()
-    }
-
-    override fun dismiss() {
-        if (!gestureImageView.positionAnimator.isLeaving) {
-            gestureImageView.positionAnimator.exit(true)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -100,11 +93,10 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
         setupActionBar()
         setupGestureImageView()
 
-        observeActiveViewPosition()
-
         val uiMedia = uiMedia
         if (uiMedia != null) {
-            Settings.getImageLoader().loadFullscreenImage(requireContext(), gestureImageView, uiMedia.media.uri)
+            Settings.getImageLoader()
+                .loadFullscreenImage(requireContext(), gestureImageView, uiMedia.media.uri)
 
             gestureImageView.positionAnimator.addPositionUpdateListener { position, isLeaving ->
                 val isFinished = position == 0F && isLeaving
@@ -130,8 +122,6 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
                 }
 
                 if (isFinished) {
-                    viewModel.onVisibilityChange(uiMedia.media.id, true, 0L)
-
                     gestureImageView.controller.settings.disableBounds()
                     gestureImageView.positionAnimator.setState(0F, false, false)
 
@@ -164,16 +154,37 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
             gestureImageView.positionAnimator.enter(viewPosition, savedInstanceState == null)
         }
 
-        if (uiMedia != null) {
-            gestureImageView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    gestureImageView.viewTreeObserver.removeOnPreDrawListener(this)
-                    viewModel.onVisibilityChange(uiMedia.media.id, false, 17L)
-                    return true
-                }
-            })
-            gestureImageView.invalidate()
+        gestureImageView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                gestureImageView.viewTreeObserver.removeOnPreDrawListener(this)
+                callback?.onPictureHide(17L)
+                return true
+            }
+        })
+        gestureImageView.invalidate()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        dismiss()
+    }
+
+    override fun dismiss() {
+        if (!gestureImageView.positionAnimator.isLeaving) {
+            gestureImageView.positionAnimator.exit(true)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        callback?.onPictureShow(0L)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        callback?.onDestroy()
+        callback = null
     }
 
     private fun setupActionBar() {
@@ -243,12 +254,21 @@ internal class MuseumDialogFragment : DialogFragment(R.layout.bazaar_fragment_di
         }
     }
 
-    private fun observeActiveViewPosition() {
-        viewModel.getActiveViewPosition().observe(viewLifecycleOwner, { viewPosition ->
-            if (gestureImageView.positionAnimator.position > 0f) {
-                gestureImageView.positionAnimator.update(viewPosition)
-            }
-        })
+    /**
+     * [MuseumListener] implementation
+     */
+
+    override fun onTrackViewPosition(viewPosition: ViewPosition) {
+        if (gestureImageView.positionAnimator.position > 0f) {
+            gestureImageView.positionAnimator.update(viewPosition)
+        }
+    }
+
+    interface Callback {
+        fun onPictureShow(delay: Long = 0L)
+        fun onPictureHide(delay: Long = 0L)
+
+        fun onDestroy()
     }
 
 }
