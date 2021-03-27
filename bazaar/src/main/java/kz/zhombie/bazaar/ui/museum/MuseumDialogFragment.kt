@@ -17,6 +17,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.core.logging.Logger
 
 class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaar_fragment_dialog_museum),
     MuseumListener {
@@ -110,6 +111,25 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
     fun setCallback(callback: Callback) {
         this.callback = callback
     }
+
+    private var artworkView: View? = null
+        set(value) {
+            field = value
+
+            if (value != null) {
+                if (onGlobalLayoutListener == null) {
+                    onGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+                        onTrackViewPosition(value)
+                    }
+
+                    if (value.viewTreeObserver.isAlive) {
+                        value.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
+                    }
+                }
+            }
+        }
+
+    private var onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private lateinit var uri: Uri
     private lateinit var title: String
@@ -220,7 +240,15 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
     override fun onDestroy() {
         super.onDestroy()
 
-        callback?.onDestroy()
+        Logger.d(TAG, "onDestroy()")
+
+        if (artworkView?.viewTreeObserver?.isAlive == true) {
+            artworkView?.viewTreeObserver?.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+        }
+
+        onGlobalLayoutListener = null
+        artworkView = null
+
         callback = null
     }
 
@@ -316,11 +344,14 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         }
     }
 
+    override fun setArtworkView(view: View): MuseumDialogFragment {
+        this.artworkView = view
+        return this
+    }
+
     interface Callback {
         fun onPictureShow(delay: Long = 0L)
         fun onPictureHide(delay: Long = 0L)
-
-        fun onDestroy()
     }
 
 }

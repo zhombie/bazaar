@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.alexvasilkov.gestures.animation.ViewPosition
@@ -85,6 +86,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private lateinit var viewModel: MediaStoreViewModel
 
     // UI interface floating messages
+    private var dialogFragment: DialogFragment? = null
     private var toast: Toast? = null
 
     // RecyclerView Adapters
@@ -516,38 +518,26 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        val fragment = MuseumDialogFragment.Builder()
+        dialogFragment?.dismiss()
+        dialogFragment = null
+        dialogFragment = MuseumDialogFragment.Builder()
             .setUri(uiMedia.media.uri)
             .setTitle(uiMedia.getDisplayTitle())
             .setSubtitle(uiMedia.media.folderDisplayName)
             .setStartViewPosition(imageView)
+            .setCallback(object : MuseumDialogFragment.Callback {
+                override fun onPictureShow(delay: Long) {
+                    viewModel.onPictureVisibilityChange(uiMedia.media.id, true, delay)
+                }
+
+                override fun onPictureHide(delay: Long) {
+                    viewModel.onPictureVisibilityChange(uiMedia.media.id, false, delay)
+                }
+            })
             .build()
+            .setArtworkView(imageView)
 
-        val onGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-            fragment.onTrackViewPosition(imageView)
-        }
-
-        if (imageView.viewTreeObserver.isAlive) {
-            imageView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
-        }
-
-        fragment.setCallback(object : MuseumDialogFragment.Callback {
-            override fun onPictureShow(delay: Long) {
-                viewModel.onPictureVisibilityChange(uiMedia.media.id, true, delay)
-            }
-
-            override fun onPictureHide(delay: Long) {
-                viewModel.onPictureVisibilityChange(uiMedia.media.id, false, delay)
-            }
-
-            override fun onDestroy() {
-                Logger.d(TAG, "onDestroy()")
-
-                imageView.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
-            }
-        })
-
-        fragment.show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
+        dialogFragment?.show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
@@ -564,8 +554,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
         }
 
-        CinemaDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
-            .show(childFragmentManager, CinemaDialogFragment::class.java.simpleName)
+        dialogFragment?.dismiss()
+        dialogFragment = null
+        dialogFragment = CinemaDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
+        dialogFragment?.show(childFragmentManager, CinemaDialogFragment::class.java.simpleName)
     }
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {

@@ -6,4 +6,6 @@ import com.alexvasilkov.gestures.animation.ViewPosition
 interface MuseumListener {
     fun onTrackViewPosition(view: View)
     fun onTrackViewPosition(viewPosition: ViewPosition)
+
+    fun setArtworkView(view: View): MuseumDialogFragment
 }
