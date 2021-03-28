@@ -12,7 +12,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.alexvasilkov.gestures.animation.ViewPosition
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -28,6 +27,8 @@ import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.core.player.AudioPlayer
+import kz.zhombie.bazaar.ui.arbat.cinema.CinemaDialogFragment
+import kz.zhombie.bazaar.ui.arbat.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
@@ -39,8 +40,6 @@ import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIMultimedia
-import kz.zhombie.bazaar.ui.museum.CinemaDialogFragment
-import kz.zhombie.bazaar.ui.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.windowHeight
@@ -527,11 +526,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             .setStartViewPosition(imageView)
             .setCallback(object : MuseumDialogFragment.Callback {
                 override fun onPictureShow(delay: Long) {
-                    viewModel.onPictureVisibilityChange(uiMedia.media.id, true, delay)
+                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, delay)
                 }
 
                 override fun onPictureHide(delay: Long) {
-                    viewModel.onPictureVisibilityChange(uiMedia.media.id, false, delay)
+                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, false, delay)
                 }
             })
             .build()
@@ -545,18 +544,25 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        fun onLayoutChange(imageView: ShapeableImageView) {
-            val position = ViewPosition.from(imageView)
-            viewModel.onLayoutChange(position)
-        }
-
-        if (imageView.viewTreeObserver.isAlive) {
-            imageView.viewTreeObserver.addOnGlobalLayoutListener { onLayoutChange(imageView) }
-        }
-
         dialogFragment?.dismiss()
         dialogFragment = null
-        dialogFragment = CinemaDialogFragment.newInstance(uiMedia, ViewPosition.from(imageView))
+        dialogFragment = CinemaDialogFragment.Builder()
+            .setUri(uiMedia.media.uri)
+            .setTitle(uiMedia.getDisplayTitle())
+            .setSubtitle(uiMedia.media.folderDisplayName)
+            .setStartViewPosition(imageView)
+            .setCallback(object : CinemaDialogFragment.Callback {
+                override fun onMovieShow(delay: Long) {
+                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, delay)
+                }
+
+                override fun onMovieHide(delay: Long) {
+                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, false, delay)
+                }
+            })
+            .build()
+            .setScreenView(imageView)
+
         dialogFragment?.show(childFragmentManager, CinemaDialogFragment::class.java.simpleName)
     }
 

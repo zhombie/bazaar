@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alexvasilkov.gestures.animation.ViewPosition
 import kotlinx.coroutines.*
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.model.*
@@ -49,9 +48,6 @@ internal class MediaStoreViewModel : ViewModel() {
 
     private val activeFolder by lazy { MutableLiveData<UIFolder>() }
     fun getActiveFolder(): LiveData<UIFolder> = activeFolder
-
-    private val activeViewPosition by lazy { MutableLiveData<ViewPosition>() }
-    fun getActiveViewPosition(): LiveData<ViewPosition> = activeViewPosition
 
     private var takePictureInput: Image? = null
     private var takeVideoInput: Video? = null
@@ -270,12 +266,8 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onLayoutChange(viewPosition: ViewPosition) {
-        activeViewPosition.postValue(viewPosition)
-    }
-
-    fun onPictureVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
-        Logger.d(TAG, "onVisibilityChange() -> id: $id, isVisible: $isVisible")
+    fun onPreviewPictureVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
+        Logger.d(TAG, "onPreviewPictureVisibilityChange() -> id: $id, isVisible: $isVisible")
         viewModelScope.launch(Dispatchers.IO) {
             delay(delayDuration)
 
