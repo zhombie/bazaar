@@ -27,8 +27,6 @@ import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.core.player.AudioPlayer
-import kz.zhombie.bazaar.ui.arbat.cinema.CinemaDialogFragment
-import kz.zhombie.bazaar.ui.arbat.museum.MuseumDialogFragment
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
@@ -43,6 +41,8 @@ import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.windowHeight
+import kz.zhombie.cinema.CinemaDialogFragment
+import kz.zhombie.museum.MuseumDialogFragment
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -632,7 +632,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         override fun onPlay() {
                             Logger.d(TAG, "onPlay() -> $currentPlayingAudio")
 
-                            playOrPauseButton?.setIconResource(R.drawable.exo_icon_pause)
+                            playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_pause)
 
                             val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
 
@@ -646,7 +646,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         override fun onPause() {
                             Logger.d(TAG, "onPause() -> $currentPlayingAudio")
 
-                            playOrPauseButton?.setIconResource(R.drawable.exo_icon_play)
+                            playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_play)
 
                             val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
 

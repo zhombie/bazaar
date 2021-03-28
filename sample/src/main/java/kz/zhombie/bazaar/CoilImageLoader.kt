@@ -49,6 +49,10 @@ class CoilImageLoader : ImageLoader {
         Coil.enqueue(request)
     }
 
+    override fun loadSmallImage(context: Context, imageView: ImageView, uri: Uri) {
+        loadGridItemImage(context, imageView, uri)
+    }
+
     override fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri) {
         val request = ImageRequest.Builder(context)
             .bitmapConfig(Bitmap.Config.ARGB_8888)

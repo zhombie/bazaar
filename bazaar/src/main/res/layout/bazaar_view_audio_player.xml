@@ -31,10 +31,10 @@
         android:minHeight="0dp"
         android:minWidth="0dp"
         android:text="@null"
-        app:icon="@drawable/exo_icon_play"
+        app:icon="@drawable/bazaar_ic_play"
         app:iconGravity="textEnd"
         app:iconPadding="0dp"
-        app:iconSize="28dp"
+        app:iconSize="16dp"
         app:iconTint="@null"
         app:rippleColor="?attr/colorControlHighlight"
         app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />

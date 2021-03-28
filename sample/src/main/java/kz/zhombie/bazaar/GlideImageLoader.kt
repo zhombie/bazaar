@@ -31,6 +31,10 @@ class GlideImageLoader : ImageLoader {
             .into(imageView)
     }
 
+    override fun loadSmallImage(context: Context, imageView: ImageView, uri: Uri) {
+        loadGridItemImage(context, imageView, uri)
+    }
+
     override fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri) {
         Glide.with(context)
             .load(uri)
