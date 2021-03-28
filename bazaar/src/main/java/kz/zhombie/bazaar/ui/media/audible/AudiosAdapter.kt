@@ -203,9 +203,9 @@ internal class AudiosAdapter constructor(
             toggleSelectionAbility(uiMultimedia)
 
             if (currentPlayingAudioPosition == bindingAdapterPosition) {
-                playOrPauseButton.setIconResource(R.drawable.exo_icon_pause)
+                playOrPauseButton.setIconResource(R.drawable.bazaar_ic_pause)
             } else {
-                playOrPauseButton.setIconResource(R.drawable.exo_icon_play)
+                playOrPauseButton.setIconResource(R.drawable.bazaar_ic_play)
             }
 
             if (uiMultimedia.isSelected) {
@@ -274,9 +274,9 @@ internal class AudiosAdapter constructor(
         fun togglePlaying(uiMultimedia: UIMultimedia, isPlaying: Boolean) {
             Logger.d(TAG, "togglePlaying() -> uiMultimedia: $uiMultimedia, isPlaying: $isPlaying")
             if (isPlaying) {
-                playOrPauseButton.setIconResource(R.drawable.exo_icon_pause)
+                playOrPauseButton.setIconResource(R.drawable.bazaar_ic_pause)
             } else {
-                playOrPauseButton.setIconResource(R.drawable.exo_icon_play)
+                playOrPauseButton.setIconResource(R.drawable.bazaar_ic_play)
             }
         }
 
