@@ -45,6 +45,7 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         private var title: String? = null
         private var subtitle: String? = null
         private var viewPosition: ViewPosition? = null
+        private var artworkView: View? = null
         private var artworkLoader: ArtworkLoader? = null
         private var callback: Callback? = null
 
@@ -73,6 +74,11 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
             return this
         }
 
+        fun setArtworkView(artworkView: View): Builder {
+            this.artworkView = artworkView
+            return this
+        }
+
         fun setArtworkLoader(artworkLoader: ArtworkLoader): Builder {
             this.artworkLoader = artworkLoader
             return this
@@ -92,6 +98,8 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
                     "Museum artwork needs start view position, in order to make smooth transition animation"
                 }
             ).apply {
+                this@Builder.artworkView?.let { setArtworkView(it) }
+
                 setArtworkLoader(requireNotNull(this@Builder.artworkLoader) {
                     "Museum artwork must be loaded somehow"
                 })

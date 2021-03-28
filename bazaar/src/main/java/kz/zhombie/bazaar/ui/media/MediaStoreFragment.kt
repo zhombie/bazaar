@@ -524,6 +524,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             .setTitle(uiMedia.getDisplayTitle())
             .setSubtitle(uiMedia.media.folderDisplayName)
             .setStartViewPosition(imageView)
+            .setArtworkView(imageView)
             .setArtworkLoader(Settings.getImageLoader())
             .setCallback(object : MuseumDialogFragment.Callback {
                 override fun onPictureShow(delay: Long) {
@@ -535,7 +536,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
             })
             .build()
-            .setArtworkView(imageView)
 
         dialogFragment?.show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
     }
@@ -552,6 +552,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             .setTitle(uiMedia.getDisplayTitle())
             .setSubtitle(uiMedia.media.folderDisplayName)
             .setStartViewPosition(imageView)
+            .setScreenView(imageView)
             .setCallback(object : CinemaDialogFragment.Callback {
                 override fun onMovieShow(delay: Long) {
                     viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, delay)
@@ -562,7 +563,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
             })
             .build()
-            .setScreenView(imageView)
 
         dialogFragment?.show(childFragmentManager, CinemaDialogFragment::class.java.simpleName)
     }

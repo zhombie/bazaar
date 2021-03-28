@@ -49,6 +49,7 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         private var title: String? = null
         private var subtitle: String? = null
         private var viewPosition: ViewPosition? = null
+        private var screenView: View? = null
         private var callback: Callback? = null
 
         fun setUri(uri: Uri): Builder {
@@ -76,6 +77,11 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
             return this
         }
 
+        fun setScreenView(screenView: View): Builder {
+            this.screenView = screenView
+            return this
+        }
+
         fun setCallback(callback: Callback): Builder {
             this.callback = callback
             return this
@@ -90,6 +96,8 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
                     "Cinema movie needs start view position, in order to make smooth transition animation"
                 }
             ).apply {
+                this@Builder.screenView?.let { setScreenView(it) }
+
                 this@Builder.callback?.let { setCallback(it) }
             }
         }
