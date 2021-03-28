@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.ImageView
+import kz.zhombie.bazaar.ui.arbat.museum.ArtworkLoader
 
-interface ImageLoader {
+interface ImageLoader : ArtworkLoader {
     fun loadGridItemImage(context: Context, imageView: ImageView, uri: Uri)
     fun loadGridItemImage(context: Context, imageView: ImageView, bitmap: Bitmap)
-    fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri)
 }

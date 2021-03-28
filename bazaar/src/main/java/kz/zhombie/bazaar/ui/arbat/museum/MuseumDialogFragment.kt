@@ -16,8 +16,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.Settings
-import kz.zhombie.bazaar.core.logging.Logger
 
 class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaar_fragment_dialog_museum),
     MuseumDialogFragmentListener {
@@ -47,6 +45,7 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         private var title: String? = null
         private var subtitle: String? = null
         private var viewPosition: ViewPosition? = null
+        private var artworkLoader: ArtworkLoader? = null
         private var callback: Callback? = null
 
         fun setUri(uri: Uri): Builder {
@@ -74,6 +73,11 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
             return this
         }
 
+        fun setArtworkLoader(artworkLoader: ArtworkLoader): Builder {
+            this.artworkLoader = artworkLoader
+            return this
+        }
+
         fun setCallback(callback: Callback): Builder {
             this.callback = callback
             return this
@@ -87,7 +91,13 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
                 startViewPosition = requireNotNull(viewPosition) {
                     "Museum artwork needs start view position, in order to make smooth transition animation"
                 }
-            )
+            ).apply {
+                setArtworkLoader(requireNotNull(this@Builder.artworkLoader) {
+                    "Museum artwork must be loaded somehow"
+                })
+
+                this@Builder.callback?.let { setCallback(it) }
+            }
         }
     }
 
@@ -106,7 +116,13 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
     private lateinit var titleView: MaterialTextView
     private lateinit var subtitleView: MaterialTextView
 
+    private var artworkLoader: ArtworkLoader? = null
+
     private var callback: Callback? = null
+
+    fun setArtworkLoader(artworkLoader: ArtworkLoader) {
+        this.artworkLoader = artworkLoader
+    }
 
     fun setCallback(callback: Callback) {
         this.callback = callback
@@ -176,7 +192,7 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         setupGestureImageView()
         setupInfo()
 
-        Settings.getImageLoader().loadFullscreenImage(requireContext(), gestureImageView, uri)
+        artworkLoader?.loadFullscreenImage(requireContext(), gestureImageView, uri)
 
         gestureImageView.positionAnimator.addPositionUpdateListener { position, isLeaving ->
             val isFinished = position == 0F && isLeaving
@@ -239,8 +255,6 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
 
     override fun onDestroy() {
         super.onDestroy()
-
-        Logger.d(TAG, "onDestroy()")
 
         if (artworkView?.viewTreeObserver?.isAlive == true) {
             artworkView?.viewTreeObserver?.removeOnGlobalLayoutListener(onGlobalLayoutListener)

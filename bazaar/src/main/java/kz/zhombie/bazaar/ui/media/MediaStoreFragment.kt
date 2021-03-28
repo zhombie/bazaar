@@ -524,6 +524,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             .setTitle(uiMedia.getDisplayTitle())
             .setSubtitle(uiMedia.media.folderDisplayName)
             .setStartViewPosition(imageView)
+            .setArtworkLoader(Settings.getImageLoader())
             .setCallback(object : MuseumDialogFragment.Callback {
                 override fun onPictureShow(delay: Long) {
                     viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, delay)

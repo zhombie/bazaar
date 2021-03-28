@@ -20,7 +20,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.core.logging.Logger
 
 class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaar_fragment_dialog_cinema),
     CinemaDialogFragmentListener, Player.EventListener {
@@ -90,7 +89,9 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
                 startViewPosition = requireNotNull(viewPosition) {
                     "Cinema movie needs start view position, in order to make smooth transition animation"
                 }
-            )
+            ).apply {
+                this@Builder.callback?.let { setCallback(it) }
+            }
         }
     }
 
@@ -401,7 +402,6 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
      */
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
-        Logger.d(TAG, "onIsPlayingChanged() -> isPlaying: $isPlaying")
         if (isPlaying) {
             playOrPauseButton.setIconResource(R.drawable.exo_icon_pause)
 
