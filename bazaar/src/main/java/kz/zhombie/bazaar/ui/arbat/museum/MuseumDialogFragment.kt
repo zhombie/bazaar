@@ -136,6 +136,8 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         this.callback = callback
     }
 
+    private var isPictureShowCalled: Boolean = false
+
     private var artworkView: View? = null
         set(value) {
             field = value
@@ -226,6 +228,11 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
             }
 
             if (isFinished) {
+                if (!isPictureShowCalled) {
+                    callback?.onPictureShow(0L)
+                    isPictureShowCalled = true
+                }
+
                 gestureImageView.controller.settings.disableBounds()
                 gestureImageView.positionAnimator.setState(0F, false, false)
 
@@ -255,14 +262,13 @@ class MuseumDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        callback?.onPictureShow(0L)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
+
+        if (!isPictureShowCalled) {
+            callback?.onPictureShow(0L)
+            isPictureShowCalled = true
+        }
 
         if (artworkView?.viewTreeObserver?.isAlive == true) {
             artworkView?.viewTreeObserver?.removeOnGlobalLayoutListener(onGlobalLayoutListener)

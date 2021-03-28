@@ -127,6 +127,8 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         this.callback = callback
     }
 
+    private var isMovieShowCalled: Boolean = false
+
     private var screenView: View? = null
         set(value) {
             field = value
@@ -234,6 +236,11 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
             }
 
             if (isFinished) {
+                if (!isMovieShowCalled) {
+                    callback?.onMovieShow(0L)
+                    isMovieShowCalled = true
+                }
+
                 gestureFrameLayout.controller.settings.disableBounds()
                 gestureFrameLayout.positionAnimator.setState(0F, false, false)
 
@@ -259,16 +266,28 @@ class CinemaDialogFragment private constructor() : DialogFragment(R.layout.bazaa
         releasePlayer()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        callback?.onMovieShow(0L)
-    }
-
     override fun onStop() {
         super.onStop()
         playerView.onPause()
         releasePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (!isMovieShowCalled) {
+            callback?.onMovieShow(0L)
+            isMovieShowCalled = true
+        }
+
+        if (screenView?.viewTreeObserver?.isAlive == true) {
+            screenView?.viewTreeObserver?.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+        }
+
+        onGlobalLayoutListener = null
+        screenView = null
+
+        callback = null
     }
 
     private fun setupActionBar() {
