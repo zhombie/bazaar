@@ -520,24 +520,23 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         dialogFragment?.dismiss()
         dialogFragment = null
         dialogFragment = MuseumDialogFragment.Builder()
+            .setArtworkLoader(Settings.getImageLoader())
+            .setArtworkView(imageView)
             .setUri(uiMedia.media.uri)
             .setTitle(uiMedia.getDisplayTitle())
             .setSubtitle(uiMedia.media.folderDisplayName)
             .setStartViewPosition(imageView)
-            .setArtworkView(imageView)
-            .setArtworkLoader(Settings.getImageLoader())
+            .setFooterViewEnabled(true)
             .setCallback(object : MuseumDialogFragment.Callback {
                 override fun onPictureShow(delay: Long) {
-                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, delay)
+                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, 0)
                 }
 
                 override fun onPictureHide(delay: Long) {
                     viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, false, delay)
                 }
             })
-            .build()
-
-        dialogFragment?.show(childFragmentManager, MuseumDialogFragment::class.java.simpleName)
+            .show(childFragmentManager)
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
@@ -548,23 +547,22 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         dialogFragment?.dismiss()
         dialogFragment = null
         dialogFragment = CinemaDialogFragment.Builder()
+            .setScreenView(imageView)
             .setUri(uiMedia.media.uri)
             .setTitle(uiMedia.getDisplayTitle())
             .setSubtitle(uiMedia.media.folderDisplayName)
             .setStartViewPosition(imageView)
-            .setScreenView(imageView)
+            .setFooterViewEnabled(true)
             .setCallback(object : CinemaDialogFragment.Callback {
                 override fun onMovieShow(delay: Long) {
-                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, delay)
+                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, 0)
                 }
 
                 override fun onMovieHide(delay: Long) {
                     viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, false, delay)
                 }
             })
-            .build()
-
-        dialogFragment?.show(childFragmentManager, CinemaDialogFragment::class.java.simpleName)
+            .show(childFragmentManager)
     }
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
