@@ -59,8 +59,8 @@ dependencies {
     implementation  'androidx.recyclerview:recyclerview:1.2.0-rc01'
 
     // Museum, Cinema (Picture, Video fullscreen preview, respectively)
-    api 'com.github.zhombie.arbat:cinema:1.0.9'
-    api 'com.github.zhombie.arbat:museum:1.0.9'
+    api 'com.github.zhombie.arbat:cinema:1.1.0'
+    api 'com.github.zhombie.arbat:museum:1.1.0'
 
     // ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer-core:2.12.2'
