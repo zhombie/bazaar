@@ -29,6 +29,10 @@ internal class Cache private constructor() {
         }
     }
 
+    fun isEmpty(): Boolean {
+        return multimedia.isNullOrEmpty()
+    }
+
     suspend fun getMultimedia(): List<Multimedia>? = withContext(Dispatchers.IO) {
         Logger.d(TAG, "getMultimedia() -> multimedia: ${multimedia?.size}")
         return@withContext multimedia

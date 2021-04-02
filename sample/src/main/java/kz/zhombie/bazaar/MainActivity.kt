@@ -4,15 +4,18 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
@@ -150,9 +153,20 @@ class MainActivity : AppCompatActivity(), ResultCallback {
             }
         }
 
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            Bazaar.preloadAll(this@MainActivity)
+//        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
         lifecycleScope.launch(Dispatchers.IO) {
-            Bazaar.preload(this@MainActivity, Mode.IMAGE_AND_VIDEO)
-            Bazaar.preload(this@MainActivity, Mode.AUDIO)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@MainActivity, "launch", Toast.LENGTH_SHORT).show()
+            }
+
+            Bazaar.sync(applicationContext)
         }
     }
 

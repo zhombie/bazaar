@@ -50,8 +50,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     Mode.IMAGE -> mediaScanManager.loadLocalMediaImages()
                     Mode.VIDEO -> mediaScanManager.loadLocalMediaVideos()
                     Mode.IMAGE_AND_VIDEO -> mediaScanManager.loadLocalMediaImagesAndVideos()
-                    else ->
-                        null
+                    else -> null
                 }
                 Logger.d(TAG, "preload() -> media: ${media?.size}")
                 if (!media.isNullOrEmpty()) {

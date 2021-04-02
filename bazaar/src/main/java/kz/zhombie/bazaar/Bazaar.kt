@@ -7,6 +7,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.core.worker.MediaSyncWorker
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.media.MediaScanManager
@@ -23,8 +24,17 @@ class Bazaar private constructor() {
             Settings.setLoggingEnabled(isLoggingEnabled)
         }
 
+        suspend fun sync(context: Context): Boolean {
+            return MediaSyncWorker.startWork(context)
+        }
+
         suspend fun preload(context: Context, mode: Mode) {
             MediaScanManager.preload(context, mode)
+        }
+
+        suspend fun preloadAll(context: Context) {
+            MediaScanManager.preload(context, Mode.IMAGE_AND_VIDEO)
+            MediaScanManager.preload(context, Mode.AUDIO)
         }
 
         suspend fun clearCache() {
