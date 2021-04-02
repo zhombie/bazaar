@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.*
 import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.api.core.settings.Mode
+import java.util.concurrent.CancellationException
 
 class MediaSyncWorker constructor(
     private val context: Context,
@@ -37,7 +38,9 @@ class MediaSyncWorker constructor(
                 @Suppress("USELESS_IS_CHECK")
                 return success is Operation.State.SUCCESS
             } catch (e: Exception) {
-                e.printStackTrace()
+                if (e !is CancellationException) {
+                    e.printStackTrace()
+                }
                 false
             }
         }
@@ -51,7 +54,9 @@ class MediaSyncWorker constructor(
                 @Suppress("USELESS_IS_CHECK")
                 return success is Operation.State.SUCCESS
             } catch (e: Exception) {
-                e.printStackTrace()
+                if (e !is CancellationException) {
+                    e.printStackTrace()
+                }
                 false
             }
         }
