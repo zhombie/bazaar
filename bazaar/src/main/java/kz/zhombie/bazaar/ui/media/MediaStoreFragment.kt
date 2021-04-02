@@ -26,7 +26,6 @@ import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
-import kz.zhombie.bazaar.core.player.AudioPlayer
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
@@ -43,6 +42,7 @@ import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.windowHeight
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.museum.MuseumDialogFragment
+import kz.zhombie.radio.Radio
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -94,7 +94,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private var audiosAdapterManager: AudiosAdapterManager? = null
 
     // Audio
-    private var audioPlayer: AudioPlayer? = null
+    private var radio: Radio? = null
     private var currentPlayingAudio: UIMultimedia? = null
 
     // Variables
@@ -232,6 +232,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onDestroy() {
+        radio?.release()
+        radio?.let { lifecycle.removeObserver(it) }
+        radio = null
+
         foldersAdapterManager?.destroy()
         foldersAdapterManager = null
 
@@ -588,10 +592,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 subtitleView?.visibility = View.VISIBLE
             }
 
-            playOrPauseButton?.setOnClickListener { audioPlayer?.playOrPause() }
+            playOrPauseButton?.setOnClickListener { radio?.playOrPause() }
 
             closeButton?.setOnClickListener {
-                audioPlayer?.release()
+                radio?.release()
 
                 val currentPlayingAudio = currentPlayingAudio
                 if (currentPlayingAudio == null) {
@@ -603,11 +607,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
                 audioPlayerViewStubInflatedView?.visibility = View.GONE
 
-                audioPlayer?.let { audioPlayer ->
-                    viewLifecycleOwner.lifecycle.removeObserver(audioPlayer)
+                radio?.let { radio ->
+                    viewLifecycleOwner.lifecycle.removeObserver(radio)
                 }
 
-                audioPlayer = null
+                radio = null
             }
 
             audioPlayerViewStubInflatedView?.setOnClickListener {
@@ -623,66 +627,65 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         fun playOrPause() {
             Logger.d(TAG, "playOrPause() -> $uiMultimedia")
 
-            if (audioPlayer == null) {
-                audioPlayer = AudioPlayer(
-                    context = requireContext(),
-                    listener = object : AudioPlayer.Listener {
-                        override fun onPlay() {
-                            Logger.d(TAG, "onPlay() -> $currentPlayingAudio")
+            if (radio == null) {
+                radio = Radio.Builder(requireContext())
+                    .create(object : Radio.Listener {
+                        override fun onPlayingStateChanged(isPlaying: Boolean) {
+                            if (isPlaying) {
+                                Logger.d(TAG, "onPlay() -> $currentPlayingAudio")
 
-                            playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_pause)
+                                playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_pause)
 
-                            val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+                                val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
 
-                            if (currentPlayingAudio == null) {
-                                // Ignored
+                                if (currentPlayingAudio == null) {
+                                    // Ignored
+                                } else {
+                                    audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = true)
+                                }
                             } else {
-                                audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = true)
+                                Logger.d(TAG, "onPause() -> $currentPlayingAudio")
+
+                                playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_play)
+
+                                val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+
+                                if (currentPlayingAudio == null) {
+                                    // Ignored
+                                } else {
+                                    audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
+                                }
                             }
                         }
 
-                        override fun onPause() {
-                            Logger.d(TAG, "onPause() -> $currentPlayingAudio")
-
-                            playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_play)
-
-                            val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
-
-                            if (currentPlayingAudio == null) {
-                                // Ignored
-                            } else {
-                                audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
-                            }
+                        override fun onPlaybackStateChanged(state: Radio.PlaybackState) {
                         }
 
-                        override fun onEnd() {
+                        override fun onPlaybackPositionChanged(position: Long) {
                         }
 
-                        override fun onPlayerError() {
+                        override fun onPlayerError(cause: Throwable?) {
                             toast?.cancel()
                             toast = null
                             toast = Toast.makeText(context, R.string.bazaar_error_player, Toast.LENGTH_SHORT)
                             toast?.show()
                         }
-                    }
-                ).also {
-                    viewLifecycleOwner.lifecycle.addObserver(it)
-                    it.create()
-                }
+                    })
+                    .also { viewLifecycleOwner.lifecycle.addObserver(it) }
             }
 
             // The same audio required to play
-            if (audioPlayer?.getAudioSource() == uiMultimedia.multimedia.uri) {
-                audioPlayer?.playOrPause()
+            if (radio?.getCurrentSource() == uiMultimedia.multimedia.uri) {
+                radio?.playOrPause()
             } else {
                 // The other audio required to play
                 val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
                 if (currentPlayingAudio == null) {
-                    audioPlayer?.setAudioSource(uiMultimedia.multimedia.uri)
+                    radio?.start(uiMultimedia.multimedia.uri)
                 } else {
-                    audioPlayer?.release()
+                    radio?.release()
                     audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
-                    audioPlayer?.setAudioSource(uiMultimedia.multimedia.uri)
+                    radio?.start(uiMultimedia.multimedia.uri)
                 }
                 this@MediaStoreFragment.currentPlayingAudio = uiMultimedia
             }
