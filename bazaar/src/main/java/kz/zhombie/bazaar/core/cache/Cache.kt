@@ -1,8 +1,11 @@
 package kz.zhombie.bazaar.core.cache
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.core.logging.Logger
+import java.util.*
 
 internal class Cache private constructor() {
 
@@ -18,35 +21,55 @@ internal class Cache private constructor() {
             }
     }
 
-    private var multimedia: List<Multimedia>? = null
-    private var media: List<Media>? = null
+    private var multimedia: MutableList<Multimedia>? = null
 
-    suspend fun getMultimedia(): List<Multimedia>? {
-        Logger.d(TAG, "getMultimedia() -> multimedia: ${media?.size}")
-        return multimedia
+    private fun ensureMultimediaExistence() {
+        if (multimedia == null) {
+            multimedia = mutableListOf()
+        }
     }
 
-    suspend fun setMultimedia(multimedia: List<Multimedia>) {
-        this.multimedia = multimedia
+    suspend fun getMultimedia(): List<Multimedia>? = withContext(Dispatchers.IO) {
+        Logger.d(TAG, "getMultimedia() -> multimedia: ${multimedia?.size}")
+        return@withContext multimedia
     }
 
-    suspend fun getMedia(): List<Media>? {
+    suspend fun setMultimedia(multimedia: List<Multimedia>) = withContext(Dispatchers.Default) {
+        Logger.d(TAG, "setMultimedia() -> multimedia: ${multimedia.size}")
+        ensureMultimediaExistence()
+        multimedia.forEach {
+            this@Cache.multimedia?.addIfDoesNotContain(it)
+        }
+    }
+
+    suspend fun getMedia(): List<Media>? = withContext(Dispatchers.IO) {
+        val media = multimedia?.filterIsInstance<Media>()
         Logger.d(TAG, "getMedia() -> media: ${media?.size}")
-        return media
+        return@withContext media
     }
 
-    suspend fun setMedia(media: List<Media>) {
-        this.media = media
+    suspend fun setMedia(media: List<Media>) = withContext(Dispatchers.Default) {
+        Logger.d(TAG, "setMedia() -> media: ${media.size}")
+        setMultimedia(media)
     }
 
-    suspend fun clear() {
-        media = null
+    suspend fun clear(): Boolean = withContext(Dispatchers.IO) {
+        multimedia?.clear()
         multimedia = null
+
+        return@withContext multimedia.isNullOrEmpty()
     }
 
     suspend fun destroy() {
         clear()
         INSTANCE = null
+    }
+
+    private fun <E> MutableCollection<E>.addIfDoesNotContain(e: E): Boolean {
+        if (e !in this) {
+            return add(e)
+        }
+        return false
     }
 
 }
