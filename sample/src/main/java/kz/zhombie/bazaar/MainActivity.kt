@@ -101,13 +101,23 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         modeButton.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Mode")
-                .setSingleChoiceItems(arrayOf(Mode.IMAGE.toString(), Mode.VIDEO.toString(), Mode.IMAGE_AND_VIDEO.toString(), Mode.AUDIO.toString()), -1) { dialog, which ->
+                .setSingleChoiceItems(
+                    arrayOf(
+                        Mode.IMAGE.toString(),
+                        Mode.VIDEO.toString(),
+                        Mode.IMAGE_AND_VIDEO.toString(),
+                        Mode.AUDIO.toString(),
+                        Mode.DOCUMENT.toString(),
+                    ),
+                    -1
+                ) { dialog, which ->
                     dialog.dismiss()
                     mode = when (which) {
                         0 -> Mode.IMAGE
                         1 -> Mode.VIDEO
                         2 -> Mode.IMAGE_AND_VIDEO
                         3 -> Mode.AUDIO
+                        4 -> Mode.DOCUMENT
                         else -> Mode.IMAGE_AND_VIDEO
                     }
                     modeView.text = mode.toString()

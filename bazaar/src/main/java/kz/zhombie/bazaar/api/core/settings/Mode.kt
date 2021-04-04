@@ -7,5 +7,8 @@ enum class Mode {
     IMAGE_AND_VIDEO,
 
     // Auditory
-    AUDIO
+    AUDIO,
+
+    // Other
+    DOCUMENT
 }

@@ -110,6 +110,10 @@ internal class MediaStoreViewModel : ViewModel() {
                             audios
                         }
                     }
+                    Mode.DOCUMENT -> {
+                        onSelectLocalMediaRequested()
+                        null
+                    }
                 }
                 if (localData != null) {
                     onLocalDataLoaded(localData)
@@ -174,9 +178,14 @@ internal class MediaStoreViewModel : ViewModel() {
                             items = uiMultimedia.mapNotNull { if (it.isAudio()) it.multimedia else null }
                         )
                     )
+                else -> {
+                    null
+                }
             }
 
-            activeFolder.postValue(defaultFolder)
+            if (defaultFolder != null) {
+                activeFolder.postValue(defaultFolder)
+            }
             displayedMedia.postValue(uiMultimedia)
 
             val folders = multimedia.mapNotNull { media ->
@@ -189,7 +198,9 @@ internal class MediaStoreViewModel : ViewModel() {
                 .sortedBy { it.folder.displayName }
                 .toMutableList()
 
-            folders.add(0, defaultFolder)
+            if (defaultFolder != null) {
+                folders.add(0, defaultFolder)
+            }
 
             displayedFolders.postValue(folders)
         }
@@ -441,6 +452,13 @@ internal class MediaStoreViewModel : ViewModel() {
                             action.postValue(MediaStoreScreen.Action.SelectLocalMediaAudios)
                         }
                     }
+                    Mode.DOCUMENT -> {
+                        if (settings.maxSelectionCount == 1) {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaDocument)
+                        } else {
+                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaDocuments)
+                        }
+                    }
                 }
             }
         }
@@ -640,6 +658,34 @@ internal class MediaStoreViewModel : ViewModel() {
                 } else {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaAudios(audios))
                 }
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
+            }
+        }
+    }
+
+    fun onLocalMediaDocumentSelected(uri: Uri?) {
+        Logger.d(TAG, "onLocalMediaAudioSelected() -> uri: $uri")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uri == null) return
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                action.postValue(MediaStoreScreen.Action.Empty)
+
+                screenState.postValue(MediaStoreScreen.State.CONTENT)
+            }
+        }
+    }
+
+    fun onLocalMediaDocumentsSelected(uris: List<Uri>?) {
+        Logger.d(TAG, "onLocalMediaAudiosSelected() -> uris: $uris")
+        if (settings.isLocalMediaSearchAndSelectEnabled) {
+            if (uris.isNullOrEmpty()) return
+            selectionJob = viewModelScope.launch(Dispatchers.IO) {
+                screenState.postValue(MediaStoreScreen.State.LOADING)
+
+                action.postValue(MediaStoreScreen.Action.Empty)
 
                 screenState.postValue(MediaStoreScreen.State.CONTENT)
             }

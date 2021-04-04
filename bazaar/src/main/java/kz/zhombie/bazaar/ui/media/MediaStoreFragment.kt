@@ -444,6 +444,48 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     resultCallback?.onMultimediaLocalMediaStoreResult(action.audios)
                     dismiss()
                 }
+                // Local media document selection
+                is MediaStoreScreen.Action.SelectLocalMediaDocument -> {
+                    getLocalMediaDocument.launch(
+                        arrayOf(
+                            "text/*",
+                            "application/pdf",
+                            "application/excel",
+                            "application/vnd.ms-excel",
+                            "application/x-excel",
+                            "application/x-msexcel",
+                            "application/vnd.ms-powerpoint",
+                            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                            "application/msword",
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        )
+                    )
+                }
+                is MediaStoreScreen.Action.SelectedLocalMediaDocument -> {
+                    resultCallback?.onMultimediaLocalMediaStoreResult(action.document)
+                    dismiss()
+                }
+                // Multiple local media document selection
+                is MediaStoreScreen.Action.SelectLocalMediaDocuments -> {
+                    getLocalMediaDocuments.launch(
+                        arrayOf(
+                            "text/*",
+                            "application/pdf",
+                            "application/excel",
+                            "application/vnd.ms-excel",
+                            "application/x-excel",
+                            "application/x-msexcel",
+                            "application/vnd.ms-powerpoint",
+                            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                            "application/msword",
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        )
+                    )
+                }
+                is MediaStoreScreen.Action.SelectedLocalMediaDocuments -> {
+                    resultCallback?.onMultimediaLocalMediaStoreResult(action.documents)
+                    dismiss()
+                }
                 // Empty value
                 is MediaStoreScreen.Action.Empty -> {
                     Toast.makeText(context, "Произошла ошибка при выборе медиафайлов", Toast.LENGTH_SHORT).show()
@@ -766,6 +808,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     private val getLocalMediaAudios = registerForActivityResult(GetMultipleContentsContract()) { uris ->
         viewModel.onLocalMediaAudiosSelected(uris)
+    }
+
+    private val getLocalMediaDocument = registerForActivityResult(GetContentContract()) { uri ->
+        viewModel.onLocalMediaDocumentSelected(uri)
+    }
+
+    private val getLocalMediaDocuments = registerForActivityResult(GetMultipleContentsContract()) { uris ->
+        viewModel.onLocalMediaDocumentsSelected(uris)
     }
 
 }

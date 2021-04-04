@@ -17,6 +17,7 @@ internal fun Audio.complete(audio: Audio?): Audio? {
         thumbnail = thumbnail ?: audio.thumbnail,
         folderId = folderId ?: audio.folderId,
         folderDisplayName = folderDisplayName ?: audio.folderDisplayName,
+        album = album ?: audio.album,
         duration = duration ?: audio.duration
     )
 }
