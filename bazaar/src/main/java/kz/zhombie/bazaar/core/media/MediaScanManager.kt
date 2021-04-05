@@ -36,12 +36,13 @@ internal class MediaScanManager constructor(private val context: Context) {
         suspend fun preload(context: Context, mode: Mode) {
             Logger.d(TAG, "preload()")
             val mediaScanManager = MediaScanManager(context)
-            if (mode == Mode.AUDIO) {
+            if (mode == Mode.AUDIO || mode == Mode.DOCUMENT) {
                 val multimedia = when (mode) {
                     Mode.AUDIO -> mediaScanManager.loadLocalMediaAudios()
+                    Mode.DOCUMENT -> null
                     else -> null
                 }
-                Logger.d(TAG, "preload() -> multimedia: ${multimedia?.size}")
+                Logger.d(TAG, "preload() -> mode: $mode, multimedia: ${multimedia?.size}")
                 if (!multimedia.isNullOrEmpty()) {
                     Cache.getInstance().setMultimedia(multimedia)
                 }
@@ -52,7 +53,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     Mode.IMAGE_AND_VIDEO -> mediaScanManager.loadLocalMediaImagesAndVideos()
                     else -> null
                 }
-                Logger.d(TAG, "preload() -> media: ${media?.size}")
+                Logger.d(TAG, "preload() -> mode: $mode, media: ${media?.size}")
                 if (!media.isNullOrEmpty()) {
                     Cache.getInstance().setMedia(media)
                 }
@@ -93,7 +94,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
                 val timestamp = System.currentTimeMillis()
 
-                Logger.d(TAG, "createCameraPictureInputTempFile() -> file.absolutePath: ${file.absolutePath}")
+                Logger.d(TAG, "createCameraPictureInputTempFile() -> ${file.absolutePath}")
 
                 Image(
                     id = timestamp,
@@ -171,7 +172,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     ): List<Media>? = withContext(dispatcher) {
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
-        val selection = "(${MediaStore.Images.Media.MIME_TYPE}=? OR ${MediaStore.Images.Media.MIME_TYPE}=?) AND ${MediaStore.Images.Media.SIZE}>=?"
+        val selection = "(${MediaStore.Images.ImageColumns.MIME_TYPE}=? OR ${MediaStore.Images.ImageColumns.MIME_TYPE}=?) AND ${MediaStore.Images.ImageColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf("image/jpeg", "image/png", "102400")
         val sortOrder = "${MediaStore.Images.ImageColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
@@ -189,7 +190,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     ): List<Media>? = withContext(dispatcher) {
         val uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.VIDEO)
-        val selection = "${MediaStore.Images.Media.SIZE}>=?"
+        val selection = "${MediaStore.Video.VideoColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf("102400")
         val sortOrder = "${MediaStore.Video.VideoColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
@@ -234,7 +235,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     ): List<Audio>? = withContext(dispatcher) {
         val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.AUDIO)
-        val selection = "${MediaStore.Images.Media.SIZE}>=?"
+        val selection = "${MediaStore.Audio.AudioColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf("102400")
         val sortOrder = "${MediaStore.Audio.AudioColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
@@ -258,6 +259,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     Video::class.java -> this@mapTo.readVideo(context)
                     Media::class.java -> this@mapTo.readFile(context)
                     Audio::class.java -> this@mapTo.readAudio()
+                    Document::class.java -> null
                     else -> null
                 }
                 if (item is T) {
@@ -509,6 +511,65 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
+    suspend fun loadSelectedLocalDocument(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        uri: Uri
+    ): Document? = withContext(dispatcher) {
+        try {
+            check(uri.scheme == ContentResolver.SCHEME_CONTENT) { "Unsupported uri.scheme!" }
+
+            var document: Document? = null
+
+            // Create new file from uri (content://...)
+            val filename = createDocumentFilename()
+            val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
+
+            // Retrieve local info from MediaStore
+            val projection = ContentResolverCompat.getOpenableContentProjection()
+
+            context.contentResolver
+                ?.query(uri, projection, null, null, null)
+                ?.use { cursor ->
+                    document = cursor.readOpenableDocument(uri, file)
+                }
+
+            // Set file path
+            document = document?.copy(path = file.absolutePath)
+
+            // Set MimeType
+            document = document?.copy(mimeType = uri.gainMimeType(null))
+
+            // Set extension
+            val extension = file.getExtension(mimeType = document?.mimeType)
+            if (!extension.isNullOrBlank()) {
+                document = document?.copy(extension = extension)
+            }
+
+            // Retrieve additional metadata from bitmap
+            runCatching {
+                context.contentResolver
+                    ?.openFileDescriptor(uri, "r")
+                    ?.use {
+                        Logger.d(TAG, "openFileDescriptor() -> $it")
+                    }
+            }
+
+            return@withContext document
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return@withContext null
+        }
+    }
+
+    suspend fun loadSelectedLocalDocuments(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        uris: List<Uri>
+    ): List<Document> = withContext(dispatcher) {
+        return@withContext uris.mapNotNull { uri ->
+            loadSelectedLocalDocument(dispatcher, uri)
+        }
+    }
+
     private suspend fun Uri.transformLocalContentToFile(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         filename: String
@@ -571,6 +632,11 @@ internal class MediaScanManager constructor(private val context: Context) {
     private fun createAudioFilename(): String {
         val timestamp = System.currentTimeMillis()
         return "AUDIO_${timestamp}"
+    }
+
+    private fun createDocumentFilename(): String {
+        val timestamp = System.currentTimeMillis()
+        return "DOC_${timestamp}"
     }
 
     private fun Uri.gainMimeType(default: String?): String? {

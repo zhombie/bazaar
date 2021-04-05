@@ -1,6 +1,7 @@
 package kz.zhombie.bazaar.ui.model
 
 import kz.zhombie.bazaar.api.model.Audio
+import kz.zhombie.bazaar.api.model.Document
 import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.model.Media
 import java.io.Serializable
@@ -14,6 +15,8 @@ internal open class UIMultimedia constructor(
 ) : Controllable, Serializable {
 
     fun isAudio(): Boolean = multimedia is Audio
+
+    fun isDocument(): Boolean = multimedia is Document
 
     fun getDisplayTitle(): String {
         var title = multimedia.displayName

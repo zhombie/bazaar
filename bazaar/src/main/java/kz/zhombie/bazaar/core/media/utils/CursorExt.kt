@@ -14,10 +14,7 @@ import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kz.zhombie.bazaar.api.model.Audio
-import kz.zhombie.bazaar.api.model.Image
-import kz.zhombie.bazaar.api.model.Media
-import kz.zhombie.bazaar.api.model.Video
+import kz.zhombie.bazaar.api.model.*
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -342,3 +339,35 @@ internal fun Cursor.readOpenableAudio(uri: Uri, file: File): Audio? {
         null
     }
 }
+
+
+internal fun Cursor.readOpenableDocument(uri: Uri, file: File): Document? {
+    return try {
+        var displayName = file.name
+        var size: Long = 0
+        if (moveToFirst()) {
+            displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
+            size = getLong(getColumnIndex(OpenableColumns.SIZE))
+        }
+        Document(
+            id = -1,
+            uri = uri,
+            path = null,
+            title = displayName,
+            displayName = displayName,
+            mimeType = null,
+            extension = file.getExtension(),
+            size = size,
+            dateAdded = 0,
+            dateModified = file.lastModified(),
+            dateCreated = 0,
+            thumbnail = null,
+            folderId = null,
+            folderDisplayName = null
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+

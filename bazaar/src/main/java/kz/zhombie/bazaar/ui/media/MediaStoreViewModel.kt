@@ -178,14 +178,17 @@ internal class MediaStoreViewModel : ViewModel() {
                             items = uiMultimedia.mapNotNull { if (it.isAudio()) it.multimedia else null }
                         )
                     )
-                else -> {
-                    null
-                }
+                Mode.DOCUMENT ->
+                    UIFolder(
+                        Folder(
+                            id = UIFolder.ALL_MEDIA_ID,
+                            displayName = "Все документы",
+                            items = uiMultimedia.mapNotNull { if (it.isDocument()) it.multimedia else null }
+                        )
+                    )
             }
 
-            if (defaultFolder != null) {
-                activeFolder.postValue(defaultFolder)
-            }
+            activeFolder.postValue(defaultFolder)
             displayedMedia.postValue(uiMultimedia)
 
             val folders = multimedia.mapNotNull { media ->
@@ -198,9 +201,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 .sortedBy { it.folder.displayName }
                 .toMutableList()
 
-            if (defaultFolder != null) {
-                folders.add(0, defaultFolder)
-            }
+            folders.add(0, defaultFolder)
 
             displayedFolders.postValue(folders)
         }
@@ -454,9 +455,9 @@ internal class MediaStoreViewModel : ViewModel() {
                     }
                     Mode.DOCUMENT -> {
                         if (settings.maxSelectionCount == 1) {
-                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaDocument)
+                            action.postValue(MediaStoreScreen.Action.SelectLocalDocument)
                         } else {
-                            action.postValue(MediaStoreScreen.Action.SelectLocalMediaDocuments)
+                            action.postValue(MediaStoreScreen.Action.SelectLocalDocuments)
                         }
                     }
                 }
@@ -664,28 +665,38 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onLocalMediaDocumentSelected(uri: Uri?) {
-        Logger.d(TAG, "onLocalMediaAudioSelected() -> uri: $uri")
+    fun onLocalDocumentSelected(uri: Uri?) {
+        Logger.d(TAG, "onLocalDocumentSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
-                action.postValue(MediaStoreScreen.Action.Empty)
+                val document = mediaScanManager.loadSelectedLocalDocument(Dispatchers.IO, uri)
+                if (document == null) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalDocument(document))
+                }
 
                 screenState.postValue(MediaStoreScreen.State.CONTENT)
             }
         }
     }
 
-    fun onLocalMediaDocumentsSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onLocalMediaAudiosSelected() -> uris: $uris")
+    fun onLocalDocumentsSelected(uris: List<Uri>?) {
+        Logger.d(TAG, "onLocalDocumentsSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             selectionJob = viewModelScope.launch(Dispatchers.IO) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
-                action.postValue(MediaStoreScreen.Action.Empty)
+                val documents = mediaScanManager.loadSelectedLocalDocuments(Dispatchers.IO, uris)
+                if (documents.isNullOrEmpty()) {
+                    action.postValue(MediaStoreScreen.Action.Empty)
+                } else {
+                    action.postValue(MediaStoreScreen.Action.SelectedLocalDocuments(documents))
+                }
 
                 screenState.postValue(MediaStoreScreen.State.CONTENT)
             }

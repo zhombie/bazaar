@@ -35,6 +35,7 @@ class Bazaar private constructor() {
         suspend fun preloadAll(context: Context) {
             MediaScanManager.preload(context, Mode.IMAGE_AND_VIDEO)
             MediaScanManager.preload(context, Mode.AUDIO)
+            MediaScanManager.preload(context, Mode.DOCUMENT)
         }
 
         suspend fun clearCache() {

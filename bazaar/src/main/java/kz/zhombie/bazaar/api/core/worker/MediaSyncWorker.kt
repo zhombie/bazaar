@@ -65,6 +65,7 @@ class MediaSyncWorker constructor(
     override suspend fun doWork(): Result {
         Bazaar.preload(context, Mode.IMAGE_AND_VIDEO)
         Bazaar.preload(context, Mode.AUDIO)
+        Bazaar.preload(context, Mode.DOCUMENT)
         return Result.success()
     }
 

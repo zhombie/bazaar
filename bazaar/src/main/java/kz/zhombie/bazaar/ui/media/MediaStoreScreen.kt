@@ -75,11 +75,11 @@ internal object MediaStoreScreen {
         object SelectLocalMediaAudios : Action()
         data class SelectedLocalMediaAudios constructor(val audios: List<Audio>) : Action()
 
-        object SelectLocalMediaDocument : Action()
-        data class SelectedLocalMediaDocument constructor(val document: Document) : Action()
+        object SelectLocalDocument : Action()
+        data class SelectedLocalDocument constructor(val document: Document) : Action()
 
-        object SelectLocalMediaDocuments : Action()
-        data class SelectedLocalMediaDocuments constructor(val documents: List<Document>) : Action()
+        object SelectLocalDocuments : Action()
+        data class SelectedLocalDocuments constructor(val documents: List<Document>) : Action()
 
         object Empty : Action()
     }

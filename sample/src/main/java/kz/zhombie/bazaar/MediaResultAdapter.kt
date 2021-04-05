@@ -109,6 +109,19 @@ MIME type: ${multimedia.mimeType},
 Обложка: ${if (multimedia.thumbnail != null) "Есть" else "Нет"}
                     """.trim()
                 }
+                is Document -> {
+                    textView.text = """
+id: ${multimedia.id}
+Название: ${multimedia.displayName}
+Тип: "Документ"
+Размер: ${multimedia.size}
+Папка: ${multimedia.folderDisplayName}
+Расширение: ${multimedia.extension}
+Ссылка: ${multimedia.uri}
+Путь: ${multimedia.path}
+MIME type: ${multimedia.mimeType}
+                    """.trim()
+                }
                 else -> {
                 }
             }

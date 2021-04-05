@@ -445,8 +445,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     dismiss()
                 }
                 // Local media document selection
-                is MediaStoreScreen.Action.SelectLocalMediaDocument -> {
-                    getLocalMediaDocument.launch(
+                is MediaStoreScreen.Action.SelectLocalDocument -> {
+                    getLocalDocument.launch(
                         arrayOf(
                             "text/*",
                             "application/pdf",
@@ -461,13 +461,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         )
                     )
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaDocument -> {
+                is MediaStoreScreen.Action.SelectedLocalDocument -> {
                     resultCallback?.onMultimediaLocalMediaStoreResult(action.document)
                     dismiss()
                 }
                 // Multiple local media document selection
-                is MediaStoreScreen.Action.SelectLocalMediaDocuments -> {
-                    getLocalMediaDocuments.launch(
+                is MediaStoreScreen.Action.SelectLocalDocuments -> {
+                    getLocalDocuments.launch(
                         arrayOf(
                             "text/*",
                             "application/pdf",
@@ -482,7 +482,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         )
                     )
                 }
-                is MediaStoreScreen.Action.SelectedLocalMediaDocuments -> {
+                is MediaStoreScreen.Action.SelectedLocalDocuments -> {
                     resultCallback?.onMultimediaLocalMediaStoreResult(action.documents)
                     dismiss()
                 }
@@ -810,12 +810,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.onLocalMediaAudiosSelected(uris)
     }
 
-    private val getLocalMediaDocument = registerForActivityResult(GetContentContract()) { uri ->
-        viewModel.onLocalMediaDocumentSelected(uri)
+    private val getLocalDocument = registerForActivityResult(GetContentContract()) { uri ->
+        viewModel.onLocalDocumentSelected(uri)
     }
 
-    private val getLocalMediaDocuments = registerForActivityResult(GetMultipleContentsContract()) { uris ->
-        viewModel.onLocalMediaDocumentsSelected(uris)
+    private val getLocalDocuments = registerForActivityResult(GetMultipleContentsContract()) { uris ->
+        viewModel.onLocalDocumentsSelected(uris)
     }
 
 }
