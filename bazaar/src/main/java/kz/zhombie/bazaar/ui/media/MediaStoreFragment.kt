@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.ui.media
 
+import android.Manifest
 import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
@@ -105,6 +106,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     // Callbacks
     private var eventListener: EventListener? = null
     private var resultCallback: ResultCallback? = null
+
+    // TODO: Handle required permissions on its own
+    private val mandatoryPermissions by lazy {
+        arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    }
 
     fun setEventListener(eventListener: EventListener) {
         this.eventListener = eventListener
