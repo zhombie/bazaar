@@ -44,9 +44,9 @@ class MediaResultAdapter constructor(
                 is Image -> {
                     val thumbnail = multimedia.thumbnail ?: multimedia.source
                     if (thumbnail == null) {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, multimedia.uri)
+                        imageLoader.loadSmallImage(itemView.context, imageView, multimedia.uri)
                     } else {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
+                        imageLoader.loadSmallImage(itemView.context, imageView, thumbnail)
                     }
 
                     textView.text = """
@@ -67,9 +67,9 @@ MIME type: ${multimedia.mimeType},
                 is Video -> {
                     val thumbnail = multimedia.thumbnail
                     if (thumbnail == null) {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, multimedia.uri)
+                        imageLoader.loadSmallImage(itemView.context, imageView, multimedia.uri)
                     } else {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
+                        imageLoader.loadSmallImage(itemView.context, imageView, thumbnail)
                     }
 
                     textView.text = """
@@ -90,9 +90,9 @@ MIME type: ${multimedia.mimeType},
                 is Audio -> {
                     val thumbnail = multimedia.thumbnail
                     if (thumbnail == null) {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, multimedia.uri)
+                        imageLoader.loadSmallImage(itemView.context, imageView, multimedia.uri)
                     } else {
-                        imageLoader.loadGridItemImage(itemView.context, imageView, thumbnail)
+                        imageLoader.loadSmallImage(itemView.context, imageView, thumbnail)
                     }
 
                     textView.text = """

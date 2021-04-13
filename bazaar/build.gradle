@@ -56,13 +56,13 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:2.3.1"
 
     // RecyclerView
-    implementation  'androidx.recyclerview:recyclerview:1.2.0-rc01'
+    implementation  'androidx.recyclerview:recyclerview:1.2.0'
 
-    // Cinema, Museum (Video, image fullscreen preview, respectively).
+    // Cinema, Museum, Radio (Video, image fullscreen preview & audio player, respectively).
     // Radio is an audio player.
-    api 'com.github.zhombie.arbat:cinema:1.1.3'
-    api 'com.github.zhombie.arbat:museum:1.1.3'
-    implementation 'com.github.zhombie.arbat:radio:1.1.3'
+    api 'com.github.zhombie.arbat:cinema:1.1.4'
+    api 'com.github.zhombie.arbat:museum:1.1.4'
+    implementation 'com.github.zhombie.arbat:radio:1.1.4'
 
     // ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer-core:2.12.2'
@@ -72,8 +72,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
 
     // Kotlin coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
 
     // WorkManager
     implementation "androidx.work:work-runtime-ktx:2.5.0"

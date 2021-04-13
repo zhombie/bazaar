@@ -7,6 +7,6 @@ import android.widget.ImageView
 import kz.zhombie.museum.ArtworkLoader
 
 interface ImageLoader : ArtworkLoader {
-    fun loadGridItemImage(context: Context, imageView: ImageView, uri: Uri)
-    fun loadGridItemImage(context: Context, imageView: ImageView, bitmap: Bitmap)
+    override fun loadSmallImage(context: Context, imageView: ImageView, uri: Uri)
+    fun loadSmallImage(context: Context, imageView: ImageView, bitmap: Bitmap)
 }

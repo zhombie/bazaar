@@ -9,7 +9,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 
 class GlideImageLoader : ImageLoader {
 
-    override fun loadGridItemImage(context: Context, imageView: ImageView, uri: Uri) {
+    override fun loadSmallImage(context: Context, imageView: ImageView, uri: Uri) {
         Glide.with(context)
             .load(uri)
             .centerCrop()
@@ -20,7 +20,7 @@ class GlideImageLoader : ImageLoader {
             .into(imageView)
     }
 
-    override fun loadGridItemImage(context: Context, imageView: ImageView, bitmap: Bitmap) {
+    override fun loadSmallImage(context: Context, imageView: ImageView, bitmap: Bitmap) {
         Glide.with(context)
             .load(bitmap)
             .centerCrop()
@@ -29,10 +29,6 @@ class GlideImageLoader : ImageLoader {
             .override(300, 300)
             .placeholder(R.drawable.bazaar_bg_rounded_white_with_stroke)
             .into(imageView)
-    }
-
-    override fun loadSmallImage(context: Context, imageView: ImageView, uri: Uri) {
-        loadGridItemImage(context, imageView, uri)
     }
 
     override fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri) {

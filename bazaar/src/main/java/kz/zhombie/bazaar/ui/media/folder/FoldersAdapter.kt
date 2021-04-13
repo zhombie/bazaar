@@ -99,7 +99,7 @@ internal class FoldersAdapter constructor(
                 if (cover == null) {
                     imageView.setImageResource(R.drawable.bazaar_bg_black)
                 } else {
-                    imageLoader.loadGridItemImage(itemView.context, imageView, cover)
+                    imageLoader.loadSmallImage(itemView.context, imageView, cover)
                 }
 
                 if (imageView.visibility != View.VISIBLE) {

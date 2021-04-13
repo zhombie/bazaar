@@ -160,11 +160,11 @@ internal class VisualMediaAdapter constructor(
 
             when {
                 image.thumbnail != null ->
-                    imageLoader.loadGridItemImage(itemView.context, imageView, image.thumbnail)
+                    imageLoader.loadSmallImage(itemView.context, imageView, image.thumbnail)
                 image.source != null ->
-                    imageLoader.loadGridItemImage(itemView.context, imageView, image.source)
+                    imageLoader.loadSmallImage(itemView.context, imageView, image.source)
                 else ->
-                    imageLoader.loadGridItemImage(itemView.context, imageView, image.uri)
+                    imageLoader.loadSmallImage(itemView.context, imageView, image.uri)
             }
 
             toggleSelectionAbility(uiMedia)
@@ -255,9 +255,9 @@ internal class VisualMediaAdapter constructor(
 
             when {
                 video.thumbnail != null ->
-                    imageLoader.loadGridItemImage(itemView.context, imageView, video.thumbnail)
+                    imageLoader.loadSmallImage(itemView.context, imageView, video.thumbnail)
                 else ->
-                    imageLoader.loadGridItemImage(itemView.context, imageView, video.uri)
+                    imageLoader.loadSmallImage(itemView.context, imageView, video.uri)
             }
 
             toggleSelectionAbility(uiMedia)

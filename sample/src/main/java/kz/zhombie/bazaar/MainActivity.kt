@@ -28,15 +28,15 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
-
-        private val IMAGE_LOADER_GLIDE = "Glide" to GlideImageLoader()
-        private val IMAGE_LOADER_COIL = "Coil" to CoilImageLoader()
-        private val DEFAULT_IMAGE_LOADER = IMAGE_LOADER_GLIDE
     }
 
     private object RequestCode {
         const val EXTERNAL_STORAGE_ACCESS = 100
     }
+
+    private lateinit var glideImageLoader: Pair<String, ImageLoader>
+    private lateinit var coilImageLoader: Pair<String, ImageLoader>
+    private lateinit var defaultImageLoader: Pair<String, ImageLoader>
 
     private lateinit var imageLoaderView: MaterialTextView
     private lateinit var imageLoaderButton: MaterialButton
@@ -57,6 +57,10 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        glideImageLoader = "Glide" to GlideImageLoader()
+        coilImageLoader = "Coil" to CoilImageLoader(this)
+        defaultImageLoader = coilImageLoader
+
         imageLoaderView = findViewById(R.id.imageLoaderView)
         imageLoaderButton = findViewById(R.id.imageLoaderButton)
         modeView = findViewById(R.id.modeView)
@@ -66,8 +70,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         showButton = findViewById(R.id.showButton)
         recyclerView = findViewById(R.id.recyclerView)
 
-        imageLoader = DEFAULT_IMAGE_LOADER.second
-        imageLoaderView.text = DEFAULT_IMAGE_LOADER.first
+        imageLoader = defaultImageLoader.second
+        imageLoaderView.text = defaultImageLoader.first
 
         Bazaar.init(imageLoader, true)
 
@@ -83,12 +87,12 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         imageLoaderButton.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Image loader")
-                .setSingleChoiceItems(arrayOf(IMAGE_LOADER_COIL.first, IMAGE_LOADER_GLIDE.first), -1) { dialog, which ->
+                .setSingleChoiceItems(arrayOf(coilImageLoader.first, glideImageLoader.first), -1) { dialog, which ->
                     dialog.dismiss()
                     val selectedImageLoader = when (which) {
-                        0 -> IMAGE_LOADER_COIL
-                        1 -> IMAGE_LOADER_GLIDE
-                        else -> IMAGE_LOADER_GLIDE
+                        0 -> coilImageLoader
+                        1 -> glideImageLoader
+                        else -> glideImageLoader
                     }
 
                     imageLoader = selectedImageLoader.second
@@ -208,6 +212,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         }
 
         super.onDestroy()
+
+        (imageLoader as? CoilImageLoader)?.clearCache()
     }
 
     override fun onCameraResult(media: Media) {
