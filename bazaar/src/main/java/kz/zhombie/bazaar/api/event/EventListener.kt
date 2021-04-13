@@ -1,5 +1,5 @@
 package kz.zhombie.bazaar.api.event
 
-fun interface EventListener {
+interface EventListener {
     fun onDestroy()
 }

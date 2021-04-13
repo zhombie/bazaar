@@ -9,7 +9,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 30
 
         versionCode 1
@@ -60,9 +60,9 @@ dependencies {
 
     // Cinema, Museum, Radio (Video, image fullscreen preview & audio player, respectively).
     // Radio is an audio player.
-    api 'com.github.zhombie.arbat:cinema:1.1.4'
-    api 'com.github.zhombie.arbat:museum:1.1.4'
-    implementation 'com.github.zhombie.arbat:radio:1.1.4'
+    api 'com.github.zhombie.arbat:cinema:1.1.5'
+    api 'com.github.zhombie.arbat:museum:1.1.5'
+    implementation 'com.github.zhombie.arbat:radio:1.1.5'
 
     // ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer-core:2.12.2'

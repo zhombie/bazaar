@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
@@ -155,9 +156,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 })
                     .setTag(Bazaar.TAG)
 //                    .setImageLoader(imageLoader)
-                    .setEventListener {
-                        Log.d(TAG, "onDestroy()")
-                    }
+                    .setEventListener(object : EventListener {
+                        override fun onDestroy() {
+                            Log.d(TAG, "onDestroy()")
+                        }
+                    })
                     .setMode(mode)
                     .setMaxSelectionCount(maxSelectionCount)
                     .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
