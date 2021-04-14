@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.*
@@ -174,13 +175,36 @@ internal class MediaScanManager constructor(private val context: Context) {
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.IMAGE)
         val selection = "(${MediaStore.Images.ImageColumns.MIME_TYPE}=? OR ${MediaStore.Images.ImageColumns.MIME_TYPE}=?) AND ${MediaStore.Images.ImageColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf("image/jpeg", "image/png", "102400")
-        val sortOrder = "${MediaStore.Images.ImageColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
-        context.contentResolver
-            ?.query(uri, projection, selection, selectionArgs, sortOrder)
-            ?.use { cursor ->
-                return@withContext cursor.mapTo<Image>(dispatcher)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val bundle = Bundle()
+
+            // Selection
+            bundle.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
+            bundle.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+
+            // Limit & offset
+            bundle.putInt(ContentResolver.QUERY_ARG_LIMIT, DEFAULT_LOCAL_LOAD_LIMIT)
+            bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
+
+            // Sort
+            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Images.ImageColumns.DATE_ADDED)
+            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+
+            context.contentResolver
+                ?.query(uri, projection, bundle, null)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Image>(dispatcher)
+                }
+        } else {
+            val sortOrder = "${MediaStore.Images.ImageColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+
+            context.contentResolver
+                ?.query(uri, projection, selection, selectionArgs, sortOrder)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Image>(dispatcher)
+                }
+        }
 
         return@withContext null
     }
@@ -192,13 +216,36 @@ internal class MediaScanManager constructor(private val context: Context) {
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.VIDEO)
         val selection = "${MediaStore.Video.VideoColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf("102400")
-        val sortOrder = "${MediaStore.Video.VideoColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
-        context.contentResolver
-            ?.query(uri, projection, selection, selectionArgs, sortOrder)
-            ?.use { cursor ->
-                return@withContext cursor.mapTo<Video>(dispatcher)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val bundle = Bundle()
+
+            // Selection
+            bundle.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
+            bundle.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+
+            // Limit & offset
+            bundle.putInt(ContentResolver.QUERY_ARG_LIMIT, DEFAULT_LOCAL_LOAD_LIMIT)
+            bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
+
+            // Sort
+            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Video.VideoColumns.DATE_ADDED)
+            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+
+            context.contentResolver
+                ?.query(uri, projection, bundle, null)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Video>(dispatcher)
+                }
+        } else {
+            val sortOrder = "${MediaStore.Video.VideoColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+
+            context.contentResolver
+                ?.query(uri, projection, selection, selectionArgs, sortOrder)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Video>(dispatcher)
+                }
+        }
 
         return@withContext null
     }
@@ -211,21 +258,45 @@ internal class MediaScanManager constructor(private val context: Context) {
         } else {
             MediaStore.Files.getContentUri("external")
         }
+
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.FILE)
-        val selection =
-            "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?) AND ${MediaStore.Files.FileColumns.SIZE}>=?"
+
+        val selection = "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?) AND ${MediaStore.Files.FileColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf(
             MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
             "102400"
         )
-        val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
-        context.contentResolver
-            ?.query(uri, projection, selection, selectionArgs, sortOrder)
-            ?.use { cursor ->
-                return@withContext cursor.mapTo<Media>(dispatcher)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val bundle = Bundle()
+
+            // Selection
+            bundle.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
+            bundle.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+
+            // Limit & offset
+            bundle.putInt(ContentResolver.QUERY_ARG_LIMIT, DEFAULT_LOCAL_LOAD_LIMIT)
+            bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
+
+            // Sort
+            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Files.FileColumns.DATE_ADDED)
+            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+
+            context.contentResolver
+                ?.query(uri, projection, bundle, null)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Media>(dispatcher)
+                }
+        } else {
+            val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+
+            context.contentResolver
+                ?.query(uri, projection, selection, selectionArgs, sortOrder)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Media>(dispatcher)
+                }
+        }
 
         return@withContext null
     }
@@ -237,13 +308,36 @@ internal class MediaScanManager constructor(private val context: Context) {
         val projection: Array<String> = ContentResolverCompat.getProjection(ContentResolverCompat.Type.AUDIO)
         val selection = "${MediaStore.Audio.AudioColumns.SIZE}>=?"
         val selectionArgs: Array<String> = arrayOf("102400")
-        val sortOrder = "${MediaStore.Audio.AudioColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
 
-        context.contentResolver
-            ?.query(uri, projection, selection, selectionArgs, sortOrder)
-            ?.use { cursor ->
-                return@withContext cursor.mapTo<Audio>(dispatcher)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val bundle = Bundle()
+
+            // Selection
+            bundle.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
+            bundle.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+
+            // Limit & offset
+            bundle.putInt(ContentResolver.QUERY_ARG_LIMIT, DEFAULT_LOCAL_LOAD_LIMIT)
+            bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
+
+            // Sort
+            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Audio.AudioColumns.DATE_ADDED)
+            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+
+            context.contentResolver
+                ?.query(uri, projection, bundle, null)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Audio>(dispatcher)
+                }
+        } else {
+            val sortOrder = "${MediaStore.Audio.AudioColumns.DATE_ADDED} DESC LIMIT $DEFAULT_LOCAL_LOAD_LIMIT"
+
+            context.contentResolver
+                ?.query(uri, projection, selection, selectionArgs, sortOrder)
+                ?.use { cursor ->
+                    return@withContext cursor.mapTo<Audio>(dispatcher)
+                }
+        }
 
         return@withContext null
     }
