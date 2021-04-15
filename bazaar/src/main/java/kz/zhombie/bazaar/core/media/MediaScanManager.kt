@@ -188,8 +188,14 @@ internal class MediaScanManager constructor(private val context: Context) {
             bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
 
             // Sort
-            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Images.ImageColumns.DATE_ADDED)
-            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+            bundle.putStringArray(
+                ContentResolver.QUERY_ARG_SORT_COLUMNS,
+                arrayOf(MediaStore.Images.ImageColumns.DATE_ADDED)
+            )
+            bundle.putInt(
+                ContentResolver.QUERY_ARG_SORT_DIRECTION,
+                ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
+            )
 
             context.contentResolver
                 ?.query(uri, projection, bundle, null)
@@ -229,8 +235,14 @@ internal class MediaScanManager constructor(private val context: Context) {
             bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
 
             // Sort
-            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Video.VideoColumns.DATE_ADDED)
-            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+            bundle.putStringArray(
+                ContentResolver.QUERY_ARG_SORT_COLUMNS,
+                arrayOf(MediaStore.Video.VideoColumns.DATE_ADDED)
+            )
+            bundle.putInt(
+                ContentResolver.QUERY_ARG_SORT_DIRECTION,
+                ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
+            )
 
             context.contentResolver
                 ?.query(uri, projection, bundle, null)
@@ -280,8 +292,14 @@ internal class MediaScanManager constructor(private val context: Context) {
             bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
 
             // Sort
-            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Files.FileColumns.DATE_ADDED)
-            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+            bundle.putStringArray(
+                ContentResolver.QUERY_ARG_SORT_COLUMNS,
+                arrayOf(MediaStore.Files.FileColumns.DATE_ADDED)
+            )
+            bundle.putInt(
+                ContentResolver.QUERY_ARG_SORT_DIRECTION,
+                ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
+            )
 
             context.contentResolver
                 ?.query(uri, projection, bundle, null)
@@ -321,8 +339,14 @@ internal class MediaScanManager constructor(private val context: Context) {
             bundle.putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
 
             // Sort
-            bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS, MediaStore.Audio.AudioColumns.DATE_ADDED)
-            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+            bundle.putStringArray(
+                ContentResolver.QUERY_ARG_SORT_COLUMNS,
+                arrayOf(MediaStore.Audio.AudioColumns.DATE_ADDED)
+            )
+            bundle.putInt(
+                ContentResolver.QUERY_ARG_SORT_DIRECTION,
+                ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
+            )
 
             context.contentResolver
                 ?.query(uri, projection, bundle, null)
