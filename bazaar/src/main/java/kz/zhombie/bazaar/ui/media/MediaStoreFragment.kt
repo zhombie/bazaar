@@ -681,7 +681,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             if (radio == null) {
                 radio = Radio.Builder(requireContext())
                     .create(object : Radio.Listener {
-                        override fun onPlayingStateChanged(isPlaying: Boolean) {
+                        override fun onIsPlayingStateChanged(isPlaying: Boolean) {
                             if (isPlaying) {
                                 Logger.d(TAG, "onPlay() -> $currentPlayingAudio")
 
@@ -726,7 +726,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             }
 
             // The same audio required to play
-            if (radio?.getCurrentSource() == uiMultimedia.multimedia.uri) {
+            if (radio?.currentSource == uiMultimedia.multimedia.uri) {
                 radio?.playOrPause()
             } else {
                 // The other audio required to play
