@@ -89,7 +89,6 @@ dependencies {
     // Coil
     implementation "io.coil-kt:coil:1.2.0"
     implementation "io.coil-kt:coil-gif:1.2.0"
-    implementation "io.coil-kt:coil-svg:1.2.0"
     implementation "io.coil-kt:coil-video:1.2.0"
 
     // Glide

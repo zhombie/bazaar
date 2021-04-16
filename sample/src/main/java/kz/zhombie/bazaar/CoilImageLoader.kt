@@ -10,7 +10,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
 import coil.fetch.VideoFrameFileFetcher
 import coil.fetch.VideoFrameUriFetcher
@@ -44,9 +43,6 @@ class CoilImageLoader constructor(context: Context) : ImageLoader {
                 } else {
                     add(GifDecoder())
                 }
-
-                // SVG
-                add(SvgDecoder(context))
             }
             .crossfade(false)
             .diskCachePolicy(CachePolicy.ENABLED)
