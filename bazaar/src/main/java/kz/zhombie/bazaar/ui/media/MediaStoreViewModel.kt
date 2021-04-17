@@ -79,7 +79,12 @@ internal class MediaStoreViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val localData = when (settings.mode) {
                     Mode.IMAGE -> {
-                        val images = Cache.getInstance().getMedia()?.filterIsInstance<Image>()
+                        val images = try {
+                            Cache.getInstance().getMedia()?.filterIsInstance<Image>()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
                         if (images.isNullOrEmpty()) {
                             mediaScanManager.loadLocalMediaImages(Dispatchers.IO)
                         } else {
@@ -87,7 +92,12 @@ internal class MediaStoreViewModel : ViewModel() {
                         }
                     }
                     Mode.VIDEO -> {
-                        val videos = Cache.getInstance().getMedia()?.filterIsInstance<Video>()
+                        val videos = try {
+                            Cache.getInstance().getMedia()?.filterIsInstance<Video>()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
                         if (videos.isNullOrEmpty()) {
                             mediaScanManager.loadLocalMediaVideos(Dispatchers.IO)
                         } else {
@@ -95,7 +105,12 @@ internal class MediaStoreViewModel : ViewModel() {
                         }
                     }
                     Mode.IMAGE_AND_VIDEO -> {
-                        val imagesAndVideos = Cache.getInstance().getMedia()?.filter { it is Image || it is Video }
+                        val imagesAndVideos = try {
+                            Cache.getInstance().getMedia()?.filter { it is Image || it is Video }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
                         if (imagesAndVideos.isNullOrEmpty()) {
                             mediaScanManager.loadLocalMediaImagesAndVideos(Dispatchers.IO)
                         } else {
@@ -103,7 +118,12 @@ internal class MediaStoreViewModel : ViewModel() {
                         }
                     }
                     Mode.AUDIO -> {
-                        val audios = Cache.getInstance().getMultimedia()?.filterIsInstance<Audio>()
+                        val audios = try {
+                            Cache.getInstance().getMultimedia()?.filterIsInstance<Audio>()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
                         if (audios.isNullOrEmpty()) {
                             mediaScanManager.loadLocalMediaAudios(Dispatchers.IO)
                         } else {
