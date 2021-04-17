@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.ui.media.visual
 
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
@@ -29,7 +30,7 @@ internal class VisualMediaAdapter constructor(
 
         private val diffCallback = object : DiffUtil.ItemCallback<UIMedia>() {
             override fun areItemsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =
-                oldItem.media.id == newItem.media.id
+                oldItem.media.id == newItem.media.id && oldItem.media.uri == newItem.media.uri
 
             override fun areContentsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =
                 oldItem == newItem
@@ -187,12 +188,16 @@ internal class VisualMediaAdapter constructor(
                 if (checkBoxButton.visibility != View.VISIBLE) {
                     checkBoxButton.visibility = View.VISIBLE
                 }
-                imageView.foreground = null
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    imageView.foreground = null
+                }
             } else {
                 if (checkBoxButton.visibility != View.GONE) {
                     checkBoxButton.visibility = View.GONE
                 }
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_rounded_alpha_black)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_rounded_alpha_black)
+                }
             }
         }
 
@@ -287,12 +292,16 @@ internal class VisualMediaAdapter constructor(
                 if (checkBoxButton.visibility != View.VISIBLE) {
                     checkBoxButton.visibility = View.VISIBLE
                 }
-                imageView.foreground = null
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    imageView.foreground = null
+                }
             } else {
                 if (checkBoxButton.visibility != View.GONE) {
                     checkBoxButton.visibility = View.GONE
                 }
-                imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_rounded_alpha_black)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    imageView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_rounded_alpha_black)
+                }
             }
         }
 

@@ -20,7 +20,7 @@
         android:layout_height="60dp">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/playOrPauseButton"
+            android:id="@+id/iconButton"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="47dp"
             android:layout_height="47dp"
@@ -35,7 +35,7 @@
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:text="@null"
-            app:icon="@drawable/bazaar_ic_play"
+            app:icon="@drawable/bazaar_ic_document"
             app:iconGravity="textEnd"
             app:iconPadding="0dp"
             app:iconSize="16dp"
@@ -78,7 +78,7 @@
             android:textColor="@color/bazaar_black"
             android:textSize="13sp"
             android:textStyle="bold"
-            tools:text="Audio display name" />
+            tools:text="Document display name" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/subtitleView"
@@ -95,11 +95,11 @@
             android:textColor="@color/bazaar_black"
             android:textSize="10sp"
             android:textStyle="normal"
-            tools:text="Audio folder name"
+            tools:text="Document folder name"
             tools:ignore="SmallSp" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/durationView"
+            android:id="@+id/sizeView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -113,7 +113,7 @@
             android:textColor="@color/bazaar_metal"
             android:textSize="10sp"
             android:textStyle="normal"
-            tools:text="Audio duration"
+            tools:text="Document size"
             tools:ignore="SmallSp" />
 
     </LinearLayout>

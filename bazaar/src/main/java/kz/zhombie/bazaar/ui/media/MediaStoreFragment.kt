@@ -32,18 +32,24 @@ import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
 import kz.zhombie.bazaar.ui.media.audible.AudiosAdapterManager
 import kz.zhombie.bazaar.ui.media.audible.AudiosHeaderAdapter
+import kz.zhombie.bazaar.ui.media.document.DocumentsAdapter
+import kz.zhombie.bazaar.ui.media.document.DocumentsAdapterManager
+import kz.zhombie.bazaar.ui.media.document.DocumentsHeaderAdapter
 import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapter
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
 import kz.zhombie.bazaar.ui.media.visual.VisualMediaHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.utils.OpenFile
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
+import kz.zhombie.bazaar.utils.openFile
 import kz.zhombie.bazaar.utils.windowHeight
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.museum.MuseumDialogFragment
 import kz.zhombie.radio.Radio
+import java.io.File
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -51,7 +57,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     VisualMediaHeaderAdapter.Callback,
     VisualMediaAdapter.Callback,
     AudiosHeaderAdapter.Callback,
-    AudiosAdapter.Callback {
+    AudiosAdapter.Callback,
+    DocumentsHeaderAdapter.Callback,
+    DocumentsAdapter.Callback {
 
     companion object {
         private val TAG: String = MediaStoreFragment::class.java.simpleName
@@ -93,6 +101,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private var foldersAdapterManager: FoldersAdapterManager? = null
     private var visualMediaAdapterManager: VisualMediaAdapterManager? = null
     private var audiosAdapterManager: AudiosAdapterManager? = null
+    private var documentsAdapterManager: DocumentsAdapterManager? = null
 
     // Audio
     private var radio: Radio? = null
@@ -221,10 +230,10 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         setupHeaderView()
         setupInfoView()
 
-        if (viewModel.getSettings().isVisualMediaMode()) {
-            setupVisualMediaView(contentView)
-        } else if (viewModel.getSettings().isAudibleMediaMode()) {
-            setupAudiosView(contentView)
+        when {
+            viewModel.getSettings().isVisualMediaMode() -> setupVisualMediaView(contentView)
+            viewModel.getSettings().isAudibleMediaMode() -> setupAudiosView(contentView)
+            viewModel.getSettings().isDocumentMode() -> setupDocumentsView(contentView)
         }
 
         setupSelectButton(selectedMediaCount = 0)
@@ -253,6 +262,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
         audiosAdapterManager?.destroy()
         audiosAdapterManager = null
+
+        documentsAdapterManager?.destroy()
+        documentsAdapterManager = null
 
         selectButton.setOnClickListener(null)
 
@@ -296,6 +308,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
                 audiosHeaderAdapterCallback = this,
                 audiosAdapterCallback = this
+            )
+        }
+    }
+
+    private fun setupDocumentsView(recyclerView: RecyclerView) {
+        if (documentsAdapterManager == null) {
+            documentsAdapterManager = DocumentsAdapterManager(requireContext(), recyclerView)
+            documentsAdapterManager?.create(
+                isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                documentsHeaderAdapterCallback = this,
+                documentsAdapterCallback = this
             )
         }
     }
@@ -766,6 +789,42 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onAudioClicked(uiMultimedia: UIMultimedia) {
+        viewModel.onMediaCheckboxClicked(uiMultimedia)
+    }
+
+    /**
+     * [DocumentsAdapter.Callback] implementation
+     */
+
+    override fun onDocumentIconClicked(uiMultimedia: UIMultimedia) {
+        val path = uiMultimedia.multimedia.path
+        if (path.isNullOrBlank()) {
+            toast?.cancel()
+            toast = null
+            toast = Toast.makeText(requireContext(), "Не получилось найти файл", Toast.LENGTH_SHORT)
+            toast?.show()
+            return
+        }
+        val file = File(path)
+        when (val openFile = file.openFile(requireContext())) {
+            is OpenFile.Success -> {
+                if (!openFile.tryToLaunch(requireContext())) {
+                    toast?.cancel()
+                    toast = null
+                    toast = Toast.makeText(requireContext(), "Не получилось открыть файл", Toast.LENGTH_SHORT)
+                    toast?.show()
+                }
+            }
+            is OpenFile.Error -> {
+                toast?.cancel()
+                toast = null
+                toast = Toast.makeText(requireContext(), "Не получилось открыть файл", Toast.LENGTH_SHORT)
+                toast?.show()
+            }
+        }
+    }
+
+    override fun onDocumentClicked(uiMultimedia: UIMultimedia) {
         viewModel.onMediaCheckboxClicked(uiMultimedia)
     }
 

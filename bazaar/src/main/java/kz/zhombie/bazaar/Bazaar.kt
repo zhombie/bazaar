@@ -88,12 +88,20 @@ class Bazaar private constructor() {
         }
 
         fun setCameraDisabled(): Builder {
-            this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
+            if (mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO) {
+                this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
+            } else {
+                this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
+            }
             return this
         }
 
         fun setCameraSettings(settings: CameraSettings): Builder {
-            this.cameraSettings = settings
+            if (mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO) {
+                this.cameraSettings = settings
+            } else {
+                this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
+            }
             return this
         }
 
@@ -138,7 +146,7 @@ class Bazaar private constructor() {
                 )
             )
             eventListener?.let { fragment.setEventListener(it) }
-            fragment.setResultCallback(requireNotNull(resultCallback) { "It makes no sense without a resultant callback." })
+            resultCallback?.let { fragment.setResultCallback(it) }
             fragment.show(fragmentManager, tag)
             return fragment
         }

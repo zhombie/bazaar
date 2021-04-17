@@ -35,7 +35,7 @@
         app:iconGravity="textEnd"
         app:iconPadding="0dp"
         app:iconSize="16dp"
-        app:iconTint="@null"
+        app:iconTint="@color/bazaar_white"
         app:rippleColor="?attr/colorControlHighlight"
         app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />
 
@@ -103,7 +103,7 @@
         app:iconGravity="textEnd"
         app:iconPadding="0dp"
         app:iconSize="35dp"
-        app:iconTint="@null"
+        app:iconTint="@color/bazaar_white"
         app:rippleColor="?attr/colorControlHighlight"
         app:shapeAppearance="@style/Bazaar.CircularShapeAppearance" />
 

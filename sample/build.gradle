@@ -65,10 +65,8 @@ android {
 }
 
 dependencies {
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
-    implementation project(":bazaar")
-//    implementation 'com.github.zhombie:bazaar:1.0.7'
 
     // Activity
     implementation "androidx.activity:activity-ktx:1.2.2"
@@ -98,6 +96,9 @@ dependencies {
     // Kotlin coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
+
+    // Library
+    implementation project(":bazaar")
 }
 
 

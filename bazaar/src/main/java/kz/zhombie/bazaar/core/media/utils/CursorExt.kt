@@ -15,6 +15,7 @@ import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.model.*
+import kz.zhombie.bazaar.utils.getExtension
 import java.io.File
 import java.util.concurrent.TimeUnit
 

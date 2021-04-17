@@ -32,6 +32,10 @@ internal object MediaStoreScreen {
             return mode == Mode.AUDIO
         }
 
+        fun isDocumentMode(): Boolean {
+            return mode == Mode.DOCUMENT
+        }
+
     }
 
     enum class State {
