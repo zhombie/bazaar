@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media
+package kz.zhombie.bazaar.ui.presentation
 
 import android.Manifest
 import android.app.Dialog
@@ -29,16 +29,16 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
-import kz.zhombie.bazaar.ui.media.audible.AudiosAdapter
-import kz.zhombie.bazaar.ui.media.audible.AudiosAdapterManager
-import kz.zhombie.bazaar.ui.media.audible.AudiosHeaderAdapter
-import kz.zhombie.bazaar.ui.media.document.DocumentsAdapter
-import kz.zhombie.bazaar.ui.media.document.DocumentsAdapterManager
-import kz.zhombie.bazaar.ui.media.document.DocumentsHeaderAdapter
-import kz.zhombie.bazaar.ui.media.folder.FoldersAdapterManager
-import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapter
-import kz.zhombie.bazaar.ui.media.visual.VisualMediaAdapterManager
-import kz.zhombie.bazaar.ui.media.visual.VisualMediaHeaderAdapter
+import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapter
+import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapterManager
+import kz.zhombie.bazaar.ui.presentation.audible.AudiosHeaderAdapter
+import kz.zhombie.bazaar.ui.presentation.document.DocumentsAdapter
+import kz.zhombie.bazaar.ui.presentation.document.DocumentsAdapterManager
+import kz.zhombie.bazaar.ui.presentation.document.DocumentsHeaderAdapter
+import kz.zhombie.bazaar.ui.presentation.folder.FoldersAdapterManager
+import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaAdapter
+import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaAdapterManager
+import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.utils.OpenFile

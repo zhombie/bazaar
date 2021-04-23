@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="bazaar_image">Image</string>
+    <string name="bazaar_video">Video</string>
+    <string name="bazaar_audio">Audio</string>
+    <string name="bazaar_document">Document</string>
+
     <string name="bazaar_camera">Camera</string>
     <string name="bazaar_explorer">Explorer</string>
+
+    <string name="bazaar_select_mode">Select mode</string>
 
     <string name="bazaar_take_picture">Take picture</string>
     <string name="bazaar_take_video">Take video</string>

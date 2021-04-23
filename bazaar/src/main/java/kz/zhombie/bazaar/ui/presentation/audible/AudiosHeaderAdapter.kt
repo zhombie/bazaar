@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.audible
+package kz.zhombie.bazaar.ui.presentation.audible
 
 import android.view.View
 import android.view.ViewGroup

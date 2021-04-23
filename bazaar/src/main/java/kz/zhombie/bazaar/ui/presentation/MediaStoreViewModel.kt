@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media
+package kz.zhombie.bazaar.ui.presentation
 
 import android.graphics.Bitmap
 import android.net.Uri

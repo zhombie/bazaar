@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media
+package kz.zhombie.bazaar.ui.presentation
 
 import android.net.Uri
 import kz.zhombie.bazaar.api.core.settings.CameraSettings

@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.folder
+package kz.zhombie.bazaar.ui.presentation.folder
 
 import android.content.Context
 import android.view.View

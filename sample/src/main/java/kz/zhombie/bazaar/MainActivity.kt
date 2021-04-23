@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var imageLoader: ImageLoader
-    private lateinit var mode: Mode
+    private var mode: Mode? = null
     private var maxSelectionCount: Int = 3
 
     private lateinit var adapter: MediaResultAdapter
@@ -108,6 +108,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 .setTitle("Mode")
                 .setSingleChoiceItems(
                     arrayOf(
+                        "ALL",
                         Mode.IMAGE.toString(),
                         Mode.VIDEO.toString(),
                         Mode.IMAGE_AND_VIDEO.toString(),
@@ -118,14 +119,19 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                 ) { dialog, which ->
                     dialog.dismiss()
                     mode = when (which) {
-                        0 -> Mode.IMAGE
-                        1 -> Mode.VIDEO
-                        2 -> Mode.IMAGE_AND_VIDEO
-                        3 -> Mode.AUDIO
-                        4 -> Mode.DOCUMENT
-                        else -> Mode.IMAGE_AND_VIDEO
+                        0 -> null
+                        1 -> Mode.IMAGE
+                        2 -> Mode.VIDEO
+                        3 -> Mode.IMAGE_AND_VIDEO
+                        4 -> Mode.AUDIO
+                        5 -> Mode.DOCUMENT
+                        else -> null
                     }
-                    modeView.text = mode.toString()
+                    if (mode == null) {
+                        modeView.text = "ALL"
+                    } else {
+                        modeView.text = mode.toString()
+                    }
                 }
                 .show()
         }
@@ -143,30 +149,67 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
         showButton.setOnClickListener {
             if (checkPermissions()) {
-                Bazaar.Builder(object : AbstractResultCallback {
-                    override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
-                        Log.d(TAG, "multimedia: $multimedia")
-                        adapter.multimedia = multimedia
-                    }
+                if (mode == null) {
+                    Bazaar.selectMode(this) { mode ->
+                        Bazaar.Builder(object : AbstractResultCallback {
+                            override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
+                                Log.d(TAG, "multimedia: $multimedia")
+                                adapter.multimedia = multimedia
+                            }
 
-                    override fun onMediaSelectResult(media: List<Media>) {
-                        Log.d(TAG, "media: $media")
-                        adapter.multimedia = media
+                            override fun onMediaSelectResult(media: List<Media>) {
+                                Log.d(TAG, "media: $media")
+                                adapter.multimedia = media
+                            }
+                        })
+                            .setTag(Bazaar.TAG)
+                            .setMode(mode)
+                            .setEventListener(object : EventListener {
+                                override fun onDestroy() {
+                                    Log.d(TAG, "onDestroy()")
+                                }
+                            })
+                            .setMaxSelectionCount(maxSelectionCount)
+                            .setCameraSettings(
+                                CameraSettings(
+                                    isPhotoShootEnabled = true,
+                                    isVideoCaptureEnabled = true
+                                )
+                            )
+                            .setLocalMediaSearchAndSelectEnabled(true)
+                            .setFoldersBasedInterfaceEnabled(true)
+                            .show(supportFragmentManager)
                     }
-                })
-                    .setTag(Bazaar.TAG)
-//                    .setImageLoader(imageLoader)
-                    .setEventListener(object : EventListener {
-                        override fun onDestroy() {
-                            Log.d(TAG, "onDestroy()")
+                } else {
+                    Bazaar.Builder(object : AbstractResultCallback {
+                        override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
+                            Log.d(TAG, "multimedia: $multimedia")
+                            adapter.multimedia = multimedia
+                        }
+
+                        override fun onMediaSelectResult(media: List<Media>) {
+                            Log.d(TAG, "media: $media")
+                            adapter.multimedia = media
                         }
                     })
-                    .setMode(mode)
-                    .setMaxSelectionCount(maxSelectionCount)
-                    .setCameraSettings(CameraSettings(isPhotoShootEnabled = true, isVideoCaptureEnabled = true))
-                    .setLocalMediaSearchAndSelectEnabled(true)
-                    .setFoldersBasedInterfaceEnabled(true)
-                    .show(supportFragmentManager)
+                        .setTag(Bazaar.TAG)
+                        .setMode(requireNotNull(mode))
+                        .setEventListener(object : EventListener {
+                            override fun onDestroy() {
+                                Log.d(TAG, "onDestroy()")
+                            }
+                        })
+                        .setMaxSelectionCount(maxSelectionCount)
+                        .setCameraSettings(
+                            CameraSettings(
+                                isPhotoShootEnabled = true,
+                                isVideoCaptureEnabled = true
+                            )
+                        )
+                        .setLocalMediaSearchAndSelectEnabled(true)
+                        .setFoldersBasedInterfaceEnabled(true)
+                        .show(supportFragmentManager)
+                }
             }
         }
 

@@ -66,6 +66,9 @@
 
         <!--Body-->
         <item name="materialAlertDialogBodyTextStyle">@style/Bazaar.Alert.BodyText</item>
+
+        <!--Choice-->
+        <item name="android:checkedTextViewStyle">@style/Bazaar.Alert.CheckedTextView</item>
     </style>
 
     <style name="Bazaar.AlertDialogStyle" parent="MaterialAlertDialog.MaterialComponents">
@@ -143,5 +146,9 @@
 
         <item name="background">@null</item>
         <item name="android:background">@null</item>
+    </style>
+
+    <style name="Bazaar.Alert.CheckedTextView" parent="Widget.MaterialComponents.CheckedTextView">
+        <item name="android:textColor">@color/bazaar_black</item>
     </style>
 </resources>

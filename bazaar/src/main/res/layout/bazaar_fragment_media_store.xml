@@ -5,7 +5,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="ui.media.MediaStoreFragment">
+    tools:context=".ui.presentation.MediaStoreFragment">
 
     <kz.zhombie.bazaar.ui.components.view.HeaderView
         android:id="@+id/headerView"

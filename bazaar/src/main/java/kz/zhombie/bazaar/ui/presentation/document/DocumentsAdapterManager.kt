@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.media.document
+package kz.zhombie.bazaar.ui.presentation.document
 
 import android.content.Context
 import android.view.View

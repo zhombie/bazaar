@@ -1,6 +1,5 @@
 package kz.zhombie.bazaar.api.core.settings
 
-// TODO: Support Mode.ALL
 enum class Mode {
     // Visual
     IMAGE,

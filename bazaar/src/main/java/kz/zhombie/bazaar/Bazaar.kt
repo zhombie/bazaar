@@ -1,8 +1,10 @@
 package kz.zhombie.bazaar
 
 import android.content.Context
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
@@ -11,8 +13,8 @@ import kz.zhombie.bazaar.api.core.worker.MediaSyncWorker
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.media.MediaScanManager
-import kz.zhombie.bazaar.ui.media.MediaStoreFragment
-import kz.zhombie.bazaar.ui.media.MediaStoreScreen
+import kz.zhombie.bazaar.ui.presentation.MediaStoreFragment
+import kz.zhombie.bazaar.ui.presentation.MediaStoreScreen
 
 class Bazaar private constructor() {
 
@@ -44,6 +46,44 @@ class Bazaar private constructor() {
 
         suspend fun destroyCache() {
             MediaScanManager.destroyCache()
+        }
+
+        fun selectMode(
+            context: Context,
+            defaultMode: Mode = Mode.IMAGE,
+            callback: (mode: Mode) -> Unit
+        ): AlertDialog? {
+            val items = arrayOf(
+                context.getString(R.string.bazaar_image),
+                context.getString(R.string.bazaar_video),
+                context.getString(R.string.bazaar_audio),
+                context.getString(R.string.bazaar_document)
+            )
+
+            val checkedItem = when (defaultMode) {
+                Mode.IMAGE -> 0
+                Mode.VIDEO -> 1
+                Mode.AUDIO -> 2
+                Mode.DOCUMENT -> 3
+                else -> 0
+            }
+
+            return MaterialAlertDialogBuilder(context, R.style.Bazaar_AlertDialogTheme)
+                .setTitle(context.getString(R.string.bazaar_select_mode))
+                .setSingleChoiceItems(items, checkedItem) { dialog, which ->
+                    dialog.dismiss()
+
+                    val mode = when (which) {
+                        0 -> Mode.IMAGE
+                        1 -> Mode.VIDEO
+                        2 -> Mode.AUDIO
+                        3 -> Mode.DOCUMENT
+                        else -> return@setSingleChoiceItems
+                    }
+
+                    callback(mode)
+                }
+                .show()
         }
     }
 
