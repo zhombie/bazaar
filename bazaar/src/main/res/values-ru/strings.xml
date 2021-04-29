@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bazaar_close">Закрыть</string>
+    <string name="bazaar_cancel">Отменить</string>
+
+    <string name="bazaar_image">Фото</string>
+    <string name="bazaar_video">Видео</string>
+    <string name="bazaar_audio">Аудио</string>
+    <string name="bazaar_document">Документ</string>
+
+    <string name="bazaar_camera">Камера</string>
+    <string name="bazaar_choose_from_library">Выбрать из библиотеки</string>
+
+    <string name="bazaar_mode_selection">Выбор режима</string>
+
+    <string name="bazaar_take_picture">Сделать фото</string>
+    <string name="bazaar_take_video">Снять видео</string>
+
+    <string name="bazaar_error_player">Возникла ошибка. Невозможно воспроизвести</string>
+</resources>

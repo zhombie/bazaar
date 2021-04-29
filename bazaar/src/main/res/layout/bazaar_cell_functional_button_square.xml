@@ -8,7 +8,8 @@
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="2.5dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageView"
@@ -26,9 +27,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
+        android:ellipsize="end"
         android:includeFontPadding="false"
         android:fontFamily="sans-serif-medium"
+        android:gravity="center"
         android:letterSpacing="0.024"
+        android:maxLines="2"
+        android:singleLine="false"
         android:textAllCaps="false"
         android:textColor="#EE333333"
         android:textSize="12sp"

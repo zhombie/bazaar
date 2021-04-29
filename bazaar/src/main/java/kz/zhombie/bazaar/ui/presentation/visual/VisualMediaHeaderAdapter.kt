@@ -12,7 +12,7 @@ import kz.zhombie.bazaar.utils.inflate
 
 internal class VisualMediaHeaderAdapter constructor(
     isCameraEnabled: Boolean,
-    isExplorerEnabled: Boolean,
+    isChooseFromLibraryEnabled: Boolean,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -22,7 +22,7 @@ internal class VisualMediaHeaderAdapter constructor(
 
     private object ViewType {
         const val CAMERA = 100
-        const val EXPLORER = 101
+        const val CHOOSE_FROM_LIBRARY = 101
     }
 
     var isCameraEnabled: Boolean = isCameraEnabled
@@ -31,23 +31,23 @@ internal class VisualMediaHeaderAdapter constructor(
             notifyDataSetChanged()
         }
 
-    var isExplorerEnabled: Boolean = isExplorerEnabled
+    var isChooseFromLibraryEnabled: Boolean = isChooseFromLibraryEnabled
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
     private fun getItem(position: Int): FunctionalButton? {
-        return if (isCameraEnabled && isExplorerEnabled) {
+        return if (isCameraEnabled && isChooseFromLibraryEnabled) {
             when (position) {
                 0 -> FunctionalButton.camera()
-                1 -> FunctionalButton.explorer()
+                1 -> FunctionalButton.chooseFromLibrary()
                 else -> null
             }
         } else {
             when {
                 isCameraEnabled -> FunctionalButton.camera()
-                isExplorerEnabled -> FunctionalButton.explorer()
+                isChooseFromLibraryEnabled -> FunctionalButton.chooseFromLibrary()
                 else -> null
             }
         }
@@ -57,22 +57,22 @@ internal class VisualMediaHeaderAdapter constructor(
         val item = getItem(position)
         return when (item?.type) {
             FunctionalButton.Type.CAMERA -> ViewType.CAMERA
-            FunctionalButton.Type.EXPLORER -> ViewType.EXPLORER
+            FunctionalButton.Type.CHOOSE_FROM_LIBRARY -> ViewType.CHOOSE_FROM_LIBRARY
             else -> super.getItemViewType(position)
         }
     }
 
-    override fun getItemCount(): Int = if (isCameraEnabled && isExplorerEnabled) {
+    override fun getItemCount(): Int = if (isCameraEnabled && isChooseFromLibraryEnabled) {
         2
     } else {
-        if (isCameraEnabled || isExplorerEnabled) 1 else 0
+        if (isCameraEnabled || isChooseFromLibraryEnabled) 1 else 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.CAMERA ->
                 ViewHolder(parent.inflate(R.layout.bazaar_cell_functional_button_square))
-            ViewType.EXPLORER ->
+            ViewType.CHOOSE_FROM_LIBRARY ->
                 ViewHolder(parent.inflate(R.layout.bazaar_cell_functional_button_square))
             else ->
                 throw ViewHolderException(viewType)
@@ -99,8 +99,8 @@ internal class VisualMediaHeaderAdapter constructor(
             itemView.setOnClickListener {
                 if (functionalButton.type == FunctionalButton.Type.CAMERA) {
                     callback.onCameraClicked()
-                } else if (functionalButton.type == FunctionalButton.Type.EXPLORER) {
-                    callback.onExplorerClicked()
+                } else if (functionalButton.type == FunctionalButton.Type.CHOOSE_FROM_LIBRARY) {
+                    callback.onChooseFromLibraryClicked()
                 }
             }
         }
@@ -108,7 +108,7 @@ internal class VisualMediaHeaderAdapter constructor(
 
     interface Callback {
         fun onCameraClicked()
-        fun onExplorerClicked()
+        fun onChooseFromLibraryClicked()
     }
 
 }

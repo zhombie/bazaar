@@ -27,11 +27,11 @@ internal class AudiosAdapterManager  constructor(
 
     fun create(
         imageLoader: ImageLoader,
-        isExplorerEnabled: Boolean,
+        isChooseFromLibraryEnabled: Boolean,
         audiosHeaderAdapterCallback: AudiosHeaderAdapter.Callback,
         audiosAdapterCallback: AudiosAdapter.Callback
     ) {
-        audiosHeaderAdapter = AudiosHeaderAdapter(isExplorerEnabled, audiosHeaderAdapterCallback)
+        audiosHeaderAdapter = AudiosHeaderAdapter(isChooseFromLibraryEnabled, audiosHeaderAdapterCallback)
         audiosAdapter = AudiosAdapter(imageLoader, audiosAdapterCallback) { leftOffset ->
             itemDecoration?.decoratorLeftOffset = leftOffset
             recyclerView.invalidateItemDecorations()

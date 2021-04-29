@@ -25,13 +25,13 @@ internal class VisualMediaAdapterManager constructor(
     fun create(
         imageLoader: ImageLoader,
         isCameraEnabled: Boolean,
-        isExplorerEnabled: Boolean,
+        isChooseFromLibraryEnabled: Boolean,
         visualMediaHeaderAdapterCallback: VisualMediaHeaderAdapter.Callback,
         visualMediaAdapterCallback: VisualMediaAdapter.Callback
     ) {
         visualMediaHeaderAdapter = VisualMediaHeaderAdapter(
             isCameraEnabled = isCameraEnabled,
-            isExplorerEnabled = isExplorerEnabled,
+            isChooseFromLibraryEnabled = isChooseFromLibraryEnabled,
             callback = visualMediaHeaderAdapterCallback
         )
 
@@ -72,8 +72,8 @@ internal class VisualMediaAdapterManager constructor(
         visualMediaHeaderAdapter?.isCameraEnabled = isEnabled
     }
 
-    fun setExplorerEnabled(isEnabled: Boolean) {
-        visualMediaHeaderAdapter?.isExplorerEnabled = isEnabled
+    fun setChooseFromLibraryEnabled(isEnabled: Boolean) {
+        visualMediaHeaderAdapter?.isChooseFromLibraryEnabled = isEnabled
     }
 
     fun show() {

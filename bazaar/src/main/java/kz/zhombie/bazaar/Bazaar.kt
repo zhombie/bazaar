@@ -51,37 +51,42 @@ class Bazaar private constructor() {
         fun selectMode(
             context: Context,
             defaultMode: Mode = Mode.IMAGE,
+            amongModes: List<Mode> = listOf(Mode.IMAGE, Mode.VIDEO, Mode.AUDIO, Mode.DOCUMENT),
             callback: (mode: Mode) -> Unit
         ): AlertDialog? {
-            val items = arrayOf(
-                context.getString(R.string.bazaar_image),
-                context.getString(R.string.bazaar_video),
-                context.getString(R.string.bazaar_audio),
-                context.getString(R.string.bazaar_document)
-            )
+            val items = mutableListOf<String>()
 
-            val checkedItem = when (defaultMode) {
-                Mode.IMAGE -> 0
-                Mode.VIDEO -> 1
-                Mode.AUDIO -> 2
-                Mode.DOCUMENT -> 3
-                else -> 0
+            if (Mode.IMAGE in amongModes) {
+                items.add(context.getString(R.string.bazaar_image))
+            }
+            if (Mode.VIDEO in amongModes) {
+                items.add(context.getString(R.string.bazaar_video))
+            }
+            if (Mode.AUDIO in amongModes) {
+                items.add(context.getString(R.string.bazaar_audio))
+            }
+            if (Mode.DOCUMENT in amongModes) {
+                items.add(context.getString(R.string.bazaar_document))
+            }
+
+            var checkedItem = amongModes.indexOf(defaultMode)
+            if (checkedItem < 0) {
+                checkedItem = 0
             }
 
             return MaterialAlertDialogBuilder(context, R.style.Bazaar_AlertDialogTheme)
-                .setTitle(context.getString(R.string.bazaar_select_mode))
-                .setSingleChoiceItems(items, checkedItem) { dialog, which ->
+                .setTitle(context.getString(R.string.bazaar_mode_selection))
+                .setSingleChoiceItems(items.toTypedArray(), checkedItem) { dialog, which ->
                     dialog.dismiss()
 
-                    val mode = when (which) {
-                        0 -> Mode.IMAGE
-                        1 -> Mode.VIDEO
-                        2 -> Mode.AUDIO
-                        3 -> Mode.DOCUMENT
-                        else -> return@setSingleChoiceItems
+                    try {
+                        callback(amongModes[which])
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-
-                    callback(mode)
+                }
+                .setNegativeButton(R.string.bazaar_close) { dialog, _ ->
+                    dialog.dismiss()
                 }
                 .show()
         }

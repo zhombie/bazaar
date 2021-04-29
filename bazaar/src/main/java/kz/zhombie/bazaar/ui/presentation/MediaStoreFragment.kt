@@ -293,7 +293,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             visualMediaAdapterManager?.create(
                 imageLoader = Settings.getImageLoader(),
                 isCameraEnabled = viewModel.getSettings().isCameraShouldBeAvailable(),
-                isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                isChooseFromLibraryEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
                 visualMediaHeaderAdapterCallback = this,
                 visualMediaAdapterCallback = this
             )
@@ -305,7 +305,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             audiosAdapterManager = AudiosAdapterManager(requireContext(), recyclerView)
             audiosAdapterManager?.create(
                 imageLoader = Settings.getImageLoader(),
-                isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                isChooseFromLibraryEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
                 audiosHeaderAdapterCallback = this,
                 audiosAdapterCallback = this
             )
@@ -316,7 +316,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         if (documentsAdapterManager == null) {
             documentsAdapterManager = DocumentsAdapterManager(requireContext(), recyclerView)
             documentsAdapterManager?.create(
-                isExplorerEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                isChooseFromLibraryEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
                 documentsHeaderAdapterCallback = this,
                 documentsAdapterCallback = this
             )
@@ -586,7 +586,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.onCameraShotRequested()
     }
 
-    override fun onExplorerClicked() {
+    override fun onChooseFromLibraryClicked() {
         viewModel.onSelectLocalMediaRequested()
     }
 

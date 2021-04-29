@@ -25,11 +25,11 @@ internal class DocumentsAdapterManager constructor(
     private var itemDecoration: SpacingItemDecoration? = null
 
     fun create(
-        isExplorerEnabled: Boolean,
+        isChooseFromLibraryEnabled: Boolean,
         documentsHeaderAdapterCallback: DocumentsHeaderAdapter.Callback,
         documentsAdapterCallback: DocumentsAdapter.Callback
     ) {
-        documentsHeaderAdapter = DocumentsHeaderAdapter(isExplorerEnabled, documentsHeaderAdapterCallback)
+        documentsHeaderAdapter = DocumentsHeaderAdapter(isChooseFromLibraryEnabled, documentsHeaderAdapterCallback)
         documentsAdapter = DocumentsAdapter(documentsAdapterCallback)
 
         concatAdapter = ConcatAdapter(documentsHeaderAdapter, documentsAdapter)

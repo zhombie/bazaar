@@ -10,7 +10,7 @@ import kz.zhombie.bazaar.ui.model.FunctionalButton
 import kz.zhombie.bazaar.utils.inflate
 
 internal class DocumentsHeaderAdapter constructor(
-    isExplorerEnabled: Boolean,
+    isChooseFromLibraryEnabled: Boolean,
     private val callback: Callback
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -18,16 +18,16 @@ internal class DocumentsHeaderAdapter constructor(
         private val TAG: String = DocumentsHeaderAdapter::class.java.simpleName
     }
 
-    var isExplorerEnabled: Boolean = isExplorerEnabled
+    var isChooseFromLibraryEnabled: Boolean = isChooseFromLibraryEnabled
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
     private fun getItem(position: Int): FunctionalButton? {
-        return if (isExplorerEnabled) {
+        return if (isChooseFromLibraryEnabled) {
             when (position) {
-                0 -> FunctionalButton.explorer()
+                0 -> FunctionalButton.chooseFromLibrary()
                 else -> null
             }
         } else {
@@ -35,7 +35,7 @@ internal class DocumentsHeaderAdapter constructor(
         }
     }
 
-    override fun getItemCount(): Int = if (isExplorerEnabled) 1 else 0
+    override fun getItemCount(): Int = if (isChooseFromLibraryEnabled) 1 else 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ViewHolder(parent.inflate(R.layout.bazaar_cell_functional_button_horizontal))
@@ -59,15 +59,15 @@ internal class DocumentsHeaderAdapter constructor(
             titleView.setText(functionalButton.title)
 
             itemView.setOnClickListener {
-                if (functionalButton.type == FunctionalButton.Type.EXPLORER) {
-                    callback.onExplorerClicked()
+                if (functionalButton.type == FunctionalButton.Type.CHOOSE_FROM_LIBRARY) {
+                    callback.onChooseFromLibraryClicked()
                 }
             }
         }
     }
 
     interface Callback {
-        fun onExplorerClicked()
+        fun onChooseFromLibraryClicked()
     }
 
 }

@@ -19,14 +19,14 @@ internal class FunctionalButton private constructor(
             return FunctionalButton(Type.CAMERA, R.drawable.bazaar_ic_camera, R.string.bazaar_camera)
         }
 
-        fun explorer(): FunctionalButton {
-            return FunctionalButton(Type.EXPLORER, R.drawable.bazaar_ic_folder_yellow, R.string.bazaar_explorer)
+        fun chooseFromLibrary(): FunctionalButton {
+            return FunctionalButton(Type.CHOOSE_FROM_LIBRARY, R.drawable.bazaar_ic_folder_yellow, R.string.bazaar_choose_from_library)
         }
     }
 
     enum class Type {
         CAMERA,
-        EXPLORER
+        CHOOSE_FROM_LIBRARY
     }
 
 }
