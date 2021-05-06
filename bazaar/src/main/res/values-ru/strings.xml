@@ -30,9 +30,19 @@
         <item quantity="zero">Ничего не выбрано</item>
         <item quantity="one">Выбрано %d файл</item>
         <item quantity="two">Выбрано %d файла</item>
-        <item quantity="few">Выбрано %d файла</item>
+        <item quantity="few">Выбрано %d файла(-ов)</item>
         <item quantity="many">Выбрано %d файлов</item>
         <item quantity="other">Выбрано %d файлов</item>
+    </plurals>
+
+    <string name="bazaar_nothing_found">Ничего не найдено</string>
+    <plurals name="bazaar_folder_items" tools:ignore="UnusedQuantity">
+        <item quantity="zero">@string/bazaar_nothing_found</item>
+        <item quantity="one">%d элемент</item>
+        <item quantity="two">%d элемента</item>
+        <item quantity="few">%d элемента(-ов)</item>
+        <item quantity="many">%d элементов</item>
+        <item quantity="other">%d элементов</item>
     </plurals>
 
     <string name="bazaar_error_player">Возникла ошибка. Невозможно воспроизвести</string>

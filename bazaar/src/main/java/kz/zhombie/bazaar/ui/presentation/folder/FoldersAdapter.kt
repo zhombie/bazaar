@@ -113,7 +113,11 @@ internal class FoldersAdapter constructor(
 
             titleView.text = uiFolder.getDisplayName(itemView.context)
 
-            subtitleView.text = "Элементы: ${uiFolder.folder.size}"
+            subtitleView.text = if (uiFolder.folder.size == 0) {
+                itemView.context.getString(R.string.bazaar_nothing_found)
+            } else {
+                itemView.context.resources.getQuantityString(R.plurals.bazaar_folder_items, uiFolder.folder.size, uiFolder.folder.size)
+            }
 
             itemView.setOnClickListener { onFolderClicked(uiFolder) }
         }
@@ -135,7 +139,11 @@ internal class FoldersAdapter constructor(
 
             titleView.text = uiFolder.getDisplayName(itemView.context)
 
-            subtitleView.text = "Элементы: ${uiFolder.folder.size}"
+            subtitleView.text = if (uiFolder.folder.size == 0) {
+                itemView.context.getString(R.string.bazaar_nothing_found)
+            } else {
+                itemView.context.resources.getQuantityString(R.plurals.bazaar_folder_items, uiFolder.folder.size, uiFolder.folder.size)
+            }
 
             itemView.setOnClickListener { onFolderClicked(uiFolder) }
         }

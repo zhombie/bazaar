@@ -27,12 +27,22 @@
 
     <string name="bazaar_nothing_selected">Ешқандай файл таңдалмады</string>
     <plurals name="bazaar_selected_files_count" tools:ignore="UnusedQuantity">
-        <item quantity="zero">Ешқандай файл таңдалмады</item>
+        <item quantity="zero">@string/bazaar_nothing_selected</item>
         <item quantity="one">%d файл таңдалды</item>
         <item quantity="two">%d файл таңдалды</item>
         <item quantity="few">%d файл таңдалды</item>
         <item quantity="many">%d файл таңдалды</item>
         <item quantity="other">%d файл таңдалды</item>
+    </plurals>
+
+    <string name="bazaar_nothing_found">Ештеңе табылмады</string>
+    <plurals name="bazaar_folder_items" tools:ignore="UnusedQuantity">
+        <item quantity="zero">@string/bazaar_nothing_found</item>
+        <item quantity="one">%d дана</item>
+        <item quantity="two">%d дана</item>
+        <item quantity="few">%d дана</item>
+        <item quantity="many">%d дана</item>
+        <item quantity="other">%d дана</item>
     </plurals>
 
     <string name="bazaar_error_player">Қате. Орындау мүмкін емес</string>

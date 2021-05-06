@@ -27,13 +27,23 @@
 
     <string name="bazaar_nothing_selected">Nothing selected</string>
     <plurals name="bazaar_selected_files_count">
-        <item quantity="zero">Nothing selected</item>
+        <item quantity="zero">@string/bazaar_nothing_selected</item>
         <item quantity="one">%d file selected</item>
         <item quantity="two">%d files selected</item>
         <item quantity="few">%d files selected</item>
         <item quantity="many">%d files selected</item>
         <item quantity="other">%d files selected</item>
     </plurals>
-    
+
+    <string name="bazaar_nothing_found">Nothing found</string>
+    <plurals name="bazaar_folder_items">
+        <item quantity="zero">@string/bazaar_nothing_found</item>
+        <item quantity="one">%d item</item>
+        <item quantity="two">%d items</item>
+        <item quantity="few">%d items</item>
+        <item quantity="many">%d items</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
     <string name="bazaar_error_player">Error occurred. Unable to play</string>
 </resources>
