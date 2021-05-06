@@ -11,6 +11,8 @@
     <string name="bazaar_select">Выбрать</string>
     <string name="bazaar_close">Закрыть</string>
     <string name="bazaar_cancel">Отменить</string>
+    <string name="bazaar_take_picture">Сделать фото</string>
+    <string name="bazaar_take_video">Снять видео</string>
 
     <string name="bazaar_image">Фото</string>
     <string name="bazaar_video">Видео</string>
@@ -21,9 +23,7 @@
     <string name="bazaar_choose_from_library">Выбрать из библиотеки</string>
 
     <string name="bazaar_mode_selection">Выбор режима</string>
-
-    <string name="bazaar_take_picture">Сделать фото</string>
-    <string name="bazaar_take_video">Снять видео</string>
+    <string name="bazaar_action_selection">Выбор действия</string>
 
     <string name="bazaar_nothing_selected">Ничего не выбрано</string>
     <plurals name="bazaar_selected_files_count" tools:ignore="UnusedQuantity">

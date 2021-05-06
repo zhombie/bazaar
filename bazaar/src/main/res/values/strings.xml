@@ -11,6 +11,8 @@
     <string name="bazaar_select">Select</string>
     <string name="bazaar_close">Close</string>
     <string name="bazaar_cancel">Cancel</string>
+    <string name="bazaar_take_picture">Take picture</string>
+    <string name="bazaar_take_video">Take video</string>
 
     <string name="bazaar_image">Image</string>
     <string name="bazaar_video">Video</string>
@@ -21,9 +23,7 @@
     <string name="bazaar_choose_from_library">Choose from library</string>
 
     <string name="bazaar_mode_selection">Mode selection</string>
-
-    <string name="bazaar_take_picture">Take picture</string>
-    <string name="bazaar_take_video">Take video</string>
+    <string name="bazaar_action_selection">Action selection</string>
 
     <string name="bazaar_nothing_selected">Nothing selected</string>
     <plurals name="bazaar_selected_files_count">

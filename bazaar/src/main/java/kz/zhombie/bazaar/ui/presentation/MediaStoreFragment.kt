@@ -392,7 +392,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
                 is MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo -> {
                     MaterialAlertDialogBuilder(requireContext(), R.style.Bazaar_AlertDialogTheme)
-                        .setTitle("Выбор действия")
+                        .setTitle(R.string.bazaar_action_selection)
                         .setSingleChoiceItems(arrayOf(getString(R.string.bazaar_take_picture), getString(R.string.bazaar_take_video)), -1) { dialog, which ->
                             dialog.dismiss()
                             if (which == 0) {

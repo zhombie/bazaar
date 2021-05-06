@@ -131,6 +131,7 @@
 
     <kz.zhombie.bazaar.ui.components.view.SelectButton
         android:id="@+id/selectButton"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"

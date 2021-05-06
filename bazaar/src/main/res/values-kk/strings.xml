@@ -11,6 +11,8 @@
     <string name="bazaar_select">Таңдау</string>
     <string name="bazaar_close">Жабу</string>
     <string name="bazaar_cancel">Бас тарту</string>
+    <string name="bazaar_take_picture">Суретке түсіру</string>
+    <string name="bazaar_take_video">Бейне түсіру</string>
 
     <string name="bazaar_image">Сурет</string>
     <string name="bazaar_video">Бейне</string>
@@ -21,9 +23,7 @@
     <string name="bazaar_choose_from_library">Құрылғыдан таңдау</string>
 
     <string name="bazaar_mode_selection">Режимді таңдау</string>
-
-    <string name="bazaar_take_picture">Суретке түсіру</string>
-    <string name="bazaar_take_video">Бейне түсіру</string>
+    <string name="bazaar_action_selection">Іс-қимылды таңдау</string>
 
     <string name="bazaar_nothing_selected">Ешқандай файл таңдалмады</string>
     <plurals name="bazaar_selected_files_count" tools:ignore="UnusedQuantity">
