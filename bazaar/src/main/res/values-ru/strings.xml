@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="bazaar_all_images">Все фото</string>
+    <string name="bazaar_all_videos">Все видео</string>
+    <string name="bazaar_all_media">Все медиа</string>
+    <string name="bazaar_all_audios">Все аудио</string>
+    <string name="bazaar_all_documents">Все документы</string>
+
+    <string name="bazaar_current_folder">Текущая папка</string>
+
+    <string name="bazaar_select">Выбрать</string>
     <string name="bazaar_close">Закрыть</string>
     <string name="bazaar_cancel">Отменить</string>
 
@@ -15,6 +24,16 @@
 
     <string name="bazaar_take_picture">Сделать фото</string>
     <string name="bazaar_take_video">Снять видео</string>
+
+    <string name="bazaar_nothing_selected">Ничего не выбрано</string>
+    <plurals name="bazaar_selected_files_count" tools:ignore="UnusedQuantity">
+        <item quantity="zero">Ничего не выбрано</item>
+        <item quantity="one">Выбрано %d файл</item>
+        <item quantity="two">Выбрано %d файла</item>
+        <item quantity="few">Выбрано %d файла</item>
+        <item quantity="many">Выбрано %d файлов</item>
+        <item quantity="other">Выбрано %d файлов</item>
+    </plurals>
 
     <string name="bazaar_error_player">Возникла ошибка. Невозможно воспроизвести</string>
 </resources>

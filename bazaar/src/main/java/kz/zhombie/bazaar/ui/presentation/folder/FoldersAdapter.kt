@@ -111,7 +111,7 @@ internal class FoldersAdapter constructor(
                 }
             }
 
-            titleView.text = uiFolder.folder.displayName
+            titleView.text = uiFolder.getDisplayName(itemView.context)
 
             subtitleView.text = "Элементы: ${uiFolder.folder.size}"
 
@@ -133,7 +133,7 @@ internal class FoldersAdapter constructor(
                 }
             }
 
-            titleView.text = uiFolder.folder.displayName
+            titleView.text = uiFolder.getDisplayName(itemView.context)
 
             subtitleView.text = "Элементы: ${uiFolder.folder.size}"
 

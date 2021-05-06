@@ -274,7 +274,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun setupHeaderView() {
-        headerView.setTitle("Все медиа")
+        headerView.setTitle(R.string.bazaar_all_media)
 
         headerView.setOnTitleButtonClickListener {
             viewModel.onHeaderViewTitleClicked()
@@ -324,7 +324,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
-        selectButton.setText(title = "Выбрать", subtitle = "Выбрано $selectedMediaCount файл(-ов)")
+        selectButton.setText(
+            title = getString(R.string.bazaar_select),
+            subtitle = if (selectedMediaCount == 0) {
+                getString(R.string.bazaar_nothing_selected)
+            } else {
+                resources.getQuantityString(R.plurals.bazaar_selected_files_count, selectedMediaCount, selectedMediaCount)
+            }
+        )
 
         if (!selectButton.hasOnClickListeners()) {
             selectButton.setOnClickListener {
@@ -574,7 +581,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     private fun observeActiveFolder() {
         viewModel.getActiveFolder().observe(viewLifecycleOwner, { uiFolder ->
-            headerView.setTitle(uiFolder.folder.displayName)
+            val displayName = uiFolder.getDisplayName(requireContext())
+            headerView.setTitle(displayName)
         })
     }
 

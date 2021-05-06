@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="bazaar_all_images">All images</string>
+    <string name="bazaar_all_videos">All videos</string>
+    <string name="bazaar_all_media">All media</string>
+    <string name="bazaar_all_audios">All audios</string>
+    <string name="bazaar_all_documents">All documents</string>
+
+    <string name="bazaar_current_folder">Current folder</string>
+
+    <string name="bazaar_select">Select</string>
     <string name="bazaar_close">Close</string>
     <string name="bazaar_cancel">Cancel</string>
 
@@ -16,5 +25,15 @@
     <string name="bazaar_take_picture">Take picture</string>
     <string name="bazaar_take_video">Take video</string>
 
+    <string name="bazaar_nothing_selected">Nothing selected</string>
+    <plurals name="bazaar_selected_files_count">
+        <item quantity="zero">Nothing selected</item>
+        <item quantity="one">%d file selected</item>
+        <item quantity="two">%d files selected</item>
+        <item quantity="few">%d files selected</item>
+        <item quantity="many">%d files selected</item>
+        <item quantity="other">%d files selected</item>
+    </plurals>
+    
     <string name="bazaar_error_player">Error occurred. Unable to play</string>
 </resources>

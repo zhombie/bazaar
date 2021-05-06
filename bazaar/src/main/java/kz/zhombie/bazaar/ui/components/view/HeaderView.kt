@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -111,6 +112,10 @@ class HeaderView @JvmOverloads constructor(
         view.layoutParams = layoutParams
         view.setBackgroundColor(Color.parseColor("#B6BDC6"))
         return view
+    }
+
+    fun setTitle(@StringRes title: Int) {
+        titleButton.setTitle(title)
     }
 
     fun setTitle(title: String) {

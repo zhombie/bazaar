@@ -6,6 +6,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.widget.LinearLayout
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
@@ -75,8 +76,12 @@ class HeaderViewTitleButton @JvmOverloads constructor(
         textView.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
         textView.setTextColor(ContextCompat.getColor(context, R.color.bazaar_metal))
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11F)
-        textView.text = "Текущий альбом"
+        textView.setText(R.string.bazaar_current_folder)
         return textView
+    }
+
+    fun setTitle(@StringRes title: Int) {
+        titleTextView.setText(title)
     }
 
     fun setTitle(title: String) {

@@ -12,9 +12,11 @@ import kz.zhombie.bazaar.api.model.*
 import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
+import kz.zhombie.bazaar.ui.model.*
 import kz.zhombie.bazaar.ui.model.UIFolder
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.onlyImages
 import kotlin.reflect.KClass
 
 internal class MediaStoreViewModel : ViewModel() {
@@ -160,63 +162,17 @@ internal class MediaStoreViewModel : ViewModel() {
             }
 
             val defaultFolder = when (settings.mode) {
-                Mode.IMAGE ->
-                    UIFolder(
-                        Folder(
-                            id = UIFolder.ALL_MEDIA_ID,
-                            displayName = "Все фото",
-                            items = uiMultimedia.mapNotNull {
-                                if (it is UIMedia && it.isImage()) it.media else null
-                            }
-                        )
-                    )
-                Mode.VIDEO ->
-                    UIFolder(
-                        Folder(
-                            id = UIFolder.ALL_MEDIA_ID,
-                            displayName = "Все видео",
-                            items = uiMultimedia.mapNotNull {
-                                if (it is UIMedia && it.isVideo()) it.media else null
-                            }
-                        )
-                    )
-                Mode.IMAGE_AND_VIDEO ->
-                    UIFolder(
-                        Folder(
-                            id = UIFolder.ALL_MEDIA_ID,
-                            displayName = "Все медиа",
-                            items = uiMultimedia.mapNotNull {
-                                if (it is UIMedia && it.isImageOrVideo()) it.media else null
-                            }
-                        )
-                    )
-                Mode.AUDIO ->
-                    UIFolder(
-                        Folder(
-                            id = UIFolder.ALL_MEDIA_ID,
-                            displayName = "Все аудио",
-                            items = uiMultimedia.mapNotNull { if (it.isAudio()) it.multimedia else null }
-                        )
-                    )
-                Mode.DOCUMENT ->
-                    UIFolder(
-                        Folder(
-                            id = UIFolder.ALL_MEDIA_ID,
-                            displayName = "Все документы",
-                            items = uiMultimedia.mapNotNull { if (it.isDocument()) it.multimedia else null }
-                        )
-                    )
+                Mode.IMAGE -> uiMultimedia.onlyImages()
+                Mode.VIDEO -> uiMultimedia.onlyVideos()
+                Mode.IMAGE_AND_VIDEO -> uiMultimedia.onlyMedia()
+                Mode.AUDIO -> uiMultimedia.onlyAudios()
+                Mode.DOCUMENT -> uiMultimedia.onlyDocuments()
             }
 
             activeFolder.postValue(defaultFolder)
             displayedMedia.postValue(uiMultimedia)
 
-            val folders = multimedia.mapNotNull { media ->
-                val folderId = media.folderId ?: return@mapNotNull null
-                val folderDisplayName = media.folderDisplayName ?: return@mapNotNull null
-                val items = uiMultimedia.mapNotNull { if (it.multimedia.folderId == folderId) it.multimedia else null }
-                UIFolder(Folder(id = folderId, displayName = folderDisplayName, items = items))
-            }
+            val folders = uiMultimedia.convert(multimedia)
                 .distinctBy { it.folder.id }
                 .sortedBy { it.folder.displayName }
                 .toMutableList()

@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     private var maxSelectionCount: Int = 3
 
     private lateinit var adapter: MediaResultAdapter
+
+    private var dialogFragment: BottomSheetDialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,7 +154,9 @@ class MainActivity : AppCompatActivity(), ResultCallback {
             if (checkPermissions()) {
                 if (mode == null) {
                     Bazaar.selectMode(this) { mode ->
-                        Bazaar.Builder(object : AbstractResultCallback {
+                        dialogFragment?.dismiss()
+                        dialogFragment = null
+                        dialogFragment = Bazaar.Builder(object : AbstractResultCallback {
                             override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
                                 Log.d(TAG, "multimedia: $multimedia")
                                 adapter.multimedia = multimedia
@@ -181,7 +186,9 @@ class MainActivity : AppCompatActivity(), ResultCallback {
                             .show(supportFragmentManager)
                     }
                 } else {
-                    Bazaar.Builder(object : AbstractResultCallback {
+                    dialogFragment?.dismiss()
+                    dialogFragment = null
+                    dialogFragment = Bazaar.Builder(object : AbstractResultCallback {
                         override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
                             Log.d(TAG, "multimedia: $multimedia")
                             adapter.multimedia = multimedia

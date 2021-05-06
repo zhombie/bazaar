@@ -4,7 +4,7 @@ import android.net.Uri
 
 data class Folder constructor(
     val id: Long,
-    val displayName: String,
+    val displayName: String? = null,
     val items: List<Multimedia>
 ) {
 

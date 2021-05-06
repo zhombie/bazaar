@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="bazaar_all_images">Барлық суреттер</string>
+    <string name="bazaar_all_videos">Барлық бейнелер</string>
+    <string name="bazaar_all_media">Барлық медиа</string>
+    <string name="bazaar_all_audios">Барлық аудио</string>
+    <string name="bazaar_all_documents">Барлық құжаттар</string>
+
+    <string name="bazaar_current_folder">Ағымдағы бума</string>
+
+    <string name="bazaar_select">Таңдау</string>
     <string name="bazaar_close">Жабу</string>
     <string name="bazaar_cancel">Бас тарту</string>
 
@@ -15,6 +24,16 @@
 
     <string name="bazaar_take_picture">Суретке түсіру</string>
     <string name="bazaar_take_video">Бейне түсіру</string>
+
+    <string name="bazaar_nothing_selected">Ешқандай файл таңдалмады</string>
+    <plurals name="bazaar_selected_files_count" tools:ignore="UnusedQuantity">
+        <item quantity="zero">Ешқандай файл таңдалмады</item>
+        <item quantity="one">%d файл таңдалды</item>
+        <item quantity="two">%d файл таңдалды</item>
+        <item quantity="few">%d файл таңдалды</item>
+        <item quantity="many">%d файл таңдалды</item>
+        <item quantity="other">%d файл таңдалды</item>
+    </plurals>
 
     <string name="bazaar_error_player">Қате. Орындау мүмкін емес</string>
 </resources>
