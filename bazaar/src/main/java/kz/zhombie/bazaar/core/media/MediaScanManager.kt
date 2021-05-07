@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.*
@@ -428,7 +429,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             if (image == null) return@withContext null
 
-            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(image).title) ?: return@withContext null)
+            val file = (uri.transformLocalContentToFile(Environment.DIRECTORY_PICTURES, dispatcher, requireNotNull(image).title) ?: return@withContext null)
 
             Logger.d(TAG, "Created local file: $file")
 
@@ -517,7 +518,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             if (video == null) return@withContext null
 
-            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(video).title) ?: return@withContext null)
+            val file = (uri.transformLocalContentToFile(Environment.DIRECTORY_MOVIES, dispatcher, requireNotNull(video).title) ?: return@withContext null)
 
             Logger.d(TAG, "Created local file: $file")
 
@@ -587,7 +588,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             if (audio == null) return@withContext null
 
-            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(audio).title) ?: return@withContext null)
+            val file = (uri.transformLocalContentToFile(Environment.DIRECTORY_MUSIC, dispatcher, requireNotNull(audio).title) ?: return@withContext null)
 
             Logger.d(TAG, "Created local file: $file")
 
@@ -671,7 +672,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             if (document == null) return@withContext null
 
-            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(document).title) ?: return@withContext null)
+            val file = (uri.transformLocalContentToFile(Environment.DIRECTORY_DOCUMENTS, dispatcher, requireNotNull(document).title) ?: return@withContext null)
 
             Logger.d(TAG, "Created local file: $file")
 
@@ -713,6 +714,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     }
 
     private suspend fun Uri.transformLocalContentToFile(
+        type: String,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         filename: String
     ): File? = withContext(dispatcher + exceptionHandler) {
@@ -722,7 +724,8 @@ internal class MediaScanManager constructor(private val context: Context) {
         var file: File? = null
 
         runCatching {
-            file = File(context.cacheDir, filename)
+            file = File(context.getExternalFilesDir(type), filename)
+//            file = File(context.cacheDir, filename)
 
             Logger.d(TAG, "Create local file [$file] with name $filename")
 

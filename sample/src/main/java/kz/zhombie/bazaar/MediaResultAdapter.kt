@@ -3,11 +3,13 @@ package kz.zhombie.bazaar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.model.*
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 class MediaResultAdapter constructor(
@@ -123,6 +125,28 @@ MIME type: ${multimedia.mimeType}
                     """.trim()
                 }
                 else -> {
+                }
+            }
+
+            itemView.setOnClickListener {
+                val path = multimedia.path
+                val file = if (!path.isNullOrBlank()) File(path) else null
+                when (val openFile = file?.open(itemView.context)) {
+                    is OpenFile.Success -> {
+                        if (!openFile.tryToLaunch(itemView.context)) {
+                            Toast.makeText(itemView.context, "error_file_cannot_be_read", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    is OpenFile.Error -> {
+                        when (openFile.type) {
+                            OpenFile.Error.Type.UNKNOWN -> {
+                                Toast.makeText(itemView.context, "error_file_cannot_be_read", Toast.LENGTH_SHORT).show()
+                            }
+                            OpenFile.Error.Type.FILE_DOES_NOT_EXIST -> {
+                                Toast.makeText(itemView.context, "not_found", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
             }
         }
