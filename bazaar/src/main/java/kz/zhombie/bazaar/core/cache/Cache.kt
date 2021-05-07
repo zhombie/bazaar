@@ -1,5 +1,6 @@
 package kz.zhombie.bazaar.core.cache
 
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.model.Media
@@ -23,6 +24,10 @@ internal class Cache private constructor() {
 
     private var multimedia: MutableList<Multimedia>? = null
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
+
     private fun ensureMultimediaExistence() {
         if (multimedia == null) {
             multimedia = mutableListOf()
@@ -33,12 +38,12 @@ internal class Cache private constructor() {
         return multimedia.isNullOrEmpty()
     }
 
-    suspend fun getMultimedia(): List<Multimedia>? = withContext(Dispatchers.IO) {
+    suspend fun getMultimedia(): List<Multimedia>? = withContext(Dispatchers.Default + exceptionHandler) {
         Logger.d(TAG, "getMultimedia() -> multimedia: ${multimedia?.size}")
         return@withContext multimedia
     }
 
-    suspend fun setMultimedia(multimedia: List<Multimedia>) = withContext(Dispatchers.Default) {
+    suspend fun setMultimedia(multimedia: List<Multimedia>) = withContext(Dispatchers.Default + exceptionHandler) {
         Logger.d(TAG, "setMultimedia() -> multimedia: ${multimedia.size}")
         ensureMultimediaExistence()
         multimedia.forEach {
@@ -46,18 +51,18 @@ internal class Cache private constructor() {
         }
     }
 
-    suspend fun getMedia(): List<Media>? = withContext(Dispatchers.IO) {
+    suspend fun getMedia(): List<Media>? = withContext(Dispatchers.Default + exceptionHandler) {
         val media = multimedia?.filterIsInstance<Media>()
         Logger.d(TAG, "getMedia() -> media: ${media?.size}")
         return@withContext media
     }
 
-    suspend fun setMedia(media: List<Media>) = withContext(Dispatchers.Default) {
+    suspend fun setMedia(media: List<Media>) = withContext(Dispatchers.Default + exceptionHandler) {
         Logger.d(TAG, "setMedia() -> media: ${media.size}")
         setMultimedia(media)
     }
 
-    suspend fun clear(): Boolean = withContext(Dispatchers.IO) {
+    suspend fun clear(): Boolean = withContext(Dispatchers.IO + exceptionHandler) {
         multimedia?.clear()
         multimedia = null
 
