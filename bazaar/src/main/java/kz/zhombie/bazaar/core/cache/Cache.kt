@@ -38,12 +38,12 @@ internal class Cache private constructor() {
         return multimedia.isNullOrEmpty()
     }
 
-    suspend fun getMultimedia(): List<Multimedia>? = withContext(Dispatchers.Default + exceptionHandler) {
+    suspend fun getMultimedia(): List<Multimedia>? = withContext(Dispatchers.IO + exceptionHandler) {
         Logger.d(TAG, "getMultimedia() -> multimedia: ${multimedia?.size}")
         return@withContext multimedia
     }
 
-    suspend fun setMultimedia(multimedia: List<Multimedia>) = withContext(Dispatchers.Default + exceptionHandler) {
+    suspend fun setMultimedia(multimedia: List<Multimedia>) = withContext(Dispatchers.IO + exceptionHandler) {
         Logger.d(TAG, "setMultimedia() -> multimedia: ${multimedia.size}")
         ensureMultimediaExistence()
         multimedia.forEach {
@@ -51,13 +51,13 @@ internal class Cache private constructor() {
         }
     }
 
-    suspend fun getMedia(): List<Media>? = withContext(Dispatchers.Default + exceptionHandler) {
+    suspend fun getMedia(): List<Media>? = withContext(Dispatchers.IO + exceptionHandler) {
         val media = multimedia?.filterIsInstance<Media>()
         Logger.d(TAG, "getMedia() -> media: ${media?.size}")
         return@withContext media
     }
 
-    suspend fun setMedia(media: List<Media>) = withContext(Dispatchers.Default + exceptionHandler) {
+    suspend fun setMedia(media: List<Media>) = withContext(Dispatchers.IO + exceptionHandler) {
         Logger.d(TAG, "setMedia() -> media: ${media.size}")
         setMultimedia(media)
     }
