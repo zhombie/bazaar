@@ -527,7 +527,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
                 // Empty value
                 is MediaStoreScreen.Action.Empty -> {
-                    Toast.makeText(context, "Произошла ошибка при выборе медиафайлов", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.bazaar_error_media_selection, Toast.LENGTH_SHORT).show()
                     dismiss()
                 }
                 else -> {
@@ -809,7 +809,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         if (path.isNullOrBlank()) {
             toast?.cancel()
             toast = null
-            toast = Toast.makeText(requireContext(), "Не получилось найти файл", Toast.LENGTH_SHORT)
+            toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
             toast?.show()
             return
         }
@@ -819,14 +819,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 if (!openFile.tryToLaunch(requireContext())) {
                     toast?.cancel()
                     toast = null
-                    toast = Toast.makeText(requireContext(), "Не получилось открыть файл", Toast.LENGTH_SHORT)
+                    toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
                     toast?.show()
                 }
             }
             is OpenFile.Error -> {
                 toast?.cancel()
                 toast = null
-                toast = Toast.makeText(requireContext(), "Не получилось открыть файл", Toast.LENGTH_SHORT)
+                toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
                 toast?.show()
             }
         }

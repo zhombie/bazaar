@@ -45,5 +45,7 @@
         <item quantity="other">%d элементов</item>
     </plurals>
 
+    <string name="bazaar_error_media_selection">Произошла ошибка при выборе медиафайлов</string>
+    <string name="bazaar_error_file_not_found">Не получилось найти файл</string>
     <string name="bazaar_error_player">Возникла ошибка. Невозможно воспроизвести</string>
 </resources>

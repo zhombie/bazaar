@@ -45,5 +45,7 @@
         <item quantity="other">%d дана</item>
     </plurals>
 
+    <string name="bazaar_error_media_selection">Медиа файлдарды таңдау кезінде қателік орын алды</string>
+    <string name="bazaar_error_file_not_found">Файл табылмады</string>
     <string name="bazaar_error_player">Қате. Орындау мүмкін емес</string>
 </resources>
