@@ -242,9 +242,9 @@ internal suspend fun Cursor.readAudio(): Audio? = withContext(Dispatchers.IO) {
 }
 
 
-internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
+internal fun Cursor.readOpenableImage(uri: Uri, filename: String, extension: String? = null): Image? {
     return try {
-        var displayName = file.name
+        var displayName = filename
         var size: Long = 0
         if (moveToFirst()) {
             displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
@@ -257,10 +257,10 @@ internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
             title = displayName,
             displayName = displayName,
             mimeType = null,
-            extension = file.getExtension(),
+            extension = extension,
             size = size,
             dateAdded = 0,
-            dateModified = file.lastModified(),
+            dateModified = System.currentTimeMillis(),
             dateCreated = 0,
             thumbnail = null,
             folderId = null,
@@ -276,9 +276,9 @@ internal fun Cursor.readOpenableImage(uri: Uri, file: File): Image? {
 }
 
 
-internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
+internal fun Cursor.readOpenableVideo(uri: Uri, filename: String, extension: String? = null): Video? {
     return try {
-        var displayName = file.name
+        var displayName = filename
         var size: Long = 0
         if (moveToFirst()) {
             displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
@@ -291,10 +291,10 @@ internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
             title = displayName,
             displayName = displayName,
             mimeType = null,
-            extension = null,
+            extension = extension,
             size = size,
             dateAdded = 0,
-            dateModified = file.lastModified(),
+            dateModified = System.currentTimeMillis(),
             dateCreated = 0,
             thumbnail = null,
             folderId = null,
@@ -310,9 +310,9 @@ internal fun Cursor.readOpenableVideo(uri: Uri, file: File): Video? {
 }
 
 
-internal fun Cursor.readOpenableAudio(uri: Uri, file: File): Audio? {
+internal fun Cursor.readOpenableAudio(uri: Uri, filename: String, extension: String? = null): Audio? {
     return try {
-        var displayName = file.name
+        var displayName = filename
         var size: Long = 0
         if (moveToFirst()) {
             displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
@@ -325,10 +325,10 @@ internal fun Cursor.readOpenableAudio(uri: Uri, file: File): Audio? {
             title = displayName,
             displayName = displayName,
             mimeType = null,
-            extension = null,
+            extension = extension,
             size = size,
             dateAdded = 0,
-            dateModified = file.lastModified(),
+            dateModified = System.currentTimeMillis(),
             dateCreated = 0,
             thumbnail = null,
             folderId = null,
@@ -342,9 +342,9 @@ internal fun Cursor.readOpenableAudio(uri: Uri, file: File): Audio? {
 }
 
 
-internal fun Cursor.readOpenableDocument(uri: Uri, file: File): Document? {
+internal fun Cursor.readOpenableDocument(uri: Uri, filename: String, extension: String? = null): Document? {
     return try {
-        var displayName = file.name
+        var displayName = filename
         var size: Long = 0
         if (moveToFirst()) {
             displayName = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
@@ -357,10 +357,10 @@ internal fun Cursor.readOpenableDocument(uri: Uri, file: File): Document? {
             title = displayName,
             displayName = displayName,
             mimeType = null,
-            extension = file.getExtension(),
+            extension = extension,
             size = size,
             dateAdded = 0,
-            dateModified = file.lastModified(),
+            dateModified = System.currentTimeMillis(),
             dateCreated = 0,
             thumbnail = null,
             folderId = null,

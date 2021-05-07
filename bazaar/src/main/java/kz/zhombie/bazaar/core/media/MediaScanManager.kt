@@ -414,7 +414,6 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Create new file from uri (content://...)
             val filename = createImageFilename()
-            val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
 
             // Retrieve local info from MediaStore
             val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -422,8 +421,16 @@ internal class MediaScanManager constructor(private val context: Context) {
             context.contentResolver
                 ?.query(uri, projection, null, null, null)
                 ?.use { cursor ->
-                    image = cursor.readOpenableImage(uri, file)
+                    image = cursor.readOpenableImage(uri, filename.removeSuffix(".") + ".jpg", "jpg")
                 }
+
+            Logger.d(TAG, "Scanned by MediaStore: $image")
+
+            if (image == null) return@withContext null
+
+            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(image).title) ?: return@withContext null)
+
+            Logger.d(TAG, "Created local file: $file")
 
             // Set file path
             image = image?.copy(path = file.absolutePath)
@@ -496,9 +503,6 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Create new file from uri (content://...)
             val filename = createVideoFilename()
-            val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
-
-            Logger.d(TAG, "Created local file: $file")
 
             // Retrieve local info from MediaStore
             val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -506,10 +510,16 @@ internal class MediaScanManager constructor(private val context: Context) {
             context.contentResolver
                 ?.query(uri, projection, null, null, null)
                 ?.use { cursor ->
-                    video = cursor.readOpenableVideo(uri, file)
+                    video = cursor.readOpenableVideo(uri, filename.removeSuffix(".") + ".mp4", "mp4")
                 }
 
             Logger.d(TAG, "Scanned by MediaStore: $video")
+
+            if (video == null) return@withContext null
+
+            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(video).title) ?: return@withContext null)
+
+            Logger.d(TAG, "Created local file: $file")
 
             // Set file path
             video = video?.copy(path = file.absolutePath)
@@ -563,9 +573,6 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Create new file from uri (content://...)
             val filename = createAudioFilename()
-            val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
-
-            Logger.d(TAG, "Created local file: $file")
 
             // Retrieve local info from MediaStore
             val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -573,10 +580,16 @@ internal class MediaScanManager constructor(private val context: Context) {
             context.contentResolver
                 ?.query(uri, projection, null, null, null)
                 ?.use { cursor ->
-                    audio = cursor.readOpenableAudio(uri, file)
+                    audio = cursor.readOpenableAudio(uri, filename.removeSuffix(".") + ".mp3", "mp3")
                 }
 
             Logger.d(TAG, "Scanned by MediaStore: $audio")
+
+            if (audio == null) return@withContext null
+
+            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(audio).title) ?: return@withContext null)
+
+            Logger.d(TAG, "Created local file: $file")
 
             // Set file path
             audio = audio?.copy(path = file.absolutePath)
@@ -646,7 +659,6 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Create new file from uri (content://...)
             val filename = createDocumentFilename()
-            val file = (uri.transformLocalContentToFile(dispatcher, filename) ?: return@withContext null)
 
             // Retrieve local info from MediaStore
             val projection = ContentResolverCompat.getOpenableContentProjection()
@@ -654,8 +666,14 @@ internal class MediaScanManager constructor(private val context: Context) {
             context.contentResolver
                 ?.query(uri, projection, null, null, null)
                 ?.use { cursor ->
-                    document = cursor.readOpenableDocument(uri, file)
+                    document = cursor.readOpenableDocument(uri, filename)
                 }
+
+            if (document == null) return@withContext null
+
+            val file = (uri.transformLocalContentToFile(dispatcher, requireNotNull(document).title) ?: return@withContext null)
+
+            Logger.d(TAG, "Created local file: $file")
 
             // Set file path
             document = document?.copy(path = file.absolutePath)
