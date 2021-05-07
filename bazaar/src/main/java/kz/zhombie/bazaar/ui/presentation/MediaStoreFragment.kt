@@ -453,7 +453,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
                 // Local media image or video selection
                 is MediaStoreScreen.Action.SelectLocalMediaImageOrVideo -> {
-                    getLocalMediaImageOrVideo.launch(arrayOf("image/*, video/*"))
+                    getLocalMediaImageOrVideo.launch(arrayOf("image/*", "video/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaImageOrVideoResult -> {
                     resultCallback?.onLocalMediaStoreResult(action.media)
@@ -461,7 +461,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
                 // Multiple local media images and videos selection
                 is MediaStoreScreen.Action.SelectLocalMediaImagesAndVideos -> {
-                    getLocalMediaImagesAndVideos.launch(arrayOf("image/*, video/*"))
+                    getLocalMediaImagesAndVideos.launch(arrayOf("image/*", "video/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaImagesAndVideosResult -> {
                     resultCallback?.onLocalMediaStoreResult(action.media)
