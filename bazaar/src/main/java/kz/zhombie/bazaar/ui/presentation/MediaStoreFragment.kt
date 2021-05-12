@@ -47,7 +47,9 @@ import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.openFile
 import kz.zhombie.bazaar.utils.windowHeight
 import kz.zhombie.cinema.CinemaDialogFragment
+import kz.zhombie.cinema.model.Movie
 import kz.zhombie.museum.MuseumDialogFragment
+import kz.zhombie.museum.model.Painting
 import kz.zhombie.radio.Radio
 import java.io.File
 import java.util.*
@@ -81,6 +83,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private lateinit var rootView: ConstraintLayout
     private lateinit var headerView: HeaderView
     private lateinit var audioPlayerViewStub: ViewStub
+    private var contentView: RecyclerView? = null
     private var audioPlayerViewStubInflatedView: View? = null
     private var playOrPauseButton: MaterialButton? = null
     private var titleView: MaterialTextView? = null
@@ -221,7 +224,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         rootView = view.findViewById(R.id.rootView)
         headerView = view.findViewById(R.id.headerView)
         audioPlayerViewStub = view.findViewById(R.id.audioPlayerViewStub)
-        val contentView = view.findViewById<RecyclerView>(R.id.contentView)
+        contentView = view.findViewById(R.id.contentView)
         selectButton = view.findViewById(R.id.selectButton)
         val foldersView = view.findViewById<RecyclerView>(R.id.foldersView)
         progressView = view.findViewById(R.id.progressView)
@@ -230,10 +233,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         setupHeaderView()
         setupInfoView()
 
-        when {
-            viewModel.getSettings().isVisualMediaMode() -> setupVisualMediaView(contentView)
-            viewModel.getSettings().isAudibleMediaMode() -> setupAudiosView(contentView)
-            viewModel.getSettings().isDocumentMode() -> setupDocumentsView(contentView)
+        contentView?.let { contentView ->
+            when {
+                viewModel.getSettings().isVisualMediaMode() -> setupVisualMediaView(contentView)
+                viewModel.getSettings().isAudibleMediaMode() -> setupAudiosView(contentView)
+                viewModel.getSettings().isDocumentMode() -> setupDocumentsView(contentView)
+            }
         }
 
         setupSelectButton(selectedMediaCount = 0)
@@ -606,22 +611,15 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         dialogFragment?.dismiss()
         dialogFragment = null
         dialogFragment = MuseumDialogFragment.Builder()
-            .setArtworkLoader(Settings.getImageLoader())
-            .setArtworkView(imageView)
-            .setUri(uiMedia.media.uri)
-            .setTitle(uiMedia.getDisplayTitle())
-            .setSubtitle(uiMedia.media.folderDisplayName)
-            .setStartViewPosition(imageView)
+            .setPaintingLoader(Settings.getImageLoader())
+            .setPainting(
+                Painting(
+                    uri = uiMedia.media.uri,
+                    info = Painting.Info(uiMedia.getDisplayTitle(), uiMedia.media.folderDisplayName)
+                )
+            )
+            .setImageView(imageView)
             .setFooterViewEnabled(true)
-            .setCallback(object : MuseumDialogFragment.Callback {
-                override fun onPictureShow(delay: Long) {
-                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, 0)
-                }
-
-                override fun onPictureHide(delay: Long) {
-                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, false, delay)
-                }
-            })
             .show(childFragmentManager)
     }
 
@@ -633,21 +631,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         dialogFragment?.dismiss()
         dialogFragment = null
         dialogFragment = CinemaDialogFragment.Builder()
+            .setMovie(
+                Movie(
+                    uri = uiMedia.media.uri,
+                    info = Movie.Info(uiMedia.getDisplayTitle(), uiMedia.media.folderDisplayName)
+                )
+            )
             .setScreenView(imageView)
-            .setUri(uiMedia.media.uri)
-            .setTitle(uiMedia.getDisplayTitle())
-            .setSubtitle(uiMedia.media.folderDisplayName)
-            .setStartViewPosition(imageView)
             .setFooterViewEnabled(true)
-            .setCallback(object : CinemaDialogFragment.Callback {
-                override fun onMovieShow(delay: Long) {
-                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, true, 0)
-                }
-
-                override fun onMovieHide(delay: Long) {
-                    viewModel.onPreviewPictureVisibilityChange(uiMedia.media.id, false, delay)
-                }
-            })
             .show(childFragmentManager)
     }
 

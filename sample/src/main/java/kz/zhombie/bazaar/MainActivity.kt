@@ -25,6 +25,8 @@ import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
 import kz.zhombie.bazaar.api.result.ResultCallback
+import kz.zhombie.cinema.CinemaDialogFragment
+import kz.zhombie.museum.MuseumDialogFragment
 
 class MainActivity : AppCompatActivity(), ResultCallback {
 
@@ -77,6 +79,8 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         imageLoader = defaultImageLoader.second
         imageLoaderView.text = defaultImageLoader.first
 
+        MuseumDialogFragment.init(imageLoader, true)
+        CinemaDialogFragment.init(true)
         Bazaar.init(imageLoader, true)
 
         mode = Mode.IMAGE_AND_VIDEO

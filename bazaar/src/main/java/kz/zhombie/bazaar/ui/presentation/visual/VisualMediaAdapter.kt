@@ -238,6 +238,7 @@ internal class VisualMediaAdapter constructor(
         }
 
         fun toggleVisibility(uiMedia: UIMedia) {
+            return
             if (uiMedia.isVisible) {
                 if (imageView.visibility != View.VISIBLE) {
                     imageView.visibility = View.VISIBLE
@@ -273,7 +274,7 @@ internal class VisualMediaAdapter constructor(
 
             val displayDuration = uiMedia.getDisplayDuration()
             textView?.text = if (displayDuration.isNullOrBlank()) {
-                "Видео"
+                itemView.context.getString(R.string.bazaar_video)
             } else {
                 displayDuration
             }
@@ -342,6 +343,7 @@ internal class VisualMediaAdapter constructor(
         }
 
         fun toggleVisibility(uiMedia: UIMedia) {
+            return
             if (uiMedia.isVisible) {
                 if (imageView.visibility != View.VISIBLE) {
                     imageView.visibility = View.VISIBLE

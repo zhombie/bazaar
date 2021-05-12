@@ -42,4 +42,7 @@ class GlideImageLoader : ImageLoader {
             .into(imageView)
     }
 
+    override fun dispose(imageView: ImageView) {
+    }
+
 }
