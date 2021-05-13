@@ -5,16 +5,13 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.core.media.model.AudioMetadata
 import kz.zhombie.bazaar.core.media.model.VideoMetadata
 import java.io.FileNotFoundException
 
-internal suspend fun Uri?.retrieveAudioMetadata(
-    context: Context,
-    dispatcher: CoroutineDispatcher
-): AudioMetadata? = withContext(dispatcher) {
+internal suspend fun Uri?.retrieveAudioMetadata(context: Context, ): AudioMetadata? = withContext(Dispatchers.IO) {
     if (this@retrieveAudioMetadata == null) return@withContext null
     try {
         @Suppress("BlockingMethodInNonBlockingContext")
@@ -40,10 +37,7 @@ internal suspend fun Uri?.retrieveAudioMetadata(
 }
 
 
-internal suspend fun Uri?.retrieveVideoMetadata(
-    context: Context,
-    dispatcher: CoroutineDispatcher
-): VideoMetadata? = withContext(dispatcher) {
+internal suspend fun Uri?.retrieveVideoMetadata(context: Context): VideoMetadata? = withContext(Dispatchers.IO) {
     if (this@retrieveVideoMetadata == null) return@withContext null
     try {
         @Suppress("BlockingMethodInNonBlockingContext")
