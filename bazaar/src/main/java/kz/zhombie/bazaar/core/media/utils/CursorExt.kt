@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kz.zhombie.bazaar.api.model.*
 import kz.zhombie.bazaar.utils.getExtension
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 internal suspend fun Cursor.readImage(context: Context): Image? = withContext(Dispatchers.IO) {

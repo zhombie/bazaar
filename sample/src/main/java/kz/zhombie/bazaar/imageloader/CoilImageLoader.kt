@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar
+package kz.zhombie.bazaar.imageloader
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,6 +22,8 @@ import coil.size.Scale
 import coil.size.ViewSizeResolver
 import coil.util.CoilUtils
 import coil.util.DebugLogger
+import kz.zhombie.bazaar.BuildConfig
+import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.museum.component.CircularProgressDrawable
 
@@ -178,7 +180,10 @@ class CoilImageLoader constructor(private val context: Context) : ImageLoader {
         }
 
         circularProgressDrawable.stop()
+
         imageLoader.memoryCache.clear()
+
+        hashMap.forEach { it.value.dispose() }
         hashMap.clear()
     }
 

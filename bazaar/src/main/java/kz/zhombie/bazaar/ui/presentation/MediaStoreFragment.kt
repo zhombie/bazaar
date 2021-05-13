@@ -41,10 +41,9 @@ import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaAdapterManager
 import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaHeaderAdapter
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIMultimedia
-import kz.zhombie.bazaar.utils.OpenFile
+import kz.zhombie.bazaar.utils.*
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
-import kz.zhombie.bazaar.utils.openFile
 import kz.zhombie.bazaar.utils.windowHeight
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.cinema.model.Movie
@@ -805,16 +804,16 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             return
         }
         val file = File(path)
-        when (val openFile = file.openFile(requireContext())) {
-            is OpenFile.Success -> {
-                if (!openFile.tryToLaunch(requireContext())) {
+        when (val action = file.open(requireContext())) {
+            is OpenFileAction.Success -> {
+                if (!action.tryToLaunch(requireContext())) {
                     toast?.cancel()
                     toast = null
                     toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
                     toast?.show()
                 }
             }
-            is OpenFile.Error -> {
+            is OpenFileAction.Error -> {
                 toast?.cancel()
                 toast = null
                 toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
