@@ -788,7 +788,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         return context.contentResolver?.getType(this) ?: default
     }
 
-    suspend fun decodeFile(
+    suspend fun decodeImageFile(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         image: Image
     ): Image = withContext(dispatcher + exceptionHandler) {

@@ -17,23 +17,20 @@ internal object MediaStoreScreen {
     ) : Serializable {
 
         fun isCameraShouldBeAvailable(): Boolean {
-            return if (isVisualMediaMode()) {
-                cameraSettings.isAnyCameraActionEnabled
-            } else {
-                false
+            return when (mode) {
+                Mode.IMAGE ->
+                    cameraSettings.isPhotoShootEnabled
+                Mode.VIDEO ->
+                    cameraSettings.isVideoCaptureEnabled
+                Mode.IMAGE_AND_VIDEO ->
+                    cameraSettings.isPhotoShootEnabled || cameraSettings.isVideoCaptureEnabled
+                else ->
+                    false
             }
         }
 
         fun isVisualMediaMode(): Boolean {
             return mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO
-        }
-
-        fun isAudibleMediaMode(): Boolean {
-            return mode == Mode.AUDIO
-        }
-
-        fun isDocumentMode(): Boolean {
-            return mode == Mode.DOCUMENT
         }
 
     }

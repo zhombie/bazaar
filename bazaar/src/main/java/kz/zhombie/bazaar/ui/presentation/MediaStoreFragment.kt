@@ -22,6 +22,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.result.ResultCallback
@@ -44,6 +45,7 @@ import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.utils.*
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
+import kz.zhombie.bazaar.utils.contract.TakeVideoContract
 import kz.zhombie.bazaar.utils.windowHeight
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.cinema.model.Movie
@@ -181,7 +183,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
                 if (viewModel.getSettings().isVisualMediaMode()) {
                     visualMediaAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
-                } else if (viewModel.getSettings().isAudibleMediaMode()){
+                } else if (viewModel.getSettings().mode == Mode.AUDIO){
                     audiosAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
                 }
 
@@ -235,8 +237,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         contentView?.let { contentView ->
             when {
                 viewModel.getSettings().isVisualMediaMode() -> setupVisualMediaView(contentView)
-                viewModel.getSettings().isAudibleMediaMode() -> setupAudiosView(contentView)
-                viewModel.getSettings().isDocumentMode() -> setupDocumentsView(contentView)
+                viewModel.getSettings().mode == Mode.AUDIO -> setupAudiosView(contentView)
+                viewModel.getSettings().mode == Mode.DOCUMENT -> setupDocumentsView(contentView)
             }
         }
 
@@ -348,7 +350,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         foldersAdapterManager = FoldersAdapterManager(requireContext(), recyclerView)
         foldersAdapterManager?.hide()
         foldersAdapterManager?.create(
-            type = if (viewModel.getSettings().isAudibleMediaMode()) {
+            type = if (viewModel.getSettings().mode == Mode.AUDIO) {
                 FoldersAdapterManager.Type.LIST
             } else {
                 FoldersAdapterManager.Type.GRID
@@ -551,7 +553,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { uiMultimedia: List<UIMultimedia> ->
             if (viewModel.getSettings().isVisualMediaMode()) {
                 visualMediaAdapterManager?.submitList(uiMultimedia)
-            } else if (viewModel.getSettings().isAudibleMediaMode()) {
+            } else if (viewModel.getSettings().mode == Mode.AUDIO) {
                 audiosAdapterManager?.submitList(uiMultimedia)
             }
         })
@@ -576,7 +578,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
                 if (viewModel.getSettings().isVisualMediaMode()) {
                     visualMediaAdapterManager?.scrollToTop()
-                } else if (viewModel.getSettings().isAudibleMediaMode()) {
+                } else if (viewModel.getSettings().mode == Mode.AUDIO) {
                     audiosAdapterManager?.scrollToTop()
                 }
             }
@@ -839,9 +841,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.onPictureTaken(isSuccess)
     }
 
-    private val takeVideo = registerForActivityResult(ActivityResultContracts.TakeVideo()) { bitmap ->
-        Logger.d(TAG, "bitmap: $bitmap")
-        viewModel.onVideoTaken(bitmap)
+    private val takeVideo = registerForActivityResult(TakeVideoContract()) { uri ->
+        Logger.d(TAG, "uri: $uri")
+        viewModel.onVideoTaken(uri)
     }
 
     private val getLocalMediaImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->

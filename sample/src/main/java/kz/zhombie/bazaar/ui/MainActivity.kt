@@ -261,72 +261,47 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         viewHolder?.showButton?.setOnClickListener {
             if (checkPermissions()) {
                 if (mode == null) {
-                    Bazaar.selectMode(this) { mode ->
-                        dialogFragment?.dismiss()
-                        dialogFragment = null
-                        dialogFragment = Bazaar.Builder(object : AbstractResultCallback {
-                            override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
-                                Log.d(TAG, "multimedia: $multimedia")
-                                adapter?.multimedia = multimedia
-                            }
-
-                            override fun onMediaSelectResult(media: List<Media>) {
-                                Log.d(TAG, "media: $media")
-                                adapter?.multimedia = media
-                            }
-                        })
-                            .setTag(Bazaar.TAG)
-                            .setMode(mode)
-                            .setEventListener(object : EventListener {
-                                override fun onDestroy() {
-                                    Log.d(TAG, "onDestroy()")
-                                }
-                            })
-                            .setMaxSelectionCount(maxSelectionCount)
-                            .setCameraSettings(
-                                CameraSettings(
-                                    isPhotoShootEnabled = true,
-                                    isVideoCaptureEnabled = true
-                                )
-                            )
-                            .setLocalMediaSearchAndSelectEnabled(true)
-                            .setFoldersBasedInterfaceEnabled(true)
-                            .show(supportFragmentManager)
+                    Bazaar.selectMode(this) { selectedMode ->
+                        launchBazaar(selectedMode)
                     }
                 } else {
-                    dialogFragment?.dismiss()
-                    dialogFragment = null
-                    dialogFragment = Bazaar.Builder(object : AbstractResultCallback {
-                        override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
-                            Log.d(TAG, "multimedia: $multimedia")
-                            adapter?.multimedia = multimedia
-                        }
-
-                        override fun onMediaSelectResult(media: List<Media>) {
-                            Log.d(TAG, "media: $media")
-                            adapter?.multimedia = media
-                        }
-                    })
-                        .setTag(Bazaar.TAG)
-                        .setMode(requireNotNull(mode))
-                        .setEventListener(object : EventListener {
-                            override fun onDestroy() {
-                                Log.d(TAG, "onDestroy()")
-                            }
-                        })
-                        .setMaxSelectionCount(maxSelectionCount)
-                        .setCameraSettings(
-                            CameraSettings(
-                                isPhotoShootEnabled = true,
-                                isVideoCaptureEnabled = true
-                            )
-                        )
-                        .setLocalMediaSearchAndSelectEnabled(true)
-                        .setFoldersBasedInterfaceEnabled(true)
-                        .show(supportFragmentManager)
+                    launchBazaar(requireNotNull(mode))
                 }
             }
         }
+    }
+
+    private fun launchBazaar(mode: Mode) {
+        dialogFragment?.dismiss()
+        dialogFragment = null
+        dialogFragment = Bazaar.Builder(object : AbstractResultCallback {
+            override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
+                Log.d(TAG, "multimedia: $multimedia")
+                adapter?.multimedia = multimedia
+            }
+
+            override fun onMediaSelectResult(media: List<Media>) {
+                Log.d(TAG, "media: $media")
+                adapter?.multimedia = media
+            }
+        })
+            .setTag(Bazaar.TAG)
+            .setMode(mode)
+            .setEventListener(object : EventListener {
+                override fun onDestroy() {
+                    Log.d(TAG, "onDestroy()")
+                }
+            })
+            .setMaxSelectionCount(maxSelectionCount)
+            .setCameraSettings(
+                CameraSettings(
+                    isPhotoShootEnabled = true,
+                    isVideoCaptureEnabled = true
+                )
+            )
+            .setLocalMediaSearchAndSelectEnabled(true)
+            .setFoldersBasedInterfaceEnabled(true)
+            .show(supportFragmentManager)
     }
 
     /**

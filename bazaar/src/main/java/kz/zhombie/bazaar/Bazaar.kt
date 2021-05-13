@@ -133,11 +133,7 @@ class Bazaar private constructor() {
         }
 
         fun setCameraDisabled(): Builder {
-            if (mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO) {
-                this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
-            } else {
-                this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
-            }
+            this.cameraSettings = CameraSettings(isPhotoShootEnabled = false, isVideoCaptureEnabled = false)
             return this
         }
 
