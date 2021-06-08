@@ -56,7 +56,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.3.1'
 
     // RecyclerView
-    implementation  'androidx.recyclerview:recyclerview:1.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     // Cinema, Museum, Radio (Video, image fullscreen preview & audio player, respectively).
     // Radio is an audio player.
@@ -76,5 +76,5 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 
     // WorkManager
-    implementation 'androidx.work:work-runtime-ktx:2.7.0-alpha03'
+    implementation 'androidx.work:work-runtime-ktx:2.7.0-alpha04'
 }

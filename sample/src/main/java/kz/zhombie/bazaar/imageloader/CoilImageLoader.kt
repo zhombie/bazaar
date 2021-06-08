@@ -79,7 +79,7 @@ class CoilImageLoader constructor(private val context: Context) : ImageLoader {
     override fun loadSmallImage(context: Context, imageView: ImageView, uri: Uri) {
         Log.d(TAG, "loadSmallImage() -> imageView: $imageView")
 
-        val request = ImageRequest.Builder(context)
+        ImageRequest.Builder(context)
             .bitmapConfig(Bitmap.Config.ARGB_8888)
             .crossfade(false)
             .data(uri)
@@ -90,12 +90,11 @@ class CoilImageLoader constructor(private val context: Context) : ImageLoader {
             .size(300, 300)
             .target(imageView)
             .build()
-
-        hashMap[imageView] = imageLoader.enqueue(request)
+            .hashMap(imageView)
     }
 
     override fun loadSmallImage(context: Context, imageView: ImageView, bitmap: Bitmap) {
-        val request = ImageRequest.Builder(context)
+        ImageRequest.Builder(context)
             .bitmapConfig(Bitmap.Config.ARGB_8888)
             .crossfade(false)
             .data(bitmap)
@@ -106,8 +105,7 @@ class CoilImageLoader constructor(private val context: Context) : ImageLoader {
             .size(300, 300)
             .target(imageView)
             .build()
-
-        hashMap[imageView] = imageLoader.enqueue(request)
+            .hashMap(imageView)
     }
 
     override fun loadFullscreenImage(context: Context, imageView: ImageView, uri: Uri) {
@@ -125,7 +123,7 @@ class CoilImageLoader constructor(private val context: Context) : ImageLoader {
             }
         }
 
-        val request = ImageRequest.Builder(context)
+        ImageRequest.Builder(context)
             .bitmapConfig(Bitmap.Config.ARGB_8888)
             .crossfade(false)
             .data(uri)
@@ -154,8 +152,11 @@ class CoilImageLoader constructor(private val context: Context) : ImageLoader {
             )
             .target(imageView)
             .build()
+            .hashMap(imageView)
+    }
 
-        hashMap[imageView] = imageLoader.enqueue(request)
+    private fun ImageRequest.hashMap(imageView: ImageView) {
+        hashMap[imageView] = imageLoader.enqueue(this)
     }
 
     override fun dispose(imageView: ImageView) {

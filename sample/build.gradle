@@ -85,9 +85,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
     // Coil
-    implementation 'io.coil-kt:coil:1.2.1'
-    implementation 'io.coil-kt:coil-gif:1.2.1'
-    implementation 'io.coil-kt:coil-video:1.2.1'
+    implementation 'io.coil-kt:coil:1.2.2'
+    implementation 'io.coil-kt:coil-gif:1.2.2'
+    implementation 'io.coil-kt:coil-video:1.2.2'
 
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'

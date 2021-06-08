@@ -69,8 +69,10 @@ internal class FoldersAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (type) {
-            Type.SQUARE -> SquareViewHolder(parent.inflate(R.layout.bazaar_cell_folder_square))
-            Type.RECTANGLE -> RectangleViewHolder(parent.inflate(R.layout.bazaar_cell_folder_rectangle))
+            Type.SQUARE ->
+                SquareViewHolder(parent.inflate(R.layout.bazaar_cell_folder_square))
+            Type.RECTANGLE ->
+                RectangleViewHolder(parent.inflate(R.layout.bazaar_cell_folder_rectangle))
         }
     }
 
@@ -82,8 +84,16 @@ internal class FoldersAdapter constructor(
         }
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        if (holder is SquareViewHolder) {
+            imageLoader.dispose(holder.imageView)
+        } else if (holder is RectangleViewHolder) {
+            imageLoader.dispose(holder.imageView)
+        }
+    }
+
     private inner class SquareViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        private val imageView = view.findViewById<SquareImageView>(R.id.imageView)
+        val imageView: SquareImageView = view.findViewById(R.id.imageView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
 
@@ -125,7 +135,7 @@ internal class FoldersAdapter constructor(
     }
 
     private inner class RectangleViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
+        val imageView: ShapeableImageView = view.findViewById(R.id.imageView)
         private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)

@@ -152,8 +152,16 @@ internal class VisualMediaAdapter constructor(
         }
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        if (holder is ImageViewHolder) {
+            imageLoader.dispose(holder.imageView)
+        } else if (holder is VideoViewHolder) {
+            imageLoader.dispose(holder.imageView)
+        }
+    }
+
     private inner class ImageViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        private val imageView: SquareImageView = view.findViewById(R.id.imageView)
+        val imageView: SquareImageView = view.findViewById(R.id.imageView)
         private val checkBoxButton: CheckBoxButton = view.findViewById(R.id.checkBoxButton)
 
         fun bind(uiMedia: UIMedia) {
@@ -252,7 +260,7 @@ internal class VisualMediaAdapter constructor(
     }
 
     private inner class VideoViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        private val imageView: SquareImageView = view.findViewById(R.id.imageView)
+        val imageView: SquareImageView = view.findViewById(R.id.imageView)
         private val checkBoxButton: CheckBoxButton = view.findViewById(R.id.checkBoxButton)
         private val textView = view.findViewById<MaterialTextView>(R.id.textView)
 
