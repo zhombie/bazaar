@@ -60,9 +60,9 @@ dependencies {
 
     // Cinema, Museum, Radio (Video, image fullscreen preview & audio player, respectively).
     // Radio is an audio player.
-    api 'com.github.zhombie.arbat:cinema:1.2.3'
-    api 'com.github.zhombie.arbat:museum:1.2.3'
-    implementation 'com.github.zhombie.arbat:radio:1.2.3'
+    api 'com.github.zhombie.arbat:cinema:1.2.4'
+    api 'com.github.zhombie.arbat:museum:1.2.4'
+    implementation 'com.github.zhombie.arbat:radio:1.2.4'
 
     // ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer-core:2.14.0'
