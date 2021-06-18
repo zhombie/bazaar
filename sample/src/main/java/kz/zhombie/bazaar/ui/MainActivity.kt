@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.*
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,6 +18,7 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.core.showSafely
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.model.Media
 import kz.zhombie.bazaar.api.model.Multimedia
@@ -53,8 +53,6 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     private var viewHolder: ViewHolder? = null
 
     private var adapter: MultimediaResultAdapter? = null
-
-    private var dialogFragment: BottomSheetDialogFragment? = null
 
     private var mode: Mode? = null
         set(value) {
@@ -142,9 +140,6 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         adapter = null
 
         viewHolder = null
-
-        dialogFragment?.dismiss()
-        dialogFragment = null
     }
 
     private fun setup() {
@@ -272,9 +267,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun launchBazaar(mode: Mode) {
-        dialogFragment?.dismiss()
-        dialogFragment = null
-        dialogFragment = Bazaar.Builder(object : AbstractResultCallback {
+        Bazaar.Builder(object : AbstractResultCallback {
             override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
                 Log.d(TAG, "multimedia: $multimedia")
                 adapter?.multimedia = multimedia
@@ -301,7 +294,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
             )
             .setLocalMediaSearchAndSelectEnabled(true)
             .setFoldersBasedInterfaceEnabled(true)
-            .show(supportFragmentManager)
+            .showSafely(supportFragmentManager)
     }
 
     /**
