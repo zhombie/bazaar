@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -30,6 +29,8 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
+import kz.zhombie.bazaar.ui.model.UIMedia
+import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapter
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapterManager
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosHeaderAdapter
@@ -40,13 +41,10 @@ import kz.zhombie.bazaar.ui.presentation.folder.FoldersAdapterManager
 import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaAdapter
 import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaAdapterManager
 import kz.zhombie.bazaar.ui.presentation.visual.VisualMediaHeaderAdapter
-import kz.zhombie.bazaar.ui.model.UIMedia
-import kz.zhombie.bazaar.ui.model.UIMultimedia
 import kz.zhombie.bazaar.utils.*
 import kz.zhombie.bazaar.utils.contract.GetContentContract
 import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.contract.TakeVideoContract
-import kz.zhombie.bazaar.utils.windowHeight
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.cinema.model.Movie
 import kz.zhombie.museum.MuseumDialogFragment
@@ -96,10 +94,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     // ViewModel
     private lateinit var viewModel: MediaStoreViewModel
-
-    // UI interface floating messages
-    private var dialogFragment: DialogFragment? = null
-    private var toast: Toast? = null
 
     // RecyclerView Adapters
     private var foldersAdapterManager: FoldersAdapterManager? = null
@@ -277,6 +271,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         super.onDestroy()
 
         eventListener?.onDestroy()
+        eventListener = null
     }
 
     private fun setupHeaderView() {
@@ -609,19 +604,20 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        dialogFragment?.dismiss()
-        dialogFragment = null
-        dialogFragment = MuseumDialogFragment.Builder()
+        MuseumDialogFragment.Builder()
             .setPaintingLoader(Settings.getImageLoader())
             .setPainting(
                 Painting(
                     uri = uiMedia.media.uri,
-                    info = Painting.Info(uiMedia.getDisplayTitle(), uiMedia.media.folderDisplayName)
+                    info = Painting.Info(
+                        title = uiMedia.getDisplayTitle(),
+                        subtitle = uiMedia.media.folderDisplayName
+                    )
                 )
             )
             .setImageView(imageView)
             .setFooterViewEnabled(true)
-            .show(childFragmentManager)
+            .showSafely(childFragmentManager)
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
@@ -629,18 +625,19 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        dialogFragment?.dismiss()
-        dialogFragment = null
-        dialogFragment = CinemaDialogFragment.Builder()
+        CinemaDialogFragment.Builder()
             .setMovie(
                 Movie(
                     uri = uiMedia.media.uri,
-                    info = Movie.Info(uiMedia.getDisplayTitle(), uiMedia.media.folderDisplayName)
+                    info = Movie.Info(
+                        title = uiMedia.getDisplayTitle(),
+                        subtitle = uiMedia.media.folderDisplayName
+                    )
                 )
             )
             .setScreenView(imageView)
             .setFooterViewEnabled(true)
-            .show(childFragmentManager)
+            .showSafely(childFragmentManager)
     }
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
@@ -739,10 +736,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         }
 
                         override fun onPlayerError(cause: Throwable?) {
-                            toast?.cancel()
-                            toast = null
-                            toast = Toast.makeText(context, R.string.bazaar_error_player, Toast.LENGTH_SHORT)
-                            toast?.show()
+                            Toast.makeText(context, R.string.bazaar_error_player, Toast.LENGTH_SHORT).show()
                         }
                     })
                     .also { viewLifecycleOwner.lifecycle.addObserver(it) }
@@ -799,27 +793,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     override fun onDocumentIconClicked(uiMultimedia: UIMultimedia) {
         val path = uiMultimedia.multimedia.path
         if (path.isNullOrBlank()) {
-            toast?.cancel()
-            toast = null
-            toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
-            toast?.show()
-            return
+            return Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
         }
         val file = File(path)
         when (val action = file.open(requireContext())) {
             is OpenFileAction.Success -> {
                 if (!action.tryToLaunch(requireContext())) {
-                    toast?.cancel()
-                    toast = null
-                    toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
-                    toast?.show()
+                    Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
                 }
             }
             is OpenFileAction.Error -> {
-                toast?.cancel()
-                toast = null
-                toast = Toast.makeText(requireContext(), R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT)
-                toast?.show()
+                Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
             }
         }
     }
