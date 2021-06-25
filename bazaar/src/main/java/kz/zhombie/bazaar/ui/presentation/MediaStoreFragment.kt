@@ -153,10 +153,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         val dialog = super.onCreateDialog(savedInstanceState)
 
         dialog.setOnShowListener {
-            if (dialog is BottomSheetDialog) {
+            if (dialog !is BottomSheetDialog) return@setOnShowListener
+
+            dialog.setOnShowListener {
                 val bottomSheet = dialog.findViewById<ViewGroup>(com.google.android.material.R.id.design_bottom_sheet) ?: return@setOnShowListener
                 bottomSheet.updateLayoutParams<ViewGroup.LayoutParams> {
-                    height = getBottomSheetDialogDefaultHeight()
+                    getBottomSheetDialogDefaultHeight()?.let {
+                        height = it
+                    }
                 }
 
                 expandedHeight = bottomSheet.layoutParams.height
@@ -209,9 +213,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.bazaar_fragment_media_store, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.bazaar_fragment_media_store, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -813,8 +815,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     // Calculates height for 90% of fullscreen
-    private fun getBottomSheetDialogDefaultHeight(): Int {
-        return requireView().windowHeight * 90 / 100
+    private fun getBottomSheetDialogDefaultHeight(): Int? {
+        return view?.let { it.windowHeight * 90 / 100 }
     }
 
     /**
