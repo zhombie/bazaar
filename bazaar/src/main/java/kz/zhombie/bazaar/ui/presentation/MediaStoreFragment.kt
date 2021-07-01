@@ -155,38 +155,37 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         dialog.setOnShowListener {
             if (dialog !is BottomSheetDialog) return@setOnShowListener
 
-            dialog.setOnShowListener {
-                val bottomSheet = dialog.findViewById<ViewGroup>(com.google.android.material.R.id.design_bottom_sheet) ?: return@setOnShowListener
-                bottomSheet.updateLayoutParams<ViewGroup.LayoutParams> {
-                    getBottomSheetDialogDefaultHeight()?.let {
-                        height = it
-                    }
+            val bottomSheet = dialog.findViewById<ViewGroup>(com.google.android.material.R.id.design_bottom_sheet) ?: return@setOnShowListener
+
+            bottomSheet.updateLayoutParams<ViewGroup.LayoutParams> {
+                getBottomSheetDialogDefaultHeight()?.let {
+                    height = it
                 }
-
-                expandedHeight = bottomSheet.layoutParams.height
-                val peekHeight = (expandedHeight / 1.3F).roundToInt()
-
-                BottomSheetBehavior.from(bottomSheet).apply {
-                    state = BottomSheetBehavior.STATE_COLLAPSED
-                    setPeekHeight(peekHeight, false)
-                    skipCollapsed = false
-                    isHideable = true
-                }
-
-                buttonHeight = selectButton.height
-                collapsedMargin = peekHeight - buttonHeight
-                selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topMargin = collapsedMargin
-                }
-
-                if (viewModel.getSettings().isVisualMediaMode()) {
-                    visualMediaAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
-                } else if (viewModel.getSettings().mode == Mode.AUDIO){
-                    audiosAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
-                }
-
-                foldersAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
+
+            expandedHeight = bottomSheet.layoutParams.height
+            val peekHeight = (expandedHeight / 1.3F).roundToInt()
+
+            BottomSheetBehavior.from(bottomSheet).apply {
+                state = BottomSheetBehavior.STATE_COLLAPSED
+                setPeekHeight(peekHeight, false)
+                skipCollapsed = false
+                isHideable = true
+            }
+
+            buttonHeight = selectButton.height
+            collapsedMargin = peekHeight - buttonHeight
+            selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                topMargin = collapsedMargin
+            }
+
+            if (viewModel.getSettings().isVisualMediaMode()) {
+                visualMediaAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+            } else if (viewModel.getSettings().mode == Mode.AUDIO) {
+                audiosAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
+            }
+
+            foldersAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
         }
 
         if (dialog is BottomSheetDialog) {

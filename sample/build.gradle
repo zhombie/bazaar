@@ -77,10 +77,10 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.2.3'
 
     // Jetpack Core
-    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation 'androidx.core:core-ktx:1.6.0'
 
     // AppCompat
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.4.0-alpha03'
 
     // Material components
     implementation 'com.google.android.material:material:1.4.0-rc01'
