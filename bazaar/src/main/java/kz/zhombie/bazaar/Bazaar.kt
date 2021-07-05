@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.core.worker.MediaSyncWorker
@@ -22,7 +21,7 @@ class Bazaar private constructor() {
         val TAG: String = Bazaar::class.java.simpleName
 
         fun init(imageLoader: ImageLoader, isLoggingEnabled: Boolean) {
-            Settings.setImageLoader(imageLoader)
+            Settings.setPermanentImageLoader(imageLoader)
             Settings.setLoggingEnabled(isLoggingEnabled)
         }
 
@@ -167,12 +166,8 @@ class Bazaar private constructor() {
         }
 
         fun show(fragmentManager: FragmentManager): BottomSheetDialogFragment {
-            if (Settings.hasImageLoader()) {
-                imageLoader?.let { imageLoader ->
-                    Settings.setImageLoader(imageLoader)
-                }
-            } else {
-                Settings.setImageLoader(requireNotNull(imageLoader) { ImageLoaderNullException() })
+            imageLoader?.let {
+                Settings.setTemporaryImageLoader(it)
             }
 
             require(maxSelectionCount in 1..10) { "Max selection count MUST be between 1 & 10" }

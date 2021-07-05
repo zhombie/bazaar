@@ -271,6 +271,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
         super.onDestroy()
 
+        Settings.cleanupTemporarySettings()
+
         eventListener?.onDestroy()
         eventListener = null
     }
@@ -346,6 +348,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         foldersAdapterManager = FoldersAdapterManager(requireContext(), recyclerView)
         foldersAdapterManager?.hide()
         foldersAdapterManager?.create(
+            imageLoader = Settings.getImageLoader(),
             type = if (viewModel.getSettings().mode == Mode.AUDIO) {
                 FoldersAdapterManager.Type.LIST
             } else {
