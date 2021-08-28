@@ -20,7 +20,8 @@
         android:layout_width="@dimen/bazaar_big_checkbox_size"
         android:layout_height="@dimen/bazaar_big_checkbox_size"
         android:layout_gravity="top|end"
-        android:layout_margin="2.5dp"
+        android:layout_margin="7.5dp"
+        android:elevation="1dp"
         android:minHeight="@dimen/bazaar_big_checkbox_min_size"
         android:minWidth="@dimen/bazaar_big_checkbox_min_size"
         app:iconSize="@dimen/bazaar_big_checkbox_icon_size" />

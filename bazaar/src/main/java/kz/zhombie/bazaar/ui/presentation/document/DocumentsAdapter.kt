@@ -118,6 +118,10 @@ internal class DocumentsAdapter constructor(
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
         private val sizeView = view.findViewById<MaterialTextView>(R.id.sizeView)
 
+        init {
+            checkBoxButton.setCheckedDrawable()
+        }
+
         fun bind(uiMultimedia: UIMultimedia) {
             toggleSelectionAbility(uiMultimedia)
 

@@ -10,7 +10,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.shape.ShapeAppearanceModel
 import kz.zhombie.bazaar.R
 
-class CheckBoxButton @JvmOverloads constructor(
+internal class CheckBoxButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.materialButtonStyle
@@ -33,7 +33,7 @@ class CheckBoxButton @JvmOverloads constructor(
 
         text = null
 
-        setCheckedDrawable()
+        setUncheckedDrawable()
         iconGravity = ICON_GRAVITY_TEXT_END
         iconPadding = 0
         iconTint = null

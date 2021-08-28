@@ -43,11 +43,11 @@
 
     <dimen name="bazaar_folder_item_corner_radius">13dp</dimen>
 
-    <dimen name="bazaar_small_checkbox_size">33dp</dimen>
-    <dimen name="bazaar_small_checkbox_min_size">29dp</dimen>
-    <dimen name="bazaar_small_checkbox_icon_size">29dp</dimen>
+    <dimen name="bazaar_small_checkbox_size">20dp</dimen>
+    <dimen name="bazaar_small_checkbox_min_size">20dp</dimen>
+    <dimen name="bazaar_small_checkbox_icon_size">20dp</dimen>
 
-    <dimen name="bazaar_big_checkbox_size">43dp</dimen>
-    <dimen name="bazaar_big_checkbox_min_size">33dp</dimen>
-    <dimen name="bazaar_big_checkbox_icon_size">33dp</dimen>
+    <dimen name="bazaar_big_checkbox_size">25dp</dimen>
+    <dimen name="bazaar_big_checkbox_min_size">25dp</dimen>
+    <dimen name="bazaar_big_checkbox_icon_size">25dp</dimen>
 </resources>

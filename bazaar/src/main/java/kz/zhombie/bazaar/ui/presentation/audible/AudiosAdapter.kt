@@ -192,6 +192,10 @@ internal class AudiosAdapter constructor(
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
         private val durationView = view.findViewById<MaterialTextView>(R.id.durationView)
 
+        init {
+            checkBoxButton.setCheckedDrawable()
+        }
+
         fun bind(uiMultimedia: UIMultimedia) {
 //            Logger.d(TAG, "uiMultimedia: $uiMultimedia")
 

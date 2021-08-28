@@ -49,6 +49,8 @@
             android:layout_width="@dimen/bazaar_small_checkbox_size"
             android:layout_height="@dimen/bazaar_small_checkbox_size"
             android:layout_gravity="bottom|end"
+            android:layout_margin="7.5dp"
+            android:elevation="1dp"
             android:minHeight="@dimen/bazaar_small_checkbox_min_size"
             android:minWidth="@dimen/bazaar_small_checkbox_min_size"
             app:iconSize="@dimen/bazaar_small_checkbox_icon_size" />
