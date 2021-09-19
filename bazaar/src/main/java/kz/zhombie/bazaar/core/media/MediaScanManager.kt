@@ -31,7 +31,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     companion object {
         private val TAG: String = MediaScanManager::class.java.simpleName
 
-        private const val DEFAULT_LOCAL_LOAD_LIMIT = 500
+        private const val DEFAULT_LOCAL_LOAD_LIMIT = 250
 
         private const val REQUIRED_IMAGE_WIDTH = 512
 
@@ -409,7 +409,10 @@ internal class MediaScanManager constructor(private val context: Context) {
             Logger.d(TAG, "Created local file: $file")
 
             // Set file
-            image = image?.copy(localFile = Content.LocalFile(file.toUri()))
+            image = image?.copy(
+                properties = image?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                localFile = Content.LocalFile(file.toUri())
+            )
 
             // Retrieve additional metadata from bitmap
 //            val imageScale = decodeScaledBitmap(uri)
@@ -479,7 +482,10 @@ internal class MediaScanManager constructor(private val context: Context) {
             Logger.d(TAG, "Created local file: $file")
 
             // Set file
-            video = video?.copy(localFile = Content.LocalFile(file.toUri()))
+            video = video?.copy(
+                properties = video?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                localFile = Content.LocalFile(file.toUri())
+            )
 
             // Retrieve additional metadata from uri
             val metadata = video?.uri.retrieveVideoMetadata(context)
@@ -540,7 +546,10 @@ internal class MediaScanManager constructor(private val context: Context) {
             Logger.d(TAG, "Created local file: $file")
 
             // Set file
-            audio = audio?.copy(localFile = Content.LocalFile(file.toUri()))
+            audio = audio?.copy(
+                properties = audio?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                localFile = Content.LocalFile(file.toUri())
+            )
 
             // Retrieve additional metadata from uri
             val metadata = audio?.uri.retrieveAudioMetadata(context)
@@ -606,7 +615,10 @@ internal class MediaScanManager constructor(private val context: Context) {
             Logger.d(TAG, "Created local file: $file")
 
             // Set file
-            document = document?.copy(localFile = Content.LocalFile(file.toUri()))
+            document = document?.copy(
+                properties = document?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                localFile = Content.LocalFile(file.toUri())
+            )
 
             // Retrieve additional metadata
 //            runCatching {
