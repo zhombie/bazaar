@@ -23,14 +23,13 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.event.EventListener
-import kz.zhombie.bazaar.api.model.Audio
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
 import kz.zhombie.bazaar.ui.model.UIMedia
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.UIContent
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapter
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapterManager
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosHeaderAdapter
@@ -47,10 +46,10 @@ import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.contract.TakeVideoContract
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.cinema.model.Movie
+import kz.zhombie.multimedia.model.Audio
 import kz.zhombie.museum.MuseumDialogFragment
 import kz.zhombie.museum.model.Painting
 import kz.zhombie.radio.Radio
-import java.io.File
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -103,7 +102,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     // Audio
     private var radio: Radio? = null
-    private var currentPlayingAudio: UIMultimedia? = null
+    private var currentPlayingAudio: UIContent? = null
 
     // Variables
     private var expandedHeight: Int = 0
@@ -388,11 +387,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         viewModel.getAction().observe(viewLifecycleOwner, { action ->
             when (action) {
                 is MediaStoreScreen.Action.SubmitSelectedMedia -> {
-                    resultCallback?.onMediaGallerySelectResult(action.media)
+                    resultCallback?.onGalleryMediaResult(action.media)
                     dismiss()
                 }
-                is MediaStoreScreen.Action.SubmitSelectedMultimedia -> {
-                    resultCallback?.onMultimediaGallerySelectResult(action.multimedia)
+                is MediaStoreScreen.Action.SubmitSelectedContent -> {
+                    resultCallback?.onGalleryContentsResult(action.content)
                     dismiss()
                 }
                 is MediaStoreScreen.Action.ChooseBetweenTakePictureOrVideo -> {
@@ -429,7 +428,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaImage.launch("image/*")
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaImageResult -> {
-                    resultCallback?.onLocalMediaStoreResult(action.image)
+                    resultCallback?.onMediaResult(action.image)
                     dismiss()
                 }
                 // Multiple local media images selection
@@ -437,7 +436,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaImages.launch("image/*")
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaImagesResult -> {
-                    resultCallback?.onLocalMediaStoreResult(action.images)
+                    resultCallback?.onMediaResult(action.images)
                     dismiss()
                 }
                 // Local media video selection
@@ -445,7 +444,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaVideo.launch("video/*")
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaVideoResult -> {
-                    resultCallback?.onLocalMediaStoreResult(action.video)
+                    resultCallback?.onMediaResult(action.video)
                     dismiss()
                 }
                 // Multiple local media videos selection
@@ -453,7 +452,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaVideos.launch("video/*")
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaVideosResult -> {
-                    resultCallback?.onLocalMediaStoreResult(action.videos)
+                    resultCallback?.onMediaResult(action.videos)
                     dismiss()
                 }
                 // Local media image or video selection
@@ -461,7 +460,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaImageOrVideo.launch(arrayOf("image/*", "video/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaImageOrVideoResult -> {
-                    resultCallback?.onLocalMediaStoreResult(action.media)
+                    resultCallback?.onMediaResult(action.media)
                     dismiss()
                 }
                 // Multiple local media images and videos selection
@@ -469,7 +468,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaImagesAndVideos.launch(arrayOf("image/*", "video/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaImagesAndVideosResult -> {
-                    resultCallback?.onLocalMediaStoreResult(action.media)
+                    resultCallback?.onMediaResult(action.media)
                     dismiss()
                 }
                 // Local media audio selection
@@ -477,7 +476,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaAudio.launch(arrayOf("audio/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaAudio -> {
-                    resultCallback?.onMultimediaLocalMediaStoreResult(action.audio)
+                    resultCallback?.onContentResult(action.audio)
                     dismiss()
                 }
                 // Multiple local media audio selection
@@ -485,7 +484,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaAudios.launch(arrayOf("audio/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaAudios -> {
-                    resultCallback?.onMultimediaLocalMediaStoreResult(action.audios)
+                    resultCallback?.onContentsResult(action.audios)
                     dismiss()
                 }
                 // Local media document selection
@@ -506,7 +505,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     )
                 }
                 is MediaStoreScreen.Action.SelectedLocalDocument -> {
-                    resultCallback?.onMultimediaLocalMediaStoreResult(action.document)
+                    resultCallback?.onContentResult(action.document)
                     dismiss()
                 }
                 // Multiple local media document selection
@@ -527,7 +526,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     )
                 }
                 is MediaStoreScreen.Action.SelectedLocalDocuments -> {
-                    resultCallback?.onMultimediaLocalMediaStoreResult(action.documents)
+                    resultCallback?.onContentsResult(action.documents)
                     dismiss()
                 }
                 // Empty value
@@ -549,11 +548,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun observeDisplayedMedia() {
-        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { uiMultimedia: List<UIMultimedia> ->
+        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { uiContents: List<UIContent> ->
             if (viewModel.getSettings().isVisualMediaMode()) {
-                visualMediaAdapterManager?.submitList(uiMultimedia)
+                visualMediaAdapterManager?.submitList(uiContents)
             } else if (viewModel.getSettings().mode == Mode.AUDIO) {
-                audiosAdapterManager?.submitList(uiMultimedia)
+                audiosAdapterManager?.submitList(uiContents)
             }
         })
     }
@@ -615,7 +614,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     uri = uiMedia.media.uri,
                     info = Painting.Info(
                         title = uiMedia.getDisplayTitle(),
-                        subtitle = uiMedia.media.folderDisplayName
+                        subtitle = uiMedia.media.folder?.displayName
                     )
                 )
             )
@@ -635,7 +634,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     uri = uiMedia.media.uri,
                     info = Movie.Info(
                         title = uiMedia.getDisplayTitle(),
-                        subtitle = uiMedia.media.folderDisplayName
+                        subtitle = uiMedia.media.folder?.displayName
                     )
                 )
             )
@@ -652,13 +651,16 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      * [AudiosAdapter.Callback] implementation
      */
 
-    override fun onAudioPlayOrPauseClicked(uiMultimedia: UIMultimedia) {
-        if (uiMultimedia.multimedia !is Audio) return
+    override fun onAudioPlayOrPauseClicked(uiContent: UIContent) {
+        if (uiContent.content !is Audio) {
+            Toast.makeText(requireContext(), "Cannot perform operation", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         fun set() {
-            titleView?.text = uiMultimedia.getDisplayTitle()
+            titleView?.text = uiContent.getDisplayTitle()
 
-            val folderDisplayName = uiMultimedia.multimedia.folderDisplayName
+            val folderDisplayName = uiContent.content.folder?.displayName
             if (folderDisplayName.isNullOrBlank()) {
                 subtitleView?.text = null
                 subtitleView?.visibility = View.GONE
@@ -700,7 +702,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         }
 
         fun playOrPause() {
-            Logger.d(TAG, "playOrPause() -> $uiMultimedia")
+            Logger.d(TAG, "playOrPause() -> $uiContent")
 
             if (radio == null) {
                 radio = Radio.Builder(requireContext())
@@ -711,7 +713,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
                                 playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_pause)
 
-                                val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+                                val currentPlayingAudio: UIContent? = currentPlayingAudio
 
                                 if (currentPlayingAudio == null) {
                                     // Ignored
@@ -723,7 +725,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
                                 playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_play)
 
-                                val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+                                val currentPlayingAudio: UIContent? = currentPlayingAudio
 
                                 if (currentPlayingAudio == null) {
                                     // Ignored
@@ -747,19 +749,19 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             }
 
             // The same audio required to play
-            if (radio?.currentSource == uiMultimedia.multimedia.uri) {
+            if (radio?.currentSource == uiContent.content.uri) {
                 radio?.playOrPause()
             } else {
                 // The other audio required to play
-                val currentPlayingAudio: UIMultimedia? = currentPlayingAudio
+                val currentPlayingAudio: UIContent? = currentPlayingAudio
                 if (currentPlayingAudio == null) {
-                    radio?.start(uiMultimedia.multimedia.uri)
+                    radio?.start(uiContent.content.uri)
                 } else {
                     radio?.release()
                     audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
-                    radio?.start(uiMultimedia.multimedia.uri)
+                    radio?.start(uiContent.content.uri)
                 }
-                this@MediaStoreFragment.currentPlayingAudio = uiMultimedia
+                this@MediaStoreFragment.currentPlayingAudio = uiContent
             }
         }
 
@@ -786,20 +788,19 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         }
     }
 
-    override fun onAudioClicked(uiMultimedia: UIMultimedia) {
-        viewModel.onMediaCheckboxClicked(uiMultimedia)
+    override fun onAudioClicked(uiContent: UIContent) {
+        viewModel.onMediaCheckboxClicked(uiContent)
     }
 
     /**
      * [DocumentsAdapter.Callback] implementation
      */
 
-    override fun onDocumentIconClicked(uiMultimedia: UIMultimedia) {
-        val path = uiMultimedia.multimedia.path
-        if (path.isNullOrBlank()) {
+    override fun onDocumentIconClicked(uiContent: UIContent) {
+        val file = uiContent.content.localFile?.file
+        if (file == null || !file.exists()) {
             return Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
         }
-        val file = File(path)
         when (val action = file.open(requireContext())) {
             is OpenFileAction.Success -> {
                 if (!action.tryToLaunch(requireContext())) {
@@ -812,8 +813,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         }
     }
 
-    override fun onDocumentClicked(uiMultimedia: UIMultimedia) {
-        viewModel.onMediaCheckboxClicked(uiMultimedia)
+    override fun onDocumentClicked(uiContent: UIContent) {
+        viewModel.onMediaCheckboxClicked(uiContent)
     }
 
     // Calculates height for 90% of fullscreen

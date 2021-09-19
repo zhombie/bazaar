@@ -2,7 +2,7 @@ package kz.zhombie.bazaar.ui.model
 
 import android.content.Context
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.model.Folder
+import kz.zhombie.multimedia.model.Folder
 
 internal data class UIFolder constructor(
     val folder: Folder,
@@ -24,10 +24,13 @@ internal data class UIFolder constructor(
 
     fun getDisplayName(context: Context): String {
         return when (displayType) {
-            DisplayType.UNKNOWN -> if (folder.displayName.isNullOrBlank()) {
-                context.getString(R.string.bazaar_all_media)
-            } else {
-                folder.displayName
+            DisplayType.UNKNOWN -> {
+                val name = folder.displayName
+                if (!name.isNullOrBlank()) {
+                    name
+                } else {
+                    context.getString(R.string.bazaar_all_media)
+                }
             }
             DisplayType.IMAGES -> context.getString(R.string.bazaar_all_images)
             DisplayType.VIDEOS -> context.getString(R.string.bazaar_all_videos)

@@ -1,35 +1,34 @@
 package kz.zhombie.bazaar.api.result
 
-import kz.zhombie.bazaar.api.model.Multimedia
-import kz.zhombie.bazaar.api.model.Media
+import kz.zhombie.multimedia.model.Content
+import kz.zhombie.multimedia.model.Media
 
 /**
  * [ResultCallback] implementation
  */
 interface AbstractResultCallback : ResultCallback {
     override fun onCameraResult(media: Media) =
-        onMediaSelectResult(listOf(media))
+        onSelectResult(listOf(media))
 
-    override fun onLocalMediaStoreResult(media: Media) =
-        onMediaSelectResult(listOf(media))
+    override fun onMediaResult(media: Media) =
+        onSelectResult(listOf(media))
 
-    override fun onLocalMediaStoreResult(media: List<Media>) =
-        onMediaSelectResult(media)
+    override fun onMediaResult(media: List<Media>) =
+        onSelectResult(media)
 
-    override fun onMultimediaLocalMediaStoreResult(multimedia: Multimedia) =
-        onMultimediaLocalMediaStoreResult(listOf(multimedia))
+    override fun onContentResult(content: Content) =
+        onSelectResult(listOf(content))
 
-    override fun onMultimediaLocalMediaStoreResult(multimedia: List<Multimedia>) =
-        onMultimediaSelectResult(multimedia)
+    override fun onContentsResult(contents: List<Content>) =
+        onSelectResult(contents)
 
-    override fun onMediaGallerySelectResult(media: List<Media>) =
-        onMediaSelectResult(media)
+    override fun onGalleryMediaResult(media: List<Media>) =
+        onSelectResult(media)
 
-    override fun onMultimediaGallerySelectResult(multimedia: List<Multimedia>) =
-        onMultimediaSelectResult(multimedia)
+    override fun onGalleryContentsResult(contents: List<Content>) =
+        onSelectResult(contents)
 
     // ------------------------------------------------------
 
-    fun onMultimediaSelectResult(multimedia: List<Multimedia>)
-    fun onMediaSelectResult(media: List<Media>)
+    fun onSelectResult(contents: List<Content>)
 }

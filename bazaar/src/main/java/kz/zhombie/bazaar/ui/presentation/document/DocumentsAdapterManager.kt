@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.ui.components.recyclerview.animator.SlideInUpAnimator
 import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.UIContent
 
 internal class DocumentsAdapterManager constructor(
     private val context: Context,
@@ -91,8 +91,8 @@ internal class DocumentsAdapterManager constructor(
         )
     }
 
-    fun submitList(uiMultimedia: List<UIMultimedia>) {
-        documentsAdapter?.submitList(uiMultimedia)
+    fun submitList(uiContents: List<UIContent>) {
+        documentsAdapter?.submitList(uiContents)
     }
 
     fun scrollToTop() {

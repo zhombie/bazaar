@@ -13,8 +13,10 @@ import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.CheckBoxButton
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.UIContent
 import kz.zhombie.bazaar.utils.inflate
+import kz.zhombie.multimedia.model.Audio
+import kz.zhombie.multimedia.model.Document
 
 internal class DocumentsAdapter constructor(
     private val callback: Callback
@@ -23,14 +25,14 @@ internal class DocumentsAdapter constructor(
     companion object {
         private val TAG = DocumentsAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<UIMultimedia>() {
-            override fun areItemsTheSame(oldItem: UIMultimedia, newItem: UIMultimedia): Boolean =
-                oldItem.multimedia.id == newItem.multimedia.id && oldItem.multimedia.uri == newItem.multimedia.uri
+        private val diffCallback = object : DiffUtil.ItemCallback<UIContent>() {
+            override fun areItemsTheSame(oldItem: UIContent, newItem: UIContent): Boolean =
+                oldItem.content.id == newItem.content.id && oldItem.content.uri == newItem.content.uri
 
-            override fun areContentsTheSame(oldItem: UIMultimedia, newItem: UIMultimedia): Boolean =
+            override fun areContentsTheSame(oldItem: UIContent, newItem: UIContent): Boolean =
                 oldItem == newItem
 
-            override fun getChangePayload(oldItem: UIMultimedia, newItem: UIMultimedia): Any? = when {
+            override fun getChangePayload(oldItem: UIContent, newItem: UIContent): Any? = when {
                 oldItem.isSelectable != newItem.isSelectable -> PayloadKey.TOGGLE_SELECTION_ABILITY
                 oldItem.isSelected != newItem.isSelected -> PayloadKey.TOGGLE_SELECTION
                 oldItem.isVisible != newItem.isVisible -> PayloadKey.TOGGLE_VISIBILITY
@@ -45,20 +47,20 @@ internal class DocumentsAdapter constructor(
         const val TOGGLE_VISIBILITY = "toggle_visibility"
     }
 
-    private val asyncListDiffer: AsyncListDiffer<UIMultimedia> by lazy {
+    private val asyncListDiffer: AsyncListDiffer<UIContent> by lazy {
         AsyncListDiffer(this, diffCallback)
     }
 
-    fun getList(): List<UIMultimedia> = asyncListDiffer.currentList
+    fun getList(): List<UIContent> = asyncListDiffer.currentList
 
-    fun submitList(uiMultimedia: List<UIMultimedia>) {
-        Logger.d(TAG, "submitList() -> ${uiMultimedia.size}")
-        asyncListDiffer.submitList(uiMultimedia)
+    fun submitList(uiContents: List<UIContent>) {
+        Logger.d(TAG, "submitList() -> ${uiContents.size}")
+        asyncListDiffer.submitList(uiContents)
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
 
-    private fun getItem(position: Int): UIMultimedia = asyncListDiffer.currentList[position]
+    private fun getItem(position: Int): UIContent = asyncListDiffer.currentList[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ViewHolder(parent.inflate(R.layout.bazaar_cell_document))
@@ -80,7 +82,7 @@ internal class DocumentsAdapter constructor(
         } else {
             var isProcessed = false
             val item = getItem(position)
-            if (!item.isAudio()) {
+            if (item.content !is Audio) {
                 super.onBindViewHolder(holder, position, payloads)
                 return
             }
@@ -122,10 +124,10 @@ internal class DocumentsAdapter constructor(
             checkBoxButton.setCheckedDrawable()
         }
 
-        fun bind(uiMultimedia: UIMultimedia) {
-            toggleSelectionAbility(uiMultimedia)
+        fun bind(uiContent: UIContent) {
+            toggleSelectionAbility(uiContent)
 
-            if (uiMultimedia.isSelected) {
+            if (uiContent.isSelected) {
                 checkBoxButton.setShownState()
                 checkBoxButton.show(false)
             } else {
@@ -133,32 +135,32 @@ internal class DocumentsAdapter constructor(
                 checkBoxButton.hide(false)
             }
 
-            titleView.text = uiMultimedia.getDisplayTitle()
+            titleView.text = uiContent.getDisplayTitle()
 
-            val folderDisplayName = uiMultimedia.multimedia.folderDisplayName
-            if (folderDisplayName.isNullOrBlank()) {
+            val folder = uiContent.content.folder?.displayName
+            if (folder.isNullOrBlank()) {
                 subtitleView.text = null
                 subtitleView.visibility = View.GONE
             } else {
-                subtitleView.text = folderDisplayName
+                subtitleView.text = folder
                 subtitleView.visibility = View.VISIBLE
             }
             
             iconButton.setOnClickListener {
-                if (uiMultimedia.isDocument()) {
-                    callback.onDocumentIconClicked(uiMultimedia)
+                if (uiContent.content is Document) {
+                    callback.onDocumentIconClicked(uiContent)
                 }
             }
 
             itemView.setOnClickListener {
-                if (uiMultimedia.isDocument()) {
-                    callback.onDocumentClicked(uiMultimedia)
+                if (uiContent.content is Document) {
+                    callback.onDocumentClicked(uiContent)
                 }
             }
         }
 
-        fun toggleSelectionAbility(uiMultimedia: UIMultimedia) {
-            if (uiMultimedia.isSelectable) {
+        fun toggleSelectionAbility(uiContent: UIContent) {
+            if (uiContent.isSelectable) {
                 itemView.isEnabled = true
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -173,22 +175,22 @@ internal class DocumentsAdapter constructor(
             }
         }
 
-        fun toggleSelection(uiMultimedia: UIMultimedia) {
-            if (uiMultimedia.isSelected) {
+        fun toggleSelection(uiContent: UIContent) {
+            if (uiContent.isSelected) {
                 checkBoxButton.show(true)
             } else {
                 checkBoxButton.hide(true)
             }
         }
 
-        fun toggleVisibility(uiMultimedia: UIMultimedia) {
-            Logger.d(TAG, "toggleVisibility() -> uiMultimedia: $uiMultimedia")
+        fun toggleVisibility(uiContent: UIContent) {
+            Logger.d(TAG, "toggleVisibility() -> uiContent: $uiContent")
         }
     }
 
     interface Callback {
-        fun onDocumentIconClicked(uiMultimedia: UIMultimedia)
-        fun onDocumentClicked(uiMultimedia: UIMultimedia)
+        fun onDocumentIconClicked(uiContent: UIContent)
+        fun onDocumentClicked(uiContent: UIContent)
     }
 
 }

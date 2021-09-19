@@ -1,62 +1,67 @@
 package kz.zhombie.bazaar.ui.model
 
-import kz.zhombie.bazaar.api.model.Folder
-import kz.zhombie.bazaar.api.model.Multimedia
+import kz.zhombie.multimedia.model.*
 
-internal fun List<UIMultimedia>.convert(multimedia: List<Multimedia>): List<UIFolder> {
-    return multimedia.mapNotNull { media ->
-        val folderId = media.folderId ?: return@mapNotNull null
-        val folderDisplayName = media.folderDisplayName ?: return@mapNotNull null
-        val items = mapNotNull { if (it.multimedia.folderId == folderId) it.multimedia else null }
+internal fun List<UIContent>.convert(contents: List<Content>): List<UIFolder> {
+    return contents.mapNotNull { media ->
+        val folderId = media.folder?.id ?: return@mapNotNull null
+        val folderDisplayName = media.folder?.displayName ?: return@mapNotNull null
+        val items = mapNotNull { if (it.content.folder?.id == folderId) it.content else null }
         UIFolder(Folder(id = folderId, displayName = folderDisplayName, items = items))
     }
 }
 
-internal fun List<UIMultimedia>.onlyImages(): UIFolder {
+internal fun List<UIContent>.onlyImages(): UIFolder {
     return UIFolder(
         Folder(
             id = UIFolder.ALL_MEDIA_ID,
-            items = mapNotNull { if (it is UIMedia && it.isImage()) it.media else null }
+            items = mapNotNull { if (it is UIMedia && it.media is Image) it.media else null }
         ),
         UIFolder.DisplayType.IMAGES
     )
 }
 
-internal fun List<UIMultimedia>.onlyVideos(): UIFolder {
+internal fun List<UIContent>.onlyVideos(): UIFolder {
     return UIFolder(
         Folder(
             id = UIFolder.ALL_MEDIA_ID,
-            items = mapNotNull { if (it is UIMedia && it.isVideo()) it.media else null }
+            items = mapNotNull { if (it is UIMedia && it.media is Video) it.media else null }
         ),
         UIFolder.DisplayType.VIDEOS
     )
 }
 
-internal fun List<UIMultimedia>.onlyMedia(): UIFolder {
+internal fun List<UIContent>.onlyImagesAndVideos(): UIFolder {
     return UIFolder(
         Folder(
             id = UIFolder.ALL_MEDIA_ID,
-            items = mapNotNull { if (it is UIMedia && it.isImageOrVideo()) it.media else null }
+            items = mapNotNull {
+                if (it is UIMedia && (it.media is Image || it.media is Video)) {
+                    it.media
+                } else {
+                    null
+                }
+            }
         ),
         UIFolder.DisplayType.MEDIA
     )
 }
 
-internal fun List<UIMultimedia>.onlyAudios(): UIFolder {
+internal fun List<UIContent>.onlyAudios(): UIFolder {
     return UIFolder(
         Folder(
             id = UIFolder.ALL_MEDIA_ID,
-            items = mapNotNull { if (it.isAudio()) it.multimedia else null }
+            items = mapNotNull { if (it.content is Audio) it.content else null }
         ),
         UIFolder.DisplayType.AUDIOS
     )
 }
 
-internal fun List<UIMultimedia>.onlyDocuments(): UIFolder {
+internal fun List<UIContent>.onlyDocuments(): UIFolder {
     return UIFolder(
         Folder(
             id = UIFolder.ALL_MEDIA_ID,
-            items = mapNotNull { if (it.isDocument()) it.multimedia else null }
+            items = mapNotNull { if (it.content is Document) it.content else null }
         ),
         UIFolder.DisplayType.DOCUMENTS
     )

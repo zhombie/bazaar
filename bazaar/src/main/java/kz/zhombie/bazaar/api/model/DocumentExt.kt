@@ -1,21 +1,18 @@
 package kz.zhombie.bazaar.api.model
 
-internal fun Document.complete(document: Document?): Document? {
+import kz.zhombie.multimedia.model.Document
+
+internal fun Document?.complete(document: Document?): Document? {
+    if (this == null) return null
     if (document == null) return null
     return Document(
         id = id,
         uri = uri,
-        path = path ?: document.path,
-        title = if (title.isNotBlank()) title else document.title,
-        displayName = if (displayName.isNotBlank()) displayName else document.displayName,
-        mimeType = mimeType ?: document.mimeType,
-        extension = extension ?: document.extension,
-        size = document.size,
-        dateAdded = dateAdded,
-        dateModified = dateModified,
-        dateCreated = dateCreated,
-        thumbnail = thumbnail ?: document.thumbnail,
-        folderId = folderId ?: document.folderId,
-        folderDisplayName = folderDisplayName ?: document.folderDisplayName,
+        title = if (!title.isNullOrBlank()) title else document.title,
+        displayName = if (!displayName.isNullOrBlank()) displayName else document.displayName,
+        folder = folder ?: document.folder,
+        history = history ?: document.history,
+        properties = properties ?: document.properties,
+        localFile = localFile ?: document.localFile
     )
 }

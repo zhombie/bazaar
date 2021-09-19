@@ -20,19 +20,18 @@ import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.core.showSafely
 import kz.zhombie.bazaar.api.event.EventListener
-import kz.zhombie.bazaar.api.model.Media
-import kz.zhombie.bazaar.api.model.Multimedia
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.imageloader.CoilImageLoader
 import kz.zhombie.bazaar.imageloader.GlideImageLoader
-import kz.zhombie.bazaar.ui.adapter.MultimediaResultAdapter
+import kz.zhombie.bazaar.ui.adapter.ContentsAdapter
 import kz.zhombie.bazaar.utils.OpenFileAction
 import kz.zhombie.bazaar.utils.open
 import kz.zhombie.bazaar.utils.tryToLaunch
 import kz.zhombie.cinema.CinemaDialogFragment
+import kz.zhombie.multimedia.model.Content
+import kz.zhombie.multimedia.model.Media
 import kz.zhombie.museum.MuseumDialogFragment
-import java.io.File
 
 class MainActivity : AppCompatActivity(), ResultCallback {
 
@@ -52,7 +51,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     private var viewHolder: ViewHolder? = null
 
-    private var adapter: MultimediaResultAdapter? = null
+    private var adapter: ContentsAdapter? = null
 
     private var mode: Mode? = null
         set(value) {
@@ -164,10 +163,9 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun setupRecyclerView() {
-        adapter = MultimediaResultAdapter(imageLoader) { multimedia ->
-            val path = multimedia.path
-            val file = if (!path.isNullOrBlank()) File(path) else null
-            when (val action = file?.open(this)) {
+        adapter = ContentsAdapter(imageLoader) { content ->
+            val file = content.localFile?.file ?: return@ContentsAdapter
+            when (val action = file.open(this)) {
                 is OpenFileAction.Success -> {
                     if (!action.tryToLaunch(this)) {
                         Toast.makeText(this, "error_file_cannot_be_read", Toast.LENGTH_SHORT).show()
@@ -268,17 +266,11 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     private fun launchBazaar(mode: Mode) {
         Bazaar.Builder(object : AbstractResultCallback {
-            override fun onMultimediaSelectResult(multimedia: List<Multimedia>) {
-                Log.d(TAG, "multimedia: $multimedia")
-                adapter?.multimedia = multimedia
-            }
-
-            override fun onMediaSelectResult(media: List<Media>) {
-                Log.d(TAG, "media: $media")
-                adapter?.multimedia = media
+            override fun onSelectResult(contents: List<Content>) {
+                Log.d(TAG, "contents: $contents")
+                adapter?.contents = contents
             }
         })
-            .setTag(Bazaar.TAG)
             .setMode(mode)
             .setEventListener(object : EventListener {
                 override fun onDestroy() {
@@ -303,37 +295,37 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     override fun onCameraResult(media: Media) {
         Log.d(TAG, "media: $media")
-        adapter?.multimedia = listOf(media)
+        adapter?.contents = listOf(media)
     }
 
-    override fun onLocalMediaStoreResult(media: Media) {
+    override fun onMediaResult(media: Media) {
         Log.d(TAG, "media: $media")
-        adapter?.multimedia = listOf(media)
+        adapter?.contents = listOf(media)
     }
 
-    override fun onLocalMediaStoreResult(media: List<Media>) {
+    override fun onMediaResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
-        adapter?.multimedia = media
+        adapter?.contents = media
     }
 
-    override fun onMultimediaLocalMediaStoreResult(multimedia: Multimedia) {
-        Log.d(TAG, "multimedia: $multimedia")
-        adapter?.multimedia = listOf(multimedia)
+    override fun onContentResult(content: Content) {
+        Log.d(TAG, "content: $content")
+        adapter?.contents = listOf(content)
     }
 
-    override fun onMultimediaLocalMediaStoreResult(multimedia: List<Multimedia>) {
-        Log.d(TAG, "multimedia: $multimedia")
-        adapter?.multimedia = multimedia
+    override fun onContentsResult(contents: List<Content>) {
+        Log.d(TAG, "contents: $contents")
+        adapter?.contents = contents
     }
 
-    override fun onMediaGallerySelectResult(media: List<Media>) {
+    override fun onGalleryMediaResult(media: List<Media>) {
         Log.d(TAG, "media: $media")
-        adapter?.multimedia = media
+        adapter?.contents = media
     }
 
-    override fun onMultimediaGallerySelectResult(multimedia: List<Multimedia>) {
-        Log.d(TAG, "multimedia: $multimedia")
-        adapter?.multimedia = multimedia
+    override fun onGalleryContentsResult(contents: List<Content>) {
+        Log.d(TAG, "contents: $contents")
+        adapter?.contents = contents
     }
 
 }

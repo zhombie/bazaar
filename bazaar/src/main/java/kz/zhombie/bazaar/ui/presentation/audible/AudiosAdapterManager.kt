@@ -12,7 +12,7 @@ import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.animator.SlideInUpAnimator
 import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.UIContent
 
 internal class AudiosAdapterManager  constructor(
     private val context: Context,
@@ -96,16 +96,17 @@ internal class AudiosAdapterManager  constructor(
         )
     }
 
-    fun submitList(uiMultimedia: List<UIMultimedia>) {
-        audiosAdapter?.submitList(uiMultimedia)
+    fun submitList(uiContents: List<UIContent>) {
+        audiosAdapter?.submitList(uiContents)
     }
 
-    fun setPlaying(uiMultimedia: UIMultimedia, isPlaying: Boolean) {
-        audiosAdapter?.setPlaying(uiMultimedia, isPlaying)
+    fun setPlaying(uiContent: UIContent, isPlaying: Boolean) {
+        audiosAdapter?.setPlaying(uiContent, isPlaying)
     }
 
-    fun smoothScrollTo(uiMultimedia: UIMultimedia) {
-        val position = audiosAdapter?.getList()?.indexOfFirst { it.multimedia.id == uiMultimedia.multimedia.id }
+    fun smoothScrollTo(uiContent: UIContent) {
+        val position = audiosAdapter?.getList()
+            ?.indexOfFirst { it.content.id == uiContent.content.id }
         if (position != null) {
             if (position >= 0) {
                 if (position <= (recyclerView.adapter?.itemCount ?: -1)) {

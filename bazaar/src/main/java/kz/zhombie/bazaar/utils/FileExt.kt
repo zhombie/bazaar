@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
@@ -21,16 +22,29 @@ sealed class OpenFileAction {
 }
 
 
-fun File.open(context: Context, authority: String = "${context.applicationContext.packageName}.provider"): OpenFileAction {
+fun File.open(
+    context: Context,
+    authority: String = "${context.applicationContext.packageName}.provider"
+): OpenFileAction {
     return if (exists()) {
         try {
             val uri = FileProvider.getUriForFile(context, authority, this)
             val mimeType = uri.getMimeType(context)
-            OpenFileAction.Success(
-                Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(uri, mimeType)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            )
+            val intent = Intent(Intent.ACTION_VIEW)
+                .setDataAndType(uri, mimeType)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            val resolveInfo =
+                context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            for (info in resolveInfo) {
+                context.grantUriPermission(
+                    info.activityInfo.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+
+            OpenFileAction.Success(intent)
         } catch (e: Exception) {
             e.printStackTrace()
             OpenFileAction.Error(OpenFileAction.Error.Reason.UNKNOWN)
@@ -64,27 +78,5 @@ fun Uri.getMimeType(context: Context): String? {
                 .getMimeTypeFromExtension(file.name.substringAfterLast('.', ""))
         }
         else -> null
-    }
-}
-
-
-fun getExtension(filename: String, mimeType: String): String? {
-    val extension = filename.substringAfterLast('.', "")
-    return if (extension.isNotBlank()) {
-        extension
-    } else {
-        MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
-    }
-}
-
-
-fun File.getExtension(mimeType: String? = null): String? {
-    val extension = name.substringAfterLast('.', "")
-    return if (extension.isNotBlank()) {
-        extension
-    } else if (!mimeType.isNullOrBlank()) {
-        MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
-    } else {
-        null
     }
 }

@@ -5,17 +5,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kz.zhombie.bazaar.api.model.complete
 import kotlinx.coroutines.*
 import kz.zhombie.bazaar.api.core.settings.Mode
-import kz.zhombie.bazaar.api.model.*
 import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.model.*
 import kz.zhombie.bazaar.ui.model.UIFolder
 import kz.zhombie.bazaar.ui.model.UIMedia
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.UIContent
 import kz.zhombie.bazaar.ui.model.onlyImages
+import kz.zhombie.multimedia.model.*
 import kotlin.reflect.KClass
 
 internal class MediaStoreViewModel : ViewModel() {
@@ -27,7 +28,7 @@ internal class MediaStoreViewModel : ViewModel() {
     private lateinit var settings: MediaStoreScreen.Settings
     private lateinit var mediaScanManager: MediaScanManager
 
-    private val allMedia = mutableListOf<Multimedia>()
+    private val allContents = mutableListOf<Content>()
 
     private val screenState by lazy { MutableLiveData<MediaStoreScreen.State>() }
     fun getScreenState(): LiveData<MediaStoreScreen.State> = screenState
@@ -35,11 +36,11 @@ internal class MediaStoreViewModel : ViewModel() {
     private val action by lazy { MutableLiveData<MediaStoreScreen.Action>() }
     fun getAction(): LiveData<MediaStoreScreen.Action> = action
 
-    private val selectedMedia by lazy { MutableLiveData<List<UIMultimedia>>() }
-    fun getSelectedMedia(): LiveData<List<UIMultimedia>> = selectedMedia
+    private val selectedMedia by lazy { MutableLiveData<List<UIContent>>() }
+    fun getSelectedMedia(): LiveData<List<UIContent>> = selectedMedia
 
-    private val displayedMedia by lazy { MutableLiveData<List<UIMultimedia>>() }
-    fun getDisplayedMedia(): LiveData<List<UIMultimedia>> = displayedMedia
+    private val displayedMedia by lazy { MutableLiveData<List<UIContent>>() }
+    fun getDisplayedMedia(): LiveData<List<UIContent>> = displayedMedia
 
     private val displayedFolders by lazy { MutableLiveData<List<UIFolder>>() }
     fun getDisplayedFolders(): LiveData<List<UIFolder>> = displayedFolders
@@ -80,7 +81,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     private fun onStart() {
-        if (allMedia.isEmpty()) {
+        if (allContents.isEmpty()) {
             viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 val localData = when (settings.mode) {
                     Mode.IMAGE -> {
@@ -124,7 +125,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     }
                     Mode.AUDIO -> {
                         val audios = try {
-                            Cache.getInstance().getMultimedia()?.filterIsInstance<Audio>()
+                            Cache.getInstance().getContents()?.filterIsInstance<Audio>()
                         } catch (e: Exception) {
                             e.printStackTrace()
                             null
@@ -147,35 +148,35 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    private fun onLocalDataLoaded(multimedia: List<Multimedia>) {
+    private fun onLocalDataLoaded(contents: List<Content>) {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            Logger.d(TAG, "onLocalDataLoaded() -> multimedia.size: ${multimedia.size}")
+            Logger.d(TAG, "onLocalDataLoaded() -> contents.size: ${contents.size}")
 
-            allMedia.addAll(multimedia)
+            allContents.addAll(contents)
 
-            val uiMultimedia: List<UIMultimedia> = multimedia.mapNotNull {
+            val uiContents: List<UIContent> = contents.mapNotNull {
                 when (it) {
                     is Media ->
                         UIMedia(it, isSelectable = true, isSelected = false, isVisible = true)
-                    is Audio ->
-                        UIMultimedia(it, isSelectable = true, isSelected = false, isVisible = true)
+                    is Document ->
+                        UIContent(it, isSelectable = true, isSelected = false, isVisible = true)
                     else ->
                         null
                 }
             }
 
             val defaultFolder = when (settings.mode) {
-                Mode.IMAGE -> uiMultimedia.onlyImages()
-                Mode.VIDEO -> uiMultimedia.onlyVideos()
-                Mode.IMAGE_AND_VIDEO -> uiMultimedia.onlyMedia()
-                Mode.AUDIO -> uiMultimedia.onlyAudios()
-                Mode.DOCUMENT -> uiMultimedia.onlyDocuments()
+                Mode.IMAGE -> uiContents.onlyImages()
+                Mode.VIDEO -> uiContents.onlyVideos()
+                Mode.IMAGE_AND_VIDEO -> uiContents.onlyImagesAndVideos()
+                Mode.AUDIO -> uiContents.onlyAudios()
+                Mode.DOCUMENT -> uiContents.onlyDocuments()
             }
 
             activeFolder.postValue(defaultFolder)
-            displayedMedia.postValue(uiMultimedia)
+            displayedMedia.postValue(uiContents)
 
-            val folders = uiMultimedia.convert(multimedia)
+            val folders = uiContents.convert(contents)
                 .distinctBy { it.folder.id }
                 .sortedBy { it.folder.displayName }
                 .toMutableList()
@@ -186,29 +187,29 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onMediaCheckboxClicked(uiMultimedia: UIMultimedia) {
+    fun onMediaCheckboxClicked(uiContent: UIContent) {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            Logger.d(TAG, "onMediaCheckboxClicked() -> uiMultimedia: $uiMultimedia")
+            Logger.d(TAG, "onMediaCheckboxClicked() -> uiContent: $uiContent")
 
             // Selected
             var selectedMediaSize = 0
             with(selectedMedia.value?.toMutableList() ?: mutableListOf()) {
                 val index = indexOfFirst {
-                    if (uiMultimedia is UIMedia) {
+                    if (uiContent is UIMedia) {
                         if (it is UIMedia) {
-                            it.media.id == uiMultimedia.media.id
+                            it.media.id == uiContent.media.id
                         } else {
                             false
                         }
                     } else {
-                        it.multimedia.id == uiMultimedia.multimedia.id
+                        it.content.id == uiContent.content.id
                     }
                 }
                 Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] index: $index")
                 if (index > -1) {
                     removeAt(index)
                 } else {
-                    add(uiMultimedia)
+                    add(uiContent)
                 }
                 selectedMediaSize = size
                 Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] selectedMediaSize: $selectedMediaSize")
@@ -218,14 +219,14 @@ internal class MediaStoreViewModel : ViewModel() {
             // All
             with(displayedMedia.value?.toMutableList() ?: mutableListOf()) {
                 indexOfFirst {
-                    if (uiMultimedia is UIMedia) {
+                    if (uiContent is UIMedia) {
                         if (it is UIMedia) {
-                            it.media.id == uiMultimedia.media.id
+                            it.media.id == uiContent.media.id
                         } else {
                             false
                         }
                     } else {
-                        it.multimedia.id == uiMultimedia.multimedia.id
+                        it.content.id == uiContent.content.id
                     }
                 }
                     .takeIf { index -> index > -1 }
@@ -267,7 +268,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     if (it is UIMedia) {
                         id == it.media.id
                     } else {
-                        id == it.multimedia.id
+                        id == it.content.id
                     }
                 }
                     .takeIf { index -> index > -1 }
@@ -287,20 +288,20 @@ internal class MediaStoreViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             Logger.d(TAG, "onFolderClicked() -> uiFolder: ${uiFolder.folder.displayName}")
 
-            val folderUiMedia = allMedia
+            val folderUiMedia = allContents
                 .filter {
                     if (uiFolder.folder.id == UIFolder.ALL_MEDIA_ID) {
                         true
                     } else {
-                        it.folderId == uiFolder.folder.id
+                        it.folder?.id == uiFolder.folder.id
                     }
                 }
                 .mapNotNull {
                     when (it) {
                         is Media ->
                             UIMedia(it, isSelectable = true, isSelected = false, isVisible = true)
-                        is Audio ->
-                            UIMultimedia(it, isSelectable = true, isSelected = false, isVisible = true)
+                        is Document ->
+                            UIContent(it, isSelectable = true, isSelected = false, isVisible = true)
                         else ->
                             null
                     }
@@ -311,9 +312,9 @@ internal class MediaStoreViewModel : ViewModel() {
             selectedMedia.forEach { eachSelectedMedia ->
                 val index = folderUiMedia.indexOfFirst {
                     if (it is UIMedia) {
-                        it.media.id == eachSelectedMedia.multimedia.id
+                        it.media.id == eachSelectedMedia.content.id
                     } else {
-                        it.multimedia.id == eachSelectedMedia.multimedia.id
+                        it.content.id == eachSelectedMedia.content.id
                     }
                 }
                 if (index > -1) {
@@ -730,16 +731,16 @@ internal class MediaStoreViewModel : ViewModel() {
                 val selectedMedia = (selectedMedia.value ?: emptyList())
                     .take(settings.maxSelectionCount)
                     .mapNotNull {
-                        when (it.multimedia) {
+                        when (it.content) {
                             is Audio -> {
-                                val audio = mediaScanManager.loadSelectedLocalMediaAudio(it.multimedia.uri)
-                                it.multimedia.complete(audio)
+                                val audio = mediaScanManager.loadSelectedLocalMediaAudio(it.content.uri)
+                                it.content.complete(audio)
                             }
                             else -> null
                         }
                     }
 
-                action.postValue(MediaStoreScreen.Action.SubmitSelectedMultimedia(selectedMedia))
+                action.postValue(MediaStoreScreen.Action.SubmitSelectedContent(selectedMedia))
             }
 
             screenState.postValue(MediaStoreScreen.State.CONTENT)

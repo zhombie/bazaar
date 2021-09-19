@@ -11,14 +11,14 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.api.model.Image
-import kz.zhombie.bazaar.api.model.Video
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.CheckBoxButton
 import kz.zhombie.bazaar.ui.components.view.SquareImageView
 import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.utils.inflate
+import kz.zhombie.multimedia.model.Image
+import kz.zhombie.multimedia.model.Video
 
 internal class VisualMediaAdapter constructor(
     private val imageLoader: ImageLoader,
@@ -74,9 +74,9 @@ internal class VisualMediaAdapter constructor(
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return when {
-            item.isImage() -> ViewType.IMAGE
-            item.isVideo() -> ViewType.VIDEO
+        return when (item.media) {
+            is Image -> ViewType.IMAGE
+            is Video -> ViewType.VIDEO
             else -> super.getItemViewType(position)
         }
     }
@@ -95,8 +95,8 @@ internal class VisualMediaAdapter constructor(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is ImageViewHolder -> if (item.isImage()) holder.bind(item)
-            is VideoViewHolder -> if (item.isVideo()) holder.bind(item)
+            is ImageViewHolder -> if (item.media is Image) holder.bind(item)
+            is VideoViewHolder -> if (item.media is Video) holder.bind(item)
         }
     }
 
@@ -111,7 +111,7 @@ internal class VisualMediaAdapter constructor(
         } else {
             var isProcessed = false
             val item = getItem(position)
-            if (!item.isImageOrVideo()) {
+            if (item.media !is Image || item.media !is Video) {
                 super.onBindViewHolder(holder, position, payloads)
                 return
             }
@@ -167,14 +167,11 @@ internal class VisualMediaAdapter constructor(
         fun bind(uiMedia: UIMedia) {
             val image: Image = if (uiMedia.media is Image) uiMedia.media else return
 
-            when {
-                image.thumbnail != null ->
-                    imageLoader.loadSmallImage(itemView.context, imageView, image.thumbnail)
-                image.source != null ->
-                    imageLoader.loadSmallImage(itemView.context, imageView, image.source)
-                else ->
-                    imageLoader.loadSmallImage(itemView.context, imageView, image.uri)
-            }
+            imageLoader.loadSmallImage(
+                itemView.context,
+                imageView,
+                image.localFile?.uri ?: image.uri
+            )
 
             toggleSelectionAbility(uiMedia)
 
@@ -267,12 +264,11 @@ internal class VisualMediaAdapter constructor(
         fun bind(uiMedia: UIMedia) {
             val video: Video = if (uiMedia.media is Video) uiMedia.media else return
 
-            when {
-                video.thumbnail != null ->
-                    imageLoader.loadSmallImage(itemView.context, imageView, video.thumbnail)
-                else ->
-                    imageLoader.loadSmallImage(itemView.context, imageView, video.uri)
-            }
+            imageLoader.loadSmallImage(
+                itemView.context,
+                imageView,
+                video.localFile?.uri ?: video.uri
+            )
 
             toggleSelectionAbility(uiMedia)
 

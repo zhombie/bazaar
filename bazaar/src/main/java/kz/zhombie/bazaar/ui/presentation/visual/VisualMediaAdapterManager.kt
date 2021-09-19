@@ -11,7 +11,7 @@ import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.animator.SlideInUpAnimator
 import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIMedia
-import kz.zhombie.bazaar.ui.model.UIMultimedia
+import kz.zhombie.bazaar.ui.model.UIContent
 
 internal class VisualMediaAdapterManager constructor(
     private val context: Context,
@@ -98,8 +98,8 @@ internal class VisualMediaAdapterManager constructor(
         )
     }
 
-    fun submitList(uiMultimedia: List<UIMultimedia>) {
-        visualMediaAdapter?.submitList(uiMultimedia.filterIsInstance<UIMedia>())
+    fun submitList(uiContents: List<UIContent>) {
+        visualMediaAdapter?.submitList(uiContents.filterIsInstance<UIMedia>())
     }
 
     fun scrollToTop() {
