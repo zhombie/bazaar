@@ -58,6 +58,8 @@ internal class MediaStoreViewModel : ViewModel() {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
+
+        screenState.postValue(MediaStoreScreen.State.CONTENT)
     }
 
     init {
