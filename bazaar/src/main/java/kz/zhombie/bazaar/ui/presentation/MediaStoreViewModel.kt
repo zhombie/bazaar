@@ -740,7 +740,7 @@ internal class MediaStoreViewModel : ViewModel() {
                         }
                     }
 
-                action.postValue(MediaStoreScreen.Action.SubmitSelectedContent(selectedMedia))
+                action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(selectedMedia))
             }
 
             screenState.postValue(MediaStoreScreen.State.CONTENT)

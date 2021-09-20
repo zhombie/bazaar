@@ -476,7 +476,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                     getLocalMediaAudio.launch(arrayOf("audio/*"))
                 }
                 is MediaStoreScreen.Action.SelectedLocalMediaAudio -> {
-                    resultCallback?.onContentResult(action.audio)
+                    resultCallback?.onMediaResult(action.audio)
                     dismiss()
                 }
                 // Multiple local media audio selection
