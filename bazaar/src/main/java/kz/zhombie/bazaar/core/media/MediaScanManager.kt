@@ -410,9 +410,21 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Set file
             image = image?.copy(
-                properties = image?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                folder = Folder(Content.generateId(), file.parent),
+                history = Content.History(modifiedAt = file.lastModified()),
+                properties = image?.properties?.copy(
+                    mimeType = context.contentResolver.getType(uri)
+                ),
                 localFile = Content.LocalFile(file.toUri())
             )
+
+            // Obtain resolution
+            val resolution = runCatching {
+                val inputStream = context.contentResolver?.openInputStream(uri) ?: return@runCatching null
+                return@runCatching inputStream.getImageResolution()
+            }.getOrNull()
+
+            image = image?.copy(resolution = resolution)
 
             // Retrieve additional metadata from bitmap
 //            val imageScale = decodeScaledBitmap(uri)
@@ -483,7 +495,11 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Set file
             video = video?.copy(
-                properties = video?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                folder = Folder(Content.generateId(), file.parent),
+                history = Content.History(modifiedAt = file.lastModified()),
+                properties = video?.properties?.copy(
+                    mimeType = context.contentResolver.getType(uri)
+                ),
                 localFile = Content.LocalFile(file.toUri())
             )
 
@@ -547,7 +563,11 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Set file
             audio = audio?.copy(
-                properties = audio?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                folder = Folder(Content.generateId(), file.parent),
+                history = Content.History(modifiedAt = file.lastModified()),
+                properties = audio?.properties?.copy(
+                    mimeType = context.contentResolver.getType(uri)
+                ),
                 localFile = Content.LocalFile(file.toUri())
             )
 
@@ -616,7 +636,11 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             // Set file
             document = document?.copy(
-                properties = document?.properties?.copy(mimeType = context.contentResolver.getType(uri)),
+                folder = Folder(Content.generateId(), file.parent),
+                history = Content.History(modifiedAt = file.lastModified()),
+                properties = document?.properties?.copy(
+                    mimeType = context.contentResolver.getType(uri)
+                ),
                 localFile = Content.LocalFile(file.toUri())
             )
 
@@ -687,22 +711,22 @@ internal class MediaScanManager constructor(private val context: Context) {
 
     private fun createImageFilename(): String {
         val timestamp = System.currentTimeMillis()
-        return "IMG_${timestamp}"
+        return "IMG_${context.packageName}_${timestamp}.jpg"
     }
 
     private fun createVideoFilename(): String {
         val timestamp = System.currentTimeMillis()
-        return "VIDEO_${timestamp}"
+        return "VIDEO_${context.packageName}_${timestamp}.mp4"
     }
 
     private fun createAudioFilename(): String {
         val timestamp = System.currentTimeMillis()
-        return "AUDIO_${timestamp}"
+        return "AUDIO_${context.packageName}_${timestamp}.mp3"
     }
 
     private fun createDocumentFilename(): String {
         val timestamp = System.currentTimeMillis()
-        return "DOC_${timestamp}"
+        return "DOC_${context.packageName}_${timestamp}"
     }
 
     suspend fun decodeImageFile(image: Image): Image = withContext(Dispatchers.IO) {
