@@ -114,7 +114,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 ),
                 resolution = null,
                 properties = null,
-                localFile = Content.LocalFile(uri)
+                localFile = Content.LocalFile(file.toUri())
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -158,7 +158,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 duration = Media.Playable.UNDEFINED_DURATION,
                 resolution = null,
                 properties = null,
-                localFile = Content.LocalFile(uri)
+                localFile = Content.LocalFile(file.toUri())
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -726,7 +726,10 @@ internal class MediaScanManager constructor(private val context: Context) {
 //            thumbnail = BitmapFactory.decodeByteArray(bytes.toByteArray(), 0, bytes.size())
 //        }
         return@withContext image.copy(
-            properties = Content.Properties(size = file.length()),
+            properties = Content.Properties(
+                size = file.length(),
+                mimeType = context.contentResolver.getType(image.uri)
+            ),
             resolution = resolution
         )
     }
@@ -744,7 +747,10 @@ internal class MediaScanManager constructor(private val context: Context) {
             null
         }
         return@withContext video.copy(
-            properties = Content.Properties(size = file.length()),
+            properties = Content.Properties(
+                size = file.length(),
+                mimeType = context.contentResolver.getType(video.uri)
+            ),
             resolution = resolution,
             duration = metadata.duration ?: Media.Playable.UNDEFINED_DURATION
         )
