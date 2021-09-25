@@ -72,7 +72,7 @@ dependencies {
     api "com.github.zhombie.arbat:radio:$arbat_version"
 
     // Multimedia
-    api 'com.github.zhombie:multimedia:1.0.4'
+    api 'com.github.zhombie:multimedia:1.0.5'
 
     // ExoPlayer
     implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
