@@ -39,9 +39,9 @@ android {
 }
 
 ext {
-    arbat_version = '1.3.5'
+    arbat_version = '1.3.6'
     coroutines_version = '1.5.2'
-    exoplayer_version = '2.15.0'
+    exoplayer_version = '2.15.1'
     lifecycle_version = '2.3.1'
 }
 
