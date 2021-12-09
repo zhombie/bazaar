@@ -1,6 +1,6 @@
 package kz.zhombie.bazaar.api.model
 
-import kz.zhombie.multimedia.model.Document
+import kz.garage.multimedia.store.model.Document
 
 internal fun Document?.complete(document: Document?): Document? {
     if (this == null) return null

@@ -1,8 +1,8 @@
 package kz.zhombie.bazaar.ui.model
 
 import android.content.Context
+import kz.garage.multimedia.store.model.Folder
 import kz.zhombie.bazaar.R
-import kz.zhombie.multimedia.model.Folder
 
 internal data class UIFolder constructor(
     val folder: Folder,

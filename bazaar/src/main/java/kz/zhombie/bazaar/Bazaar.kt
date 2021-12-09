@@ -6,90 +6,188 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kz.zhombie.bazaar.api.core.ImageLoader
+import kz.zhombie.bazaar.api.core.exception.ImageLoaderNullException
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.core.worker.MediaSyncWorker
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
+import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.presentation.MediaStoreFragment
 import kz.zhombie.bazaar.ui.presentation.MediaStoreScreen
 
-class Bazaar private constructor() {
+object Bazaar {
+    const val TAG = "Bazaar"
 
-    companion object {
-        val TAG: String = Bazaar::class.java.simpleName
+    /**
+     * Settings
+     */
 
-        fun init(imageLoader: ImageLoader, isLoggingEnabled: Boolean) {
-            Settings.setPermanentImageLoader(imageLoader)
-            Settings.setLoggingEnabled(isLoggingEnabled)
-        }
+    data class Configuration constructor(
+        val isLoggingEnabled: Boolean
+    )
 
-        suspend fun sync(context: Context): Boolean {
-            return MediaSyncWorker.startWork(context)
-        }
-
-        suspend fun preload(context: Context, mode: Mode) {
-            MediaScanManager.preload(context, mode)
-        }
-
-        suspend fun preloadAll(context: Context) {
-            MediaScanManager.preload(context, Mode.IMAGE_AND_VIDEO)
-            MediaScanManager.preload(context, Mode.AUDIO)
-            MediaScanManager.preload(context, Mode.DOCUMENT)
-        }
-
-        suspend fun clearCache() {
-            MediaScanManager.clearCache()
-        }
-
-        suspend fun destroyCache() {
-            MediaScanManager.destroyCache()
-        }
-
-        fun selectMode(
-            context: Context,
-            defaultMode: Mode = Mode.IMAGE,
-            amongModes: List<Mode> = listOf(Mode.IMAGE, Mode.VIDEO, Mode.AUDIO, Mode.DOCUMENT),
-            callback: (mode: Mode) -> Unit
-        ): AlertDialog? {
-            val items = mutableListOf<String>()
-
-            if (Mode.IMAGE in amongModes) {
-                items.add(context.getString(R.string.bazaar_image))
-            }
-            if (Mode.VIDEO in amongModes) {
-                items.add(context.getString(R.string.bazaar_video))
-            }
-            if (Mode.AUDIO in amongModes) {
-                items.add(context.getString(R.string.bazaar_audio))
-            }
-            if (Mode.DOCUMENT in amongModes) {
-                items.add(context.getString(R.string.bazaar_document))
-            }
-
-            var checkedItem = amongModes.indexOf(defaultMode)
-            if (checkedItem < 0) {
-                checkedItem = 0
-            }
-
-            return MaterialAlertDialogBuilder(context, R.style.Bazaar_AlertDialogTheme)
-                .setTitle(context.getString(R.string.bazaar_mode_selection))
-                .setSingleChoiceItems(items.toTypedArray(), checkedItem) { dialog, which ->
-                    dialog.dismiss()
-
-                    try {
-                        callback(amongModes[which])
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-                .setNegativeButton(R.string.bazaar_close) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-        }
+    interface Factory {
+        fun getBazaarConfiguration(): Configuration
     }
+
+    private var configuration: Configuration? = null
+    private var configurationFactory: Factory? = null
+
+    private var imageLoader: ImageLoader? = null
+    private var imageLoaderFactory: ImageLoader.Factory? = null
+
+    fun isLoggingEnabled(): Boolean = configuration?.isLoggingEnabled ?: false
+
+    @Synchronized
+    fun getImageLoader(context: Context?): ImageLoader =
+        imageLoader ?: setImageLoaderFactory(context)
+
+    @Synchronized
+    fun setImageLoader(loader: ImageLoader) {
+        imageLoaderFactory = null
+        imageLoader = loader
+    }
+
+    @Synchronized
+    fun setImageLoader(factory: ImageLoader.Factory) {
+        imageLoaderFactory = factory
+        imageLoader = null
+    }
+
+    @Synchronized
+    fun setImageLoaderFactory(context: Context?): ImageLoader {
+        imageLoader?.let { return it }
+
+        imageLoader = imageLoaderFactory?.getImageLoader()
+            ?: (context?.applicationContext as? ImageLoader.Factory)?.getImageLoader()
+
+        Logger.debug(TAG, "setImageLoaderFactory() -> $imageLoader")
+
+        imageLoaderFactory = null
+
+        return imageLoader ?: throw ImageLoaderNullException()
+    }
+
+    @Synchronized
+    fun getConfiguration(context: Context?): Configuration =
+        configuration ?: setConfigurationFactory(context)
+
+    @Synchronized
+    fun setConfiguration(configuration: Configuration?) {
+        configurationFactory = null
+        this.configuration = configuration
+    }
+
+    @Synchronized
+    fun setConfiguration(factory: Factory) {
+        configuration = null
+        configurationFactory = factory
+    }
+
+    @Synchronized
+    fun setConfigurationFactory(context: Context?): Configuration {
+        configuration?.let { return it }
+
+        configuration = configurationFactory?.getBazaarConfiguration()
+            ?: (context?.applicationContext as? Factory)?.getBazaarConfiguration()
+            ?: Configuration(false)
+
+        Logger.debug(TAG, "setConfigurationFactory() -> $configuration")
+
+        configurationFactory = null
+
+        return requireNotNull(configuration)
+    }
+
+    @Synchronized
+    fun clear() {
+        Logger.debug(TAG, "clear()")
+
+        configuration = null
+        configurationFactory = null
+
+        imageLoader = null
+        imageLoaderFactory = null
+    }
+
+    /**
+     * Handy bridge-based methods
+     */
+
+    suspend fun sync(context: Context): Boolean {
+        return MediaSyncWorker.startWork(context)
+    }
+
+    suspend fun preload(context: Context, mode: Mode) {
+        MediaScanManager.preload(context, mode)
+    }
+
+    suspend fun preloadAll(context: Context) {
+        MediaScanManager.preload(context, Mode.IMAGE_AND_VIDEO)
+        MediaScanManager.preload(context, Mode.AUDIO)
+        MediaScanManager.preload(context, Mode.DOCUMENT)
+    }
+
+    suspend fun clearCache() {
+        MediaScanManager.clearCache()
+    }
+
+    suspend fun destroyCache() {
+        MediaScanManager.destroyCache()
+    }
+
+    /**
+     * Pre-selection
+     */
+
+    fun selectMode(
+        context: Context,
+        defaultMode: Mode = Mode.IMAGE,
+        amongModes: List<Mode> = listOf(Mode.IMAGE, Mode.VIDEO, Mode.AUDIO, Mode.DOCUMENT),
+        callback: (mode: Mode) -> Unit
+    ): AlertDialog? {
+        val items = mutableListOf<String>()
+
+        if (Mode.IMAGE in amongModes) {
+            items.add(context.getString(R.string.bazaar_image))
+        }
+        if (Mode.VIDEO in amongModes) {
+            items.add(context.getString(R.string.bazaar_video))
+        }
+        if (Mode.AUDIO in amongModes) {
+            items.add(context.getString(R.string.bazaar_audio))
+        }
+        if (Mode.DOCUMENT in amongModes) {
+            items.add(context.getString(R.string.bazaar_document))
+        }
+
+        var checkedItem = amongModes.indexOf(defaultMode)
+        if (checkedItem < 0) {
+            checkedItem = 0
+        }
+
+        return MaterialAlertDialogBuilder(context, R.style.Bazaar_AlertDialogTheme)
+            .setTitle(context.getString(R.string.bazaar_mode_selection))
+            .setSingleChoiceItems(items.toTypedArray(), checkedItem) { dialog, which ->
+                dialog.dismiss()
+
+                try {
+                    callback(amongModes[which])
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            .setNegativeButton(R.string.bazaar_close) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    /**
+     * Builder pattern
+     */
 
     class Builder constructor(private var resultCallback: ResultCallback? = null) {
 
@@ -166,10 +264,6 @@ class Bazaar private constructor() {
         }
 
         fun show(fragmentManager: FragmentManager): BottomSheetDialogFragment {
-            imageLoader?.let {
-                Settings.setTemporaryImageLoader(it)
-            }
-
             require(maxSelectionCount in 1..10) { "Max selection count MUST be between 1 & 10" }
 
             val fragment = MediaStoreFragment.newInstance(

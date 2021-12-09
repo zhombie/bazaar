@@ -1,6 +1,5 @@
 package kz.zhombie.bazaar.ui.presentation
 
-import android.Manifest
 import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
@@ -19,8 +18,9 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
+import kz.garage.multimedia.store.model.Audio
+import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.Settings
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
@@ -28,8 +28,8 @@ import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.components.view.HeaderView
 import kz.zhombie.bazaar.ui.components.view.SelectButton
-import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIContent
+import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapter
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosAdapterManager
 import kz.zhombie.bazaar.ui.presentation.audible.AudiosHeaderAdapter
@@ -46,7 +46,6 @@ import kz.zhombie.bazaar.utils.contract.GetMultipleContentsContract
 import kz.zhombie.bazaar.utils.contract.TakeVideoContract
 import kz.zhombie.cinema.CinemaDialogFragment
 import kz.zhombie.cinema.model.Movie
-import kz.zhombie.multimedia.model.Audio
 import kz.zhombie.museum.MuseumDialogFragment
 import kz.zhombie.museum.model.Painting
 import kz.zhombie.radio.Radio
@@ -78,21 +77,21 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     // UI interface views
-    private lateinit var rootView: ConstraintLayout
-    private lateinit var headerView: HeaderView
-    private lateinit var audioPlayerViewStub: ViewStub
+    private var rootView: ConstraintLayout? = null
+    private var headerView: HeaderView? = null
+    private var audioPlayerViewStub: ViewStub? = null
     private var contentView: RecyclerView? = null
     private var audioPlayerViewStubInflatedView: View? = null
     private var playOrPauseButton: MaterialButton? = null
     private var titleView: MaterialTextView? = null
     private var subtitleView: MaterialTextView? = null
     private var closeButton: MaterialButton? = null
-    private lateinit var selectButton: SelectButton
-    private lateinit var progressView: LinearLayout
-    private lateinit var cancelButton: MaterialButton
+    private var selectButton: SelectButton? = null
+    private var progressView: LinearLayout? = null
+    private var cancelButton: MaterialButton? = null
 
     // ViewModel
-    private lateinit var viewModel: MediaStoreViewModel
+    private var viewModel: MediaStoreViewModel? = null
 
     // RecyclerView Adapters
     private var foldersAdapterManager: FoldersAdapterManager? = null
@@ -114,12 +113,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private var resultCallback: ResultCallback? = null
 
     // TODO: Handle required permissions on its own
-    private val mandatoryPermissions by lazy {
-        arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-    }
+//    private val mandatoryPermissions by lazy {
+//        arrayOf(
+//            Manifest.permission.READ_EXTERNAL_STORAGE,
+//            Manifest.permission.WRITE_EXTERNAL_STORAGE
+//        )
+//    }
 
     fun setEventListener(eventListener: EventListener) {
         this.eventListener = eventListener
@@ -136,14 +135,22 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
         setStyle(STYLE_NORMAL, theme)
 
-        viewModel = ViewModelProvider(this, MediaStoreViewModelFactory())
-            .get(MediaStoreViewModel::class.java)
+        val configuration = Bazaar.getConfiguration(requireContext())
+        Logger.debug(TAG, "configuration: $configuration")
+
+        val imageLoader = Bazaar.getImageLoader(requireContext())
+        Logger.debug(TAG, "imageLoader: $imageLoader")
+
+        viewModel = ViewModelProvider(
+            this,
+            MediaStoreViewModelFactory()
+        )[MediaStoreViewModel::class.java]
 
         val settings = arguments?.getSerializable(BundleKey.SETTINGS) as MediaStoreScreen.Settings
         val mediaScanManager = MediaScanManager(requireContext())
 
-        viewModel.setSettings(settings)
-        viewModel.setMediaScanManager(mediaScanManager)
+        viewModel?.setSettings(settings)
+        viewModel?.setMediaScanManager(mediaScanManager)
     }
 
     // TODO: Try to get rid of hack, which helps to set fixed position.
@@ -172,15 +179,16 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 isHideable = true
             }
 
-            buttonHeight = selectButton.height
+            buttonHeight = selectButton?.height ?: 0
             collapsedMargin = peekHeight - buttonHeight
-            selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+
+            selectButton?.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 topMargin = collapsedMargin
             }
 
-            if (viewModel.getSettings().isVisualMediaMode()) {
+            if (viewModel?.getSettings()?.isVisualMediaMode() == true) {
                 visualMediaAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
-            } else if (viewModel.getSettings().mode == Mode.AUDIO) {
+            } else if (viewModel?.getSettings()?.mode == Mode.AUDIO) {
                 audiosAdapterManager?.setPadding(extraPaddingBottom = buttonHeight)
             }
 
@@ -193,7 +201,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    selectButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    selectButton?.updateLayoutParams<ConstraintLayout.LayoutParams> {
                         topMargin = if (slideOffset > 0) {
                             (((expandedHeight - buttonHeight) - collapsedMargin) * slideOffset + collapsedMargin).roundToInt()
                         } else {
@@ -230,9 +238,12 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
         contentView?.let { contentView ->
             when {
-                viewModel.getSettings().isVisualMediaMode() -> setupVisualMediaView(contentView)
-                viewModel.getSettings().mode == Mode.AUDIO -> setupAudiosView(contentView)
-                viewModel.getSettings().mode == Mode.DOCUMENT -> setupDocumentsView(contentView)
+                viewModel?.getSettings()?.isVisualMediaMode() == true ->
+                    setupVisualMediaView(contentView)
+                viewModel?.getSettings()?.mode == Mode.AUDIO ->
+                    setupAudiosView(contentView)
+                viewModel?.getSettings()?.mode == Mode.DOCUMENT ->
+                    setupDocumentsView(contentView)
             }
         }
 
@@ -266,24 +277,22 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         documentsAdapterManager?.destroy()
         documentsAdapterManager = null
 
-        selectButton.setOnClickListener(null)
+        selectButton?.setOnClickListener(null)
 
         super.onDestroy()
-
-        Settings.cleanupTemporarySettings()
 
         eventListener?.onDestroy()
         eventListener = null
     }
 
     private fun setupHeaderView() {
-        headerView.setTitle(R.string.bazaar_all_media)
+        headerView?.setTitle(R.string.bazaar_all_media)
 
-        headerView.setOnTitleButtonClickListener {
-            viewModel.onHeaderViewTitleClicked()
+        headerView?.setOnTitleButtonClickListener {
+            viewModel?.onHeaderViewTitleClicked()
         }
 
-        headerView.setOnCloseButtonClickListener { dismiss() }
+        headerView?.setOnCloseButtonClickListener { dismiss() }
     }
 
     private fun setupInfoView() {
@@ -294,9 +303,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         if (visualMediaAdapterManager == null) {
             visualMediaAdapterManager = VisualMediaAdapterManager(requireContext(), recyclerView)
             visualMediaAdapterManager?.create(
-                imageLoader = Settings.getImageLoader(),
-                isCameraEnabled = viewModel.getSettings().isCameraShouldBeAvailable(),
-                isChooseFromLibraryEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                isCameraEnabled = viewModel?.getSettings()?.isCameraShouldBeAvailable() == true,
+                isChooseFromLibraryEnabled = viewModel?.getSettings()?.isLocalMediaSearchAndSelectEnabled == true,
                 visualMediaHeaderAdapterCallback = this,
                 visualMediaAdapterCallback = this
             )
@@ -307,8 +315,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         if (audiosAdapterManager == null) {
             audiosAdapterManager = AudiosAdapterManager(requireContext(), recyclerView)
             audiosAdapterManager?.create(
-                imageLoader = Settings.getImageLoader(),
-                isChooseFromLibraryEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                isChooseFromLibraryEnabled = viewModel?.getSettings()?.isLocalMediaSearchAndSelectEnabled == true,
                 audiosHeaderAdapterCallback = this,
                 audiosAdapterCallback = this
             )
@@ -319,7 +326,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         if (documentsAdapterManager == null) {
             documentsAdapterManager = DocumentsAdapterManager(requireContext(), recyclerView)
             documentsAdapterManager?.create(
-                isChooseFromLibraryEnabled = viewModel.getSettings().isLocalMediaSearchAndSelectEnabled,
+                isChooseFromLibraryEnabled = viewModel?.getSettings()?.isLocalMediaSearchAndSelectEnabled == true,
                 documentsHeaderAdapterCallback = this,
                 documentsAdapterCallback = this
             )
@@ -327,7 +334,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun setupSelectButton(selectedMediaCount: Int = 0) {
-        selectButton.setText(
+        selectButton?.setText(
             title = getString(R.string.bazaar_select),
             subtitle = if (selectedMediaCount == 0) {
                 getString(R.string.bazaar_nothing_selected)
@@ -336,9 +343,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             }
         )
 
-        if (!selectButton.hasOnClickListeners()) {
-            selectButton.setOnClickListener {
-                viewModel.onSubmitSelectMediaRequested()
+        if (selectButton?.hasOnClickListeners() == false) {
+            selectButton?.setOnClickListener {
+                viewModel?.onSubmitSelectMediaRequested()
             }
         }
     }
@@ -347,44 +354,43 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         foldersAdapterManager = FoldersAdapterManager(requireContext(), recyclerView)
         foldersAdapterManager?.hide()
         foldersAdapterManager?.create(
-            imageLoader = Settings.getImageLoader(),
-            type = if (viewModel.getSettings().mode == Mode.AUDIO) {
+            type = if (viewModel?.getSettings()?.mode == Mode.AUDIO) {
                 FoldersAdapterManager.Type.LIST
             } else {
                 FoldersAdapterManager.Type.GRID
             },
-            isCoverEnabled = viewModel.getSettings().isVisualMediaMode()
+            isCoverEnabled = viewModel?.getSettings()?.isVisualMediaMode() == true
         ) {
-            viewModel.onFolderClicked(it)
+            viewModel?.onFolderClicked(it)
         }
     }
 
     private fun setupProgressView() {
-        progressView.visibility = View.GONE
-        cancelButton.setOnClickListener { viewModel.onCancelMediaSelectionRequested() }
+        progressView?.visibility = View.GONE
+        cancelButton?.setOnClickListener { viewModel?.onCancelMediaSelectionRequested() }
     }
 
     private fun observeScreenState() {
-        viewModel.getScreenState().observe(viewLifecycleOwner, { state ->
+        viewModel?.getScreenState()?.observe(viewLifecycleOwner, { state ->
             when (state) {
                 MediaStoreScreen.State.LOADING -> {
-                    selectButton.isEnabled = false
-                    progressView.visibility = View.VISIBLE
+                    selectButton?.isEnabled = false
+                    progressView?.visibility = View.VISIBLE
                 }
                 MediaStoreScreen.State.CONTENT -> {
-                    selectButton.isEnabled = true
-                    progressView.visibility = View.GONE
+                    selectButton?.isEnabled = true
+                    progressView?.visibility = View.GONE
                 }
                 else -> {
-                    selectButton.isEnabled = true
-                    progressView.visibility = View.GONE
+                    selectButton?.isEnabled = true
+                    progressView?.visibility = View.GONE
                 }
             }
         })
     }
 
     private fun observeAction() {
-        viewModel.getAction().observe(viewLifecycleOwner, { action ->
+        viewModel?.getAction()?.observe(viewLifecycleOwner, { action ->
             when (action) {
                 is MediaStoreScreen.Action.SubmitSelectedMedia -> {
                     resultCallback?.onGalleryMediaResult(action.media)
@@ -400,9 +406,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                         .setSingleChoiceItems(arrayOf(getString(R.string.bazaar_take_picture), getString(R.string.bazaar_take_video)), -1) { dialog, which ->
                             dialog.dismiss()
                             if (which == 0) {
-                                viewModel.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakePicture::class)
+                                viewModel?.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakePicture::class)
                             } else if (which == 1) {
-                                viewModel.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakeVideo::class)
+                                viewModel?.onChoiceMadeBetweenTakePictureOrVideo(MediaStoreScreen.Action.TakeVideo::class)
                             }
                         }
                         .show()
@@ -541,42 +547,42 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun observeSelectedMedia() {
-        viewModel.getSelectedMedia().observe(viewLifecycleOwner, { media ->
-            Logger.d(TAG, "getSelectedMedia() -> media.size: ${media.size}")
+        viewModel?.getSelectedMedia()?.observe(viewLifecycleOwner, { media ->
+            Logger.debug(TAG, "getSelectedMedia() -> media.size: ${media.size}")
             setupSelectButton(media.size)
         })
     }
 
     private fun observeDisplayedMedia() {
-        viewModel.getDisplayedMedia().observe(viewLifecycleOwner, { uiContents: List<UIContent> ->
-            if (viewModel.getSettings().isVisualMediaMode()) {
+        viewModel?.getDisplayedMedia()?.observe(viewLifecycleOwner, { uiContents: List<UIContent> ->
+            if (viewModel?.getSettings()?.isVisualMediaMode() == true) {
                 visualMediaAdapterManager?.submitList(uiContents)
-            } else if (viewModel.getSettings().mode == Mode.AUDIO) {
+            } else if (viewModel?.getSettings()?.mode == Mode.AUDIO) {
                 audiosAdapterManager?.submitList(uiContents)
             }
         })
     }
 
     private fun observeDisplayedFolders() {
-        viewModel.getDisplayedFolders().observe(viewLifecycleOwner, { folders ->
+        viewModel?.getDisplayedFolders()?.observe(viewLifecycleOwner, { folders ->
             foldersAdapterManager?.submitList(folders)
         })
     }
 
     private fun observeIsFoldersDisplayed() {
-        viewModel.getIsFoldersDisplayed().observe(viewLifecycleOwner, { isFoldersDisplayed ->
+        viewModel?.getIsFoldersDisplayed()?.observe(viewLifecycleOwner, { isFoldersDisplayed ->
             if (isFoldersDisplayed) {
-                headerView.toggleIcon(true)
+                headerView?.toggleIcon(true)
                 foldersAdapterManager?.show()
 
                 (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
-                headerView.toggleIcon(false)
+                headerView?.toggleIcon(false)
                 foldersAdapterManager?.hide()
 
-                if (viewModel.getSettings().isVisualMediaMode()) {
+                if (viewModel?.getSettings()?.isVisualMediaMode() == true) {
                     visualMediaAdapterManager?.scrollToTop()
-                } else if (viewModel.getSettings().mode == Mode.AUDIO) {
+                } else if (viewModel?.getSettings()?.mode == Mode.AUDIO) {
                     audiosAdapterManager?.scrollToTop()
                 }
             }
@@ -584,9 +590,9 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     private fun observeActiveFolder() {
-        viewModel.getActiveFolder().observe(viewLifecycleOwner, { uiFolder ->
+        viewModel?.getActiveFolder()?.observe(viewLifecycleOwner, { uiFolder ->
             val displayName = uiFolder.getDisplayName(requireContext())
-            headerView.setTitle(displayName)
+            headerView?.setTitle(displayName)
         })
     }
 
@@ -595,11 +601,11 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onCameraClicked() {
-        viewModel.onCameraShotRequested()
+        viewModel?.onCameraShotRequested()
     }
 
     override fun onChooseFromLibraryClicked() {
-        viewModel.onSelectLocalMediaRequested()
+        viewModel?.onSelectLocalMediaRequested()
     }
 
     /**
@@ -608,7 +614,6 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
         MuseumDialogFragment.Builder()
-            .setPaintingLoader(Settings.getImageLoader())
             .setPainting(
                 Painting(
                     uri = uiMedia.media.uri,
@@ -624,7 +629,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
-        viewModel.onMediaCheckboxClicked(uiMedia)
+        viewModel?.onMediaCheckboxClicked(uiMedia)
     }
 
     override fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
@@ -644,7 +649,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
-        viewModel.onMediaCheckboxClicked(uiMedia)
+        viewModel?.onMediaCheckboxClicked(uiMedia)
     }
 
     /**
@@ -702,14 +707,14 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         }
 
         fun playOrPause() {
-            Logger.d(TAG, "playOrPause() -> $uiContent")
+            Logger.debug(TAG, "playOrPause() -> $uiContent")
 
             if (radio == null) {
                 radio = Radio.Builder(requireContext())
                     .create(object : Radio.Listener {
                         override fun onIsPlayingStateChanged(isPlaying: Boolean) {
                             if (isPlaying) {
-                                Logger.d(TAG, "onPlay() -> $currentPlayingAudio")
+                                Logger.debug(TAG, "onPlay() -> $currentPlayingAudio")
 
                                 playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_pause)
 
@@ -721,7 +726,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                                     audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = true)
                                 }
                             } else {
-                                Logger.d(TAG, "onPause() -> $currentPlayingAudio")
+                                Logger.debug(TAG, "onPause() -> $currentPlayingAudio")
 
                                 playOrPauseButton?.setIconResource(R.drawable.bazaar_ic_play)
 
@@ -766,7 +771,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         }
 
         if (audioPlayerViewStubInflatedView == null) {
-            audioPlayerViewStub.setOnInflateListener { _, inflated ->
+            audioPlayerViewStub?.setOnInflateListener { _, inflated ->
                 audioPlayerViewStubInflatedView = inflated
                 playOrPauseButton = inflated?.findViewById(R.id.playOrPauseButton)
                 titleView = inflated?.findViewById(R.id.titleView)
@@ -777,7 +782,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
                 playOrPause()
             }
 
-            audioPlayerViewStub.inflate()
+            audioPlayerViewStub?.inflate()
         } else {
             if (audioPlayerViewStubInflatedView?.visibility != View.VISIBLE) {
                 audioPlayerViewStubInflatedView?.visibility = View.VISIBLE
@@ -789,7 +794,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onAudioClicked(uiContent: UIContent) {
-        viewModel.onMediaCheckboxClicked(uiContent)
+        viewModel?.onMediaCheckboxClicked(uiContent)
     }
 
     /**
@@ -814,7 +819,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onDocumentClicked(uiContent: UIContent) {
-        viewModel.onMediaCheckboxClicked(uiContent)
+        viewModel?.onMediaCheckboxClicked(uiContent)
     }
 
     // Calculates height for 90% of fullscreen
@@ -827,52 +832,52 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
-        viewModel.onPictureTaken(isSuccess)
+        viewModel?.onPictureTaken(isSuccess)
     }
 
     private val takeVideo = registerForActivityResult(TakeVideoContract()) { uri ->
-        Logger.d(TAG, "uri: $uri")
-        viewModel.onVideoTaken(uri)
+        Logger.debug(TAG, "uri: $uri")
+        viewModel?.onVideoTaken(uri)
     }
 
     private val getLocalMediaImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        viewModel.onLocalMediaImageSelected(uri)
+        viewModel?.onLocalMediaImageSelected(uri)
     }
 
     private val getLocalMediaImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        viewModel.onLocalMediaImagesSelected(uris)
+        viewModel?.onLocalMediaImagesSelected(uris)
     }
 
     private val getLocalMediaVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        viewModel.onLocalMediaVideoSelected(uri)
+        viewModel?.onLocalMediaVideoSelected(uri)
     }
 
     private val getLocalMediaVideos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri>? ->
-        viewModel.onLocalMediaVideosSelected(uris)
+        viewModel?.onLocalMediaVideosSelected(uris)
     }
 
     private val getLocalMediaImageOrVideo = registerForActivityResult(GetContentContract()) { uri ->
-        viewModel.onLocalMediaImageOrVideoSelected(uri)
+        viewModel?.onLocalMediaImageOrVideoSelected(uri)
     }
 
     private val getLocalMediaImagesAndVideos = registerForActivityResult(GetMultipleContentsContract()) { uris ->
-        viewModel.onLocalMediaImagesAndVideosSelected(uris)
+        viewModel?.onLocalMediaImagesAndVideosSelected(uris)
     }
 
     private val getLocalMediaAudio = registerForActivityResult(GetContentContract()) { uri ->
-        viewModel.onLocalMediaAudioSelected(uri)
+        viewModel?.onLocalMediaAudioSelected(uri)
     }
 
     private val getLocalMediaAudios = registerForActivityResult(GetMultipleContentsContract()) { uris ->
-        viewModel.onLocalMediaAudiosSelected(uris)
+        viewModel?.onLocalMediaAudiosSelected(uris)
     }
 
     private val getLocalDocument = registerForActivityResult(GetContentContract()) { uri ->
-        viewModel.onLocalDocumentSelected(uri)
+        viewModel?.onLocalDocumentSelected(uri)
     }
 
     private val getLocalDocuments = registerForActivityResult(GetMultipleContentsContract()) { uris ->
-        viewModel.onLocalDocumentsSelected(uris)
+        viewModel?.onLocalDocumentsSelected(uris)
     }
 
 }

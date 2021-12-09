@@ -1,9 +1,9 @@
 package kz.zhombie.bazaar.ui.presentation
 
 import android.net.Uri
+import kz.garage.multimedia.store.model.*
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
-import kz.zhombie.multimedia.model.*
 import java.io.Serializable
 
 internal object MediaStoreScreen {

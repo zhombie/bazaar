@@ -13,6 +13,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kz.garage.multimedia.store.model.Content
+import kz.garage.multimedia.store.model.Media
+import kz.zhombie.bazaar.App
 import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
@@ -22,16 +25,16 @@ import kz.zhombie.bazaar.api.core.showSafely
 import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
 import kz.zhombie.bazaar.api.result.ResultCallback
-import kz.zhombie.bazaar.imageloader.CoilImageLoader
-import kz.zhombie.bazaar.imageloader.GlideImageLoader
+import kz.zhombie.bazaar.imageLoader
+import kz.zhombie.bazaar.loader.CoilImageLoader
+import kz.zhombie.bazaar.loader.GlideImageLoader
 import kz.zhombie.bazaar.ui.adapter.ContentsAdapter
 import kz.zhombie.bazaar.utils.OpenFileAction
 import kz.zhombie.bazaar.utils.open
 import kz.zhombie.bazaar.utils.tryToLaunch
-import kz.zhombie.cinema.CinemaDialogFragment
-import kz.zhombie.multimedia.model.Content
-import kz.zhombie.multimedia.model.Media
-import kz.zhombie.museum.MuseumDialogFragment
+import kz.zhombie.cinema.Cinema
+import kz.zhombie.museum.Museum
+import kz.zhombie.museum.paintingLoader
 
 class MainActivity : AppCompatActivity(), ResultCallback {
 
@@ -43,13 +46,26 @@ class MainActivity : AppCompatActivity(), ResultCallback {
         const val EXTERNAL_STORAGE_ACCESS = 100
     }
 
-    private lateinit var glideImageLoader: Pair<String, ImageLoader>
-    private lateinit var coilImageLoader: Pair<String, ImageLoader>
-    private lateinit var defaultImageLoader: Pair<String, ImageLoader>
+    private val app: App?
+        get() = (applicationContext as? App)
 
-    private lateinit var imageLoader: ImageLoader
+    private var GLIDE_IMAGE_LOADER: Pair<String, ImageLoader>? = null
+    private var COIL_IMAGE_LOADER: Pair<String, ImageLoader>? = null
 
-    private var viewHolder: ViewHolder? = null
+    private var IMAGE_LOADER: Pair<String, ImageLoader>? = null
+        set(value) {
+            field = value
+
+            Log.d(TAG, "IMAGE_LOADER -> $value")
+
+            if (value != null) {
+                Museum.setPaintingLoader(value.second)
+            }
+
+            uiViewHolder?.imageLoaderView?.text = value?.first
+        }
+
+    private var uiViewHolder: UIViewHolder? = null
 
     private var adapter: ContentsAdapter? = null
 
@@ -58,23 +74,23 @@ class MainActivity : AppCompatActivity(), ResultCallback {
             field = value
 
             if (value == null) {
-                viewHolder?.modeView?.text = "ALL"
+                uiViewHolder?.modeView?.text = "ALL"
             } else {
-                viewHolder?.modeView?.text = value.toString()
+                uiViewHolder?.modeView?.text = value.toString()
             }
         }
 
     private var maxSelectionCount: Int = 3
         set(value) {
             field = value
-            viewHolder?.maxSelectionCountView?.text = value.toString()
+            uiViewHolder?.maxSelectionCountView?.text = value.toString()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewHolder = ViewHolder(this)
+        uiViewHolder = UIViewHolder(this)
 
         setup()
 
@@ -132,28 +148,48 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
         super.onDestroy()
 
-        if (imageLoader is CoilImageLoader) {
-            (imageLoader as? CoilImageLoader)?.clearCache()
-        }
-
         adapter = null
 
-        viewHolder = null
+        uiViewHolder = null
+
+        // Cinema
+        Cinema.clear()
+
+        // Museum
+        paintingLoader.clearCache()
+        Museum.clear()
+
+        // Bazaar
+        imageLoader.clearCache()
+        Bazaar.clear()
     }
 
     private fun setup() {
-        // Image loader declaration
-        glideImageLoader = "Glide" to GlideImageLoader()
-        coilImageLoader = "Coil" to CoilImageLoader(this)
-        defaultImageLoader = coilImageLoader
+        // Image Loader declaration
+        val imageLoaderInstance = app?.getImageLoader()
 
-        imageLoader = defaultImageLoader.second
-        viewHolder?.imageLoaderView?.text = defaultImageLoader.first
+        Log.d(TAG, "setup() -> $imageLoaderInstance")
 
-        // Library initialization
-        MuseumDialogFragment.init(imageLoader, true)
-        CinemaDialogFragment.init(true)
-        Bazaar.init(imageLoader, true)
+        var default: Pair<String, ImageLoader>? = null
+
+        GLIDE_IMAGE_LOADER = if (imageLoaderInstance is GlideImageLoader) {
+            val new = "Glide" to imageLoaderInstance
+            default = new
+            new
+        } else {
+            "Glide" to GlideImageLoader(this, this)
+        }
+
+        COIL_IMAGE_LOADER = if (imageLoaderInstance is CoilImageLoader) {
+            val new = "Coil" to imageLoaderInstance
+            default = new
+            new
+        } else {
+            "Coil" to CoilImageLoader(this, Bazaar.isLoggingEnabled())
+        }
+
+        // Default Image Loader
+        IMAGE_LOADER = default
 
         // Mode
         mode = Mode.IMAGE_AND_VIDEO
@@ -163,7 +199,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun setupRecyclerView() {
-        adapter = ContentsAdapter(imageLoader) { content ->
+        adapter = ContentsAdapter { content ->
             val file = content.localFile?.file ?: return@ContentsAdapter
             when (val action = file.open(this)) {
                 is OpenFileAction.Success -> {
@@ -184,31 +220,30 @@ class MainActivity : AppCompatActivity(), ResultCallback {
             }
         }
 
-        viewHolder?.recyclerView?.adapter = adapter
+        uiViewHolder?.recyclerView?.adapter = adapter
     }
 
     private fun setupImageLoaderButton() {
-        viewHolder?.imageLoaderButton?.setOnClickListener {
+        uiViewHolder?.imageLoaderButton?.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Image loader")
-                .setSingleChoiceItems(arrayOf(coilImageLoader.first, glideImageLoader.first), -1) { dialog, which ->
+                .setSingleChoiceItems(
+                    arrayOf(COIL_IMAGE_LOADER?.first, GLIDE_IMAGE_LOADER?.first),
+                    -1
+                ) { dialog, which ->
                     dialog.dismiss()
-                    val selectedImageLoader = when (which) {
-                        0 -> coilImageLoader
-                        1 -> glideImageLoader
-                        else -> glideImageLoader
+                    IMAGE_LOADER = when (which) {
+                        0 -> COIL_IMAGE_LOADER
+                        1 -> GLIDE_IMAGE_LOADER
+                        else -> COIL_IMAGE_LOADER
                     }
-
-                    imageLoader = selectedImageLoader.second
-                    viewHolder?.imageLoaderView?.text = selectedImageLoader.first
-                    adapter?.imageLoader = selectedImageLoader.second
                 }
                 .show()
         }
     }
 
     private fun setupModeButton() {
-        viewHolder?.modeButton?.setOnClickListener {
+        uiViewHolder?.modeButton?.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Mode")
                 .setSingleChoiceItems(
@@ -239,7 +274,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun setupMaxSelectionCountButton() {
-        viewHolder?.maxSelectionCountButton?.setOnClickListener {
+        uiViewHolder?.maxSelectionCountButton?.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Max selection count")
                 .setSingleChoiceItems(arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), -1) { dialog, which ->
@@ -251,7 +286,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     }
 
     private fun setupShowButton() {
-        viewHolder?.showButton?.setOnClickListener {
+        uiViewHolder?.showButton?.setOnClickListener {
             if (checkPermissions()) {
                 if (mode == null) {
                     Bazaar.selectMode(this) { selectedMode ->

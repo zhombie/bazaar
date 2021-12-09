@@ -1,9 +1,9 @@
 package kz.zhombie.bazaar.ui.model
 
-import kz.zhombie.multimedia.model.Audio
-import kz.zhombie.multimedia.model.Content
-import kz.zhombie.multimedia.model.Document
-import kz.zhombie.multimedia.model.Media
+import kz.garage.multimedia.store.model.Audio
+import kz.garage.multimedia.store.model.Content
+import kz.garage.multimedia.store.model.Document
+import kz.garage.multimedia.store.model.Media
 import java.io.Serializable
 import java.util.concurrent.TimeUnit
 

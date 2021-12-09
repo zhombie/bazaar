@@ -1,7 +1,7 @@
 package kz.zhombie.bazaar.api.model
 
-import kz.zhombie.multimedia.model.Media
-import kz.zhombie.multimedia.model.Video
+import kz.garage.multimedia.store.model.Media
+import kz.garage.multimedia.store.model.Video
 
 internal fun Video.complete(video: Video?): Video? {
     if (video == null) return null

@@ -1,13 +1,13 @@
 package kz.zhombie.bazaar.api.core.worker
 
 import android.content.Context
-import android.os.Build
 import androidx.work.*
 import kotlinx.coroutines.CancellationException
 import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.core.logging.Logger
 
+@Suppress("USELESS_IS_CHECK")
 class MediaSyncWorker constructor(
     private val context: Context,
     params: WorkerParameters
@@ -23,11 +23,7 @@ class MediaSyncWorker constructor(
                 .setRequiresBatteryNotLow(true)
                 .setRequiresCharging(false)
                 .setRequiresStorageNotLow(false)
-                .apply {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        setRequiresDeviceIdle(false)
-                    }
-                }
+                .setRequiresDeviceIdle(false)
                 .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
                 .build()
 
@@ -41,7 +37,6 @@ class MediaSyncWorker constructor(
                 )
             return try {
                 val success = operation.await()
-                @Suppress("USELESS_IS_CHECK")
                 return success is Operation.State.SUCCESS
             } catch (e: Exception) {
                 if (e !is CancellationException) {
@@ -57,8 +52,8 @@ class MediaSyncWorker constructor(
 
             return try {
                 val success = operation.await()
-                Logger.d(TAG, "cancelWork() -> success: $success")
-                return true
+                Logger.debug(TAG, "cancelWork() -> success: $success")
+                return success is Operation.State.SUCCESS
             } catch (e: Exception) {
                 if (e !is CancellationException) {
                     e.printStackTrace()

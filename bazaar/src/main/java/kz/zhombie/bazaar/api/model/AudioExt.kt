@@ -1,7 +1,7 @@
 package kz.zhombie.bazaar.api.model
 
-import kz.zhombie.multimedia.model.Audio
-import kz.zhombie.multimedia.model.Media
+import kz.garage.multimedia.store.model.Audio
+import kz.garage.multimedia.store.model.Media
 
 internal fun Audio.complete(audio: Audio?): Audio? {
     if (audio == null) return null

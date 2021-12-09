@@ -10,14 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.core.logging.Logger
+import kz.zhombie.bazaar.dispose
+import kz.zhombie.bazaar.load
 import kz.zhombie.bazaar.ui.components.view.SquareImageView
 import kz.zhombie.bazaar.ui.model.UIFolder
 import kz.zhombie.bazaar.utils.inflate
 
 internal class FoldersAdapter constructor(
-    private val imageLoader: ImageLoader,
     private val type: Type,
     private val isCoverEnabled: Boolean,
     private val onFolderClicked: (uiFolder: UIFolder) -> Unit,
@@ -52,14 +51,14 @@ internal class FoldersAdapter constructor(
             } else {
                 if (field != value) {
                     field = value
-                    Logger.d(TAG, "leftOffset: $value")
+//                    Logger.debug(TAG, "leftOffset: $value")
                     onLeftOffsetReadyListener?.invoke(value)
                 }
             }
         }
 
     fun submitList(data: List<UIFolder>) {
-        Logger.d(TAG, "submitList() -> ${data.size}")
+//        Logger.debug(TAG, "submitList() -> ${data.size}")
         asyncListDiffer.submitList(data)
     }
 
@@ -85,15 +84,16 @@ internal class FoldersAdapter constructor(
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
         if (holder is SquareViewHolder) {
-            imageLoader.dispose(holder.imageView)
+            holder.unbind()
         } else if (holder is RectangleViewHolder) {
-            imageLoader.dispose(holder.imageView)
+            holder.unbind()
         }
     }
 
     private inner class SquareViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        val imageView: SquareImageView = view.findViewById(R.id.imageView)
+        private val imageView: SquareImageView = view.findViewById(R.id.imageView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
 
@@ -109,7 +109,11 @@ internal class FoldersAdapter constructor(
                 if (cover == null) {
                     imageView.setImageResource(R.drawable.bazaar_bg_black)
                 } else {
-                    imageLoader.loadSmallImage(itemView.context, imageView, cover)
+                    imageView.load(cover) {
+                        setErrorDrawable(R.drawable.bazaar_bg_black)
+                        setPlaceholderDrawable(R.drawable.bazaar_bg_black)
+                        setSize(300, 300)
+                    }
                 }
 
                 if (imageView.visibility != View.VISIBLE) {
@@ -136,10 +140,14 @@ internal class FoldersAdapter constructor(
             itemView.setOnClickListener { onFolderClicked(uiFolder) }
         }
 
+        fun unbind() {
+            imageView.dispose()
+        }
+
     }
 
     private inner class RectangleViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
-        val imageView: ShapeableImageView = view.findViewById(R.id.imageView)
+        private val imageView: ShapeableImageView = view.findViewById(R.id.imageView)
         private val contentView = view.findViewById<LinearLayout>(R.id.contentView)
         private val titleView = view.findViewById<MaterialTextView>(R.id.titleView)
         private val subtitleView = view.findViewById<MaterialTextView>(R.id.subtitleView)
@@ -164,6 +172,10 @@ internal class FoldersAdapter constructor(
             }
 
             itemView.setOnClickListener { onFolderClicked(uiFolder) }
+        }
+
+        fun unbind() {
+            imageView.dispose()
         }
 
     }

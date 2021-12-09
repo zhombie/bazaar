@@ -1,6 +1,5 @@
 package kz.zhombie.bazaar.ui.presentation.document
 
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -10,13 +9,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
+import kz.garage.multimedia.store.model.Audio
+import kz.garage.multimedia.store.model.Document
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.CheckBoxButton
 import kz.zhombie.bazaar.ui.model.UIContent
 import kz.zhombie.bazaar.utils.inflate
-import kz.zhombie.multimedia.model.Audio
-import kz.zhombie.multimedia.model.Document
 
 internal class DocumentsAdapter constructor(
     private val callback: Callback
@@ -54,7 +53,7 @@ internal class DocumentsAdapter constructor(
     fun getList(): List<UIContent> = asyncListDiffer.currentList
 
     fun submitList(uiContents: List<UIContent>) {
-        Logger.d(TAG, "submitList() -> ${uiContents.size}")
+        Logger.debug(TAG, "submitList() -> ${uiContents.size}")
         asyncListDiffer.submitList(uiContents)
     }
 
@@ -76,7 +75,7 @@ internal class DocumentsAdapter constructor(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        Logger.d(TAG, "payloads: $payloads")
+        Logger.debug(TAG, "payloads: $payloads")
         if (payloads.isNullOrEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
         } else {
@@ -163,15 +162,11 @@ internal class DocumentsAdapter constructor(
             if (uiContent.isSelectable) {
                 itemView.isEnabled = true
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    itemView.foreground = null
-                }
+                itemView.foreground = null
             } else {
                 itemView.isEnabled = false
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_alpha_black)
-                }
+                itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_alpha_black)
             }
         }
 
@@ -184,7 +179,7 @@ internal class DocumentsAdapter constructor(
         }
 
         fun toggleVisibility(uiContent: UIContent) {
-            Logger.d(TAG, "toggleVisibility() -> uiContent: $uiContent")
+            Logger.debug(TAG, "toggleVisibility() -> uiContent: $uiContent")
         }
     }
 

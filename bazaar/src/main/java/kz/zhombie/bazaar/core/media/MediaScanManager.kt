@@ -13,15 +13,15 @@ import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import kotlinx.coroutines.*
+import kz.garage.multimedia.store.Projection
+import kz.garage.multimedia.store.getImageResolution
+import kz.garage.multimedia.store.model.*
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.model.ImageBitmap
 import kz.zhombie.bazaar.core.media.utils.*
 import kz.zhombie.bazaar.utils.*
-import kz.zhombie.multimedia.Projection
-import kz.zhombie.multimedia.getImageResolution
-import kz.zhombie.multimedia.model.*
 import java.io.*
 import java.util.*
 import kotlin.math.min
@@ -38,7 +38,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         private const val DEFAULT_CAMERA_FOLDER = "camera"
 
         suspend fun preload(context: Context, mode: Mode) {
-            Logger.d(TAG, "preload()")
+            Logger.debug(TAG, "preload()")
             val mediaScanManager = MediaScanManager(context)
             if (mode == Mode.AUDIO || mode == Mode.DOCUMENT) {
                 val contents = when (mode) {
@@ -46,7 +46,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     Mode.DOCUMENT -> null
                     else -> null
                 }
-                Logger.d(TAG, "preload() -> mode: $mode, contents: ${contents?.size}")
+                Logger.debug(TAG, "preload() -> mode: $mode, contents: ${contents?.size}")
                 if (!contents.isNullOrEmpty()) {
                     Cache.getInstance().setContents(contents)
                 }
@@ -57,7 +57,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     Mode.IMAGE_AND_VIDEO -> mediaScanManager.loadLocalMediaImagesAndVideos()
                     else -> null
                 }
-                Logger.d(TAG, "preload() -> mode: $mode, media: ${media?.size}")
+                Logger.debug(TAG, "preload() -> mode: $mode, media: ${media?.size}")
                 if (!media.isNullOrEmpty()) {
                     Cache.getInstance().setMedia(media)
                 }
@@ -65,19 +65,25 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
 
         suspend fun clearCache() {
-            Logger.d(TAG, "clearCache()")
+            Logger.debug(TAG, "clearCache()")
             Cache.getInstance().clear()
         }
 
         suspend fun destroyCache() {
-            Logger.d(TAG, "destroyCache()")
+            Logger.debug(TAG, "destroyCache()")
             Cache.getInstance().destroy()
         }
     }
 
-    suspend fun createCameraPictureInputTempFile(): Image? = withContext(Dispatchers.IO) {
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
+
+    private val io = Dispatchers.Default + exceptionHandler
+
+    suspend fun createCameraPictureInputTempFile(): Image? = withContext(io) {
         try {
-            Logger.d(TAG, "createCameraPictureInputTempFile()")
+            Logger.debug(TAG, "createCameraPictureInputTempFile()")
 
             // Must be same as <cache-path name="*" path="*" />
             val directory = File(context.cacheDir, DEFAULT_CAMERA_FOLDER).apply { mkdirs() }
@@ -96,7 +102,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
             val timestamp = System.currentTimeMillis()
 
-            Logger.d(TAG, "createCameraPictureInputTempFile() -> ${file.absolutePath}")
+            Logger.debug(TAG, "createCameraPictureInputTempFile() -> ${file.absolutePath}")
 
             Image(
                 id = Content.generateId(),
@@ -122,7 +128,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
-    suspend fun createCameraVideoInputTempFile(): Video? = withContext(Dispatchers.IO) {
+    suspend fun createCameraVideoInputTempFile(): Video? = withContext(io) {
         try {
             // Must be same as <cache-path name="*" path="*" />
             val directory = File(context.cacheDir, DEFAULT_CAMERA_FOLDER).apply { mkdirs() }
@@ -166,7 +172,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         }
     }
 
-    suspend fun loadLocalMediaImages(): List<Media>? = withContext(Dispatchers.IO) {
+    suspend fun loadLocalMediaImages(): List<Media>? = withContext(io) {
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection: Array<String> = Projection.Image.get().toTypedArray()
         val selection = "(${MediaStore.Images.ImageColumns.MIME_TYPE}=? OR ${MediaStore.Images.ImageColumns.MIME_TYPE}=?) AND ${MediaStore.Images.ImageColumns.SIZE}>=?"
@@ -397,7 +403,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     image = cursor.readOpenableImage(uri)
                 }
 
-            Logger.d(TAG, "Scanned by MediaStore: $image")
+            Logger.debug(TAG, "Scanned by MediaStore: $image")
 
             if (image == null) return@withContext null
 
@@ -406,7 +412,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 filename = requireNotNull(image).label ?: createImageFilename()
             ) ?: return@withContext null
 
-            Logger.d(TAG, "Created local file: $file")
+            Logger.debug(TAG, "Created local file: $file")
 
             // Set file
             image = image?.copy(
@@ -482,7 +488,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     video = cursor.readOpenableVideo(uri)
                 }
 
-            Logger.d(TAG, "Scanned by MediaStore: $video")
+            Logger.debug(TAG, "Scanned by MediaStore: $video")
 
             if (video == null) return@withContext null
 
@@ -491,7 +497,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 filename = requireNotNull(video).label ?: createVideoFilename()
             ) ?: return@withContext null
 
-            Logger.d(TAG, "Created local file: $file")
+            Logger.debug(TAG, "Created local file: $file")
 
             // Set file
             video = video?.copy(
@@ -520,7 +526,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 )
             }
 
-            Logger.d(TAG, "video: $video")
+            Logger.debug(TAG, "video: $video")
 
             return@withContext video
         } catch (e: Exception) {
@@ -550,7 +556,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                     audio = cursor.readOpenableAudio(uri)
                 }
 
-            Logger.d(TAG, "Scanned by MediaStore: $audio")
+            Logger.debug(TAG, "Scanned by MediaStore: $audio")
 
             if (audio == null) return@withContext null
 
@@ -559,7 +565,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 requireNotNull(audio).label ?: createAudioFilename()
             ) ?: return@withContext null
 
-            Logger.d(TAG, "Created local file: $file")
+            Logger.debug(TAG, "Created local file: $file")
 
             // Set file
             audio = audio?.copy(
@@ -579,7 +585,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 )
             }
 
-            Logger.d(TAG, "audio: $audio")
+            Logger.debug(TAG, "audio: $audio")
 
             return@withContext audio
         } catch (e: Exception) {
@@ -596,7 +602,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
     suspend fun loadSelectedLocalMediaImageOrVideo(uri: Uri): Media? = withContext(Dispatchers.IO) {
         val mimeType = uri.getMimeType(context)?.lowercase(Locale.ROOT)
-        Logger.d(TAG, "loadSelectedLocalMediaImageOrVideo() -> mimeType: $mimeType")
+        Logger.debug(TAG, "loadSelectedLocalMediaImageOrVideo() -> mimeType: $mimeType")
         if (mimeType.isNullOrBlank()) {
             return@withContext null
         }
@@ -632,7 +638,7 @@ internal class MediaScanManager constructor(private val context: Context) {
                 requireNotNull(document).label ?: createDocumentFilename()
             ) ?: return@withContext null
 
-            Logger.d(TAG, "Created local file: $file")
+            Logger.debug(TAG, "Created local file: $file")
 
             // Set file
             document = document?.copy(
@@ -670,14 +676,14 @@ internal class MediaScanManager constructor(private val context: Context) {
         type: String,
         filename: String
     ): File? = withContext(Dispatchers.IO) {
-        Logger.d(TAG, "transformLocalContentToFile() -> filename: $filename")
+        Logger.debug(TAG, "transformLocalContentToFile() -> filename: $filename")
 
         // If file could not be created, then there is no need to continue code flow
         return@withContext runCatching {
             val file = File(context.getExternalFilesDir(type), filename)
 //            file = File(context.cacheDir, filename)
 
-            Logger.d(TAG, "Create local file [$file] with name $filename")
+            Logger.debug(TAG, "Create local file [$file] with name $filename")
 
             if (!file.exists()) {
                 file.createNewFile()
@@ -733,7 +739,7 @@ internal class MediaScanManager constructor(private val context: Context) {
         val file = image.localFile?.file ?: return@withContext image
         if (!file.exists()) return@withContext image
         val bitmap: Bitmap? = BitmapFactory.decodeFile(file.path)
-        Logger.d(TAG, "takenImage: $bitmap, ${bitmap?.width} x ${bitmap?.height}")
+        Logger.debug(TAG, "takenImage: $bitmap, ${bitmap?.width} x ${bitmap?.height}")
         val width = bitmap?.width
         val height = bitmap?.height
         val resolution = if (width != null && height != null) {
@@ -795,7 +801,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
     @Throws(IllegalArgumentException::class)
     private fun decodeScaledBitmap(uri: Uri): ImageBitmap? {
-        Logger.d(TAG, "decodeScaledBitmap() -> uri: $uri")
+        Logger.debug(TAG, "decodeScaledBitmap() -> uri: $uri")
 
         val inputStream = context.contentResolver?.openInputStream(uri) ?: return null
 

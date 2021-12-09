@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIFolder
 
@@ -30,14 +29,12 @@ internal class FoldersAdapterManager constructor(
     private var itemDecoration: SpacingItemDecoration? = null
 
     fun create(
-        imageLoader: ImageLoader,
         type: Type,
         isCoverEnabled: Boolean,
         onFolderClicked: (uiFolder: UIFolder) -> Unit
     ) {
         if (foldersAdapter == null) {
             foldersAdapter = FoldersAdapter(
-                imageLoader = imageLoader,
                 type = if (type == Type.LIST) {
                     FoldersAdapter.Type.RECTANGLE
                 } else {

@@ -5,7 +5,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.R
 
-class ViewHolder constructor(activity: MainActivity) {
+class UIViewHolder constructor(activity: MainActivity) {
 
     val imageLoaderView: MaterialTextView = activity.findViewById(R.id.imageLoaderView)
     val imageLoaderButton: MaterialButton = activity.findViewById(R.id.imageLoaderButton)

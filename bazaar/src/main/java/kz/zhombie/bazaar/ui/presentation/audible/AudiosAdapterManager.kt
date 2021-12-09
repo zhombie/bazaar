@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.animator.SlideInUpAnimator
 import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
 import kz.zhombie.bazaar.ui.model.UIContent
@@ -26,13 +25,12 @@ internal class AudiosAdapterManager  constructor(
     private var itemDecoration: SpacingItemDecoration? = null
 
     fun create(
-        imageLoader: ImageLoader,
         isChooseFromLibraryEnabled: Boolean,
         audiosHeaderAdapterCallback: AudiosHeaderAdapter.Callback,
         audiosAdapterCallback: AudiosAdapter.Callback
     ) {
         audiosHeaderAdapter = AudiosHeaderAdapter(isChooseFromLibraryEnabled, audiosHeaderAdapterCallback)
-        audiosAdapter = AudiosAdapter(imageLoader, audiosAdapterCallback) { leftOffset ->
+        audiosAdapter = AudiosAdapter(audiosAdapterCallback) { leftOffset ->
             itemDecoration?.decoratorLeftOffset = leftOffset
             recyclerView.invalidateItemDecorations()
         }

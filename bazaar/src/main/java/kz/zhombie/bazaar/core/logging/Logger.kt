@@ -1,22 +1,18 @@
 package kz.zhombie.bazaar.core.logging
 
 import android.util.Log
-import kz.zhombie.bazaar.Settings
+import kz.zhombie.bazaar.Bazaar
 
 internal object Logger {
-
-    private const val TAG = "Logger"
-
-    fun d(tag: String = TAG, message: String) {
-        if (Settings.isLoggingEnabled()) {
+    fun debug(tag: String = Bazaar.TAG, message: String) {
+        if (Bazaar.isLoggingEnabled()) {
             Log.d(tag, message)
         }
     }
 
-    fun w(tag: String = TAG, message: String) {
-        if (Settings.isLoggingEnabled()) {
+    fun warn(tag: String = Bazaar.TAG, message: String) {
+        if (Bazaar.isLoggingEnabled()) {
             Log.w(tag, message)
         }
     }
-
 }

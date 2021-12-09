@@ -5,18 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kz.zhombie.bazaar.api.model.complete
 import kotlinx.coroutines.*
+import kz.garage.multimedia.store.model.*
 import kz.zhombie.bazaar.api.core.settings.Mode
+import kz.zhombie.bazaar.api.model.complete
 import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
 import kz.zhombie.bazaar.ui.model.*
-import kz.zhombie.bazaar.ui.model.UIFolder
-import kz.zhombie.bazaar.ui.model.UIMedia
-import kz.zhombie.bazaar.ui.model.UIContent
-import kz.zhombie.bazaar.ui.model.onlyImages
-import kz.zhombie.multimedia.model.*
 import kotlin.reflect.KClass
 
 internal class MediaStoreViewModel : ViewModel() {
@@ -63,7 +59,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     init {
-        Logger.d(TAG, "created")
+        Logger.debug(TAG, "created")
     }
 
     fun getSettings(): MediaStoreScreen.Settings {
@@ -152,7 +148,7 @@ internal class MediaStoreViewModel : ViewModel() {
 
     private fun onLocalDataLoaded(contents: List<Content>) {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            Logger.d(TAG, "onLocalDataLoaded() -> contents.size: ${contents.size}")
+            Logger.debug(TAG, "onLocalDataLoaded() -> contents.size: ${contents.size}")
 
             allContents.addAll(contents)
 
@@ -191,7 +187,7 @@ internal class MediaStoreViewModel : ViewModel() {
 
     fun onMediaCheckboxClicked(uiContent: UIContent) {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            Logger.d(TAG, "onMediaCheckboxClicked() -> uiContent: $uiContent")
+            Logger.debug(TAG, "onMediaCheckboxClicked() -> uiContent: $uiContent")
 
             // Selected
             var selectedMediaSize = 0
@@ -207,14 +203,14 @@ internal class MediaStoreViewModel : ViewModel() {
                         it.content.id == uiContent.content.id
                     }
                 }
-                Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] index: $index")
+                Logger.debug(TAG, "onMediaCheckboxClicked() -> [SELECTED] index: $index")
                 if (index > -1) {
                     removeAt(index)
                 } else {
                     add(uiContent)
                 }
                 selectedMediaSize = size
-                Logger.d(TAG, "onMediaCheckboxClicked() -> [SELECTED] selectedMediaSize: $selectedMediaSize")
+                Logger.debug(TAG, "onMediaCheckboxClicked() -> [SELECTED] selectedMediaSize: $selectedMediaSize")
                 selectedMedia.postValue(this)
             }
 
@@ -233,7 +229,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 }
                     .takeIf { index -> index > -1 }
                     ?.let { index ->
-                        Logger.d(TAG, "onMediaCheckboxClicked() -> [ALL] index: $index")
+                        Logger.debug(TAG, "onMediaCheckboxClicked() -> [ALL] index: $index")
 
                         this[index] = this[index].copy(isSelected = !this[index].isSelected)
 
@@ -261,7 +257,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onPreviewPictureVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
-        Logger.d(TAG, "onPreviewPictureVisibilityChange() -> id: $id, isVisible: $isVisible")
+        Logger.debug(TAG, "onPreviewPictureVisibilityChange() -> id: $id, isVisible: $isVisible")
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             delay(delayDuration)
 
@@ -288,7 +284,7 @@ internal class MediaStoreViewModel : ViewModel() {
 
     fun onFolderClicked(uiFolder: UIFolder) {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            Logger.d(TAG, "onFolderClicked() -> uiFolder: ${uiFolder.folder.displayName}")
+            Logger.debug(TAG, "onFolderClicked() -> uiFolder: ${uiFolder.folder.displayName}")
 
             val folderUiMedia = allContents
                 .filter {
@@ -348,7 +344,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onCameraShotRequested() {
-        Logger.d(TAG, "onCameraShotRequested()")
+        Logger.debug(TAG, "onCameraShotRequested()")
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             when (settings.mode) {
                 Mode.IMAGE -> {
@@ -381,7 +377,7 @@ internal class MediaStoreViewModel : ViewModel() {
     private suspend fun takePicture() {
         val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
         this@MediaStoreViewModel.takePictureInput = takePictureInput
-        Logger.d(TAG, "takePictureInput: $takePictureInput")
+        Logger.debug(TAG, "takePictureInput: $takePictureInput")
         if (takePictureInput != null) {
             action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
         }
@@ -390,7 +386,7 @@ internal class MediaStoreViewModel : ViewModel() {
     private suspend fun takeVideo() {
         val takeVideoInput = mediaScanManager.createCameraVideoInputTempFile()
         this@MediaStoreViewModel.takeVideoInput = takeVideoInput
-        Logger.d(TAG, "takeVideoInput: $takeVideoInput")
+        Logger.debug(TAG, "takeVideoInput: $takeVideoInput")
         if (takeVideoInput != null) {
             action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
         }
@@ -402,14 +398,14 @@ internal class MediaStoreViewModel : ViewModel() {
                 if (kClass == MediaStoreScreen.Action.TakePicture::class) {
                     val takePictureInput = mediaScanManager.createCameraPictureInputTempFile()
                     this@MediaStoreViewModel.takePictureInput = takePictureInput
-                    Logger.d(TAG, "takePictureInput: $takePictureInput")
+                    Logger.debug(TAG, "takePictureInput: $takePictureInput")
                     if (takePictureInput != null) {
                         action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
                     }
                 } else if (kClass == MediaStoreScreen.Action.TakeVideo::class) {
                     val takeVideoInput = mediaScanManager.createCameraVideoInputTempFile()
                     this@MediaStoreViewModel.takeVideoInput = takeVideoInput
-                    Logger.d(TAG, "takeVideoInput: $takeVideoInput")
+                    Logger.debug(TAG, "takeVideoInput: $takeVideoInput")
                     if (takeVideoInput != null) {
                         action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
                     }
@@ -419,7 +415,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onSelectLocalMediaRequested() {
-        Logger.d(TAG, "onSelectLocalMediaRequested()")
+        Logger.debug(TAG, "onSelectLocalMediaRequested()")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 when (settings.mode) {
@@ -464,17 +460,17 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onPictureTaken(isSuccess: Boolean) {
-        Logger.d(TAG, "onPictureTaken() -> isSuccess: $isSuccess")
+        Logger.debug(TAG, "onPictureTaken() -> isSuccess: $isSuccess")
         if (settings.cameraSettings.isPhotoShootEnabled) {
             if (!isSuccess) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 var image = takePictureInput
-                Logger.d(TAG, "takenPictureInput: $image")
+                Logger.debug(TAG, "takenPictureInput: $image")
                 if (image != null) {
                     image = mediaScanManager.decodeImageFile(image)
-                    Logger.d(TAG, "takenPictureInput: $image")
+                    Logger.debug(TAG, "takenPictureInput: $image")
                     action.postValue(MediaStoreScreen.Action.TakenPictureResult(image))
                     takePictureInput = null
                 }
@@ -485,17 +481,17 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onVideoTaken(uri: Uri?) {
-        Logger.d(TAG, "onVideoTaken() -> uri: $uri")
+        Logger.debug(TAG, "onVideoTaken() -> uri: $uri")
         if (settings.cameraSettings.isVideoCaptureEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 var video = takeVideoInput
-                Logger.d(TAG, "takenVideoInput: $video")
+                Logger.debug(TAG, "takenVideoInput: $video")
                 if (video != null) {
                     video = mediaScanManager.decodeVideoFile(video)
-                    Logger.d(TAG, "takenVideoInput: $video")
+                    Logger.debug(TAG, "takenVideoInput: $video")
                     action.postValue(MediaStoreScreen.Action.TakenVideoResult(video))
                     takeVideoInput = null
                 }
@@ -506,14 +502,14 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaImageSelected(uri: Uri?) {
-        Logger.d(TAG, "onLocalMediaImageSelected() -> uri: $uri")
+        Logger.debug(TAG, "onLocalMediaImageSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val image = mediaScanManager.loadSelectedLocalMediaImage(uri)
-                Logger.d(TAG, "loadSelectedLocalMediaImage() -> image: $image")
+                Logger.debug(TAG, "loadSelectedLocalMediaImage() -> image: $image")
                 if (image == null) {
                     action.postValue(MediaStoreScreen.Action.Empty)
                 } else {
@@ -526,7 +522,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaImagesSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onLocalMediaImagesSelected() -> uris: $uris")
+        Logger.debug(TAG, "onLocalMediaImagesSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -534,7 +530,7 @@ internal class MediaStoreViewModel : ViewModel() {
 
                 val allowedUris = uris.take(settings.maxSelectionCount)
                 val images = mediaScanManager.loadSelectedLocalMediaImages(allowedUris)
-                Logger.d(TAG, "loadSelectedLocalMediaImages() -> images: $images")
+                Logger.debug(TAG, "loadSelectedLocalMediaImages() -> images: $images")
                 if (images.isNullOrEmpty()) {
                     action.postValue(MediaStoreScreen.Action.Empty)
                 } else {
@@ -547,14 +543,14 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaVideoSelected(uri: Uri?) {
-        Logger.d(TAG, "onLocalMediaVideoSelected() -> uri: $uri")
+        Logger.debug(TAG, "onLocalMediaVideoSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 screenState.postValue(MediaStoreScreen.State.LOADING)
 
                 val video = mediaScanManager.loadSelectedLocalMediaVideo(uri)
-                Logger.d(TAG, "loadSelectedLocalMediaVideo() -> video: $video")
+                Logger.debug(TAG, "loadSelectedLocalMediaVideo() -> video: $video")
                 if (video == null) {
                     action.postValue(MediaStoreScreen.Action.Empty)
                 } else {
@@ -567,7 +563,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaVideosSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onLocalMediaVideosSelected() -> uris: $uris")
+        Logger.debug(TAG, "onLocalMediaVideosSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -575,7 +571,7 @@ internal class MediaStoreViewModel : ViewModel() {
 
                 val allowedUris = uris.take(settings.maxSelectionCount)
                 val videos = mediaScanManager.loadSelectedLocalMediaVideos(allowedUris)
-                Logger.d(TAG, "loadSelectedLocalMediaVideos() -> videos: $videos")
+                Logger.debug(TAG, "loadSelectedLocalMediaVideos() -> videos: $videos")
                 if (videos.isNullOrEmpty()) {
                     action.postValue(MediaStoreScreen.Action.Empty)
                 } else {
@@ -588,7 +584,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaImageOrVideoSelected(uri: Uri?) {
-        Logger.d(TAG, "onLocalMediaImageOrVideoSelected() -> uri: $uri")
+        Logger.debug(TAG, "onLocalMediaImageOrVideoSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -607,7 +603,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaImagesAndVideosSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onLocalMediaImagesAndVideosSelected() -> uris: $uris")
+        Logger.debug(TAG, "onLocalMediaImagesAndVideosSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -627,7 +623,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaAudioSelected(uri: Uri?) {
-        Logger.d(TAG, "onLocalMediaAudioSelected() -> uri: $uri")
+        Logger.debug(TAG, "onLocalMediaAudioSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -646,7 +642,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalMediaAudiosSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onLocalMediaAudiosSelected() -> uris: $uris")
+        Logger.debug(TAG, "onLocalMediaAudiosSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -666,7 +662,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalDocumentSelected(uri: Uri?) {
-        Logger.d(TAG, "onLocalDocumentSelected() -> uri: $uri")
+        Logger.debug(TAG, "onLocalDocumentSelected() -> uri: $uri")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uri == null) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
@@ -685,7 +681,7 @@ internal class MediaStoreViewModel : ViewModel() {
     }
 
     fun onLocalDocumentsSelected(uris: List<Uri>?) {
-        Logger.d(TAG, "onLocalDocumentsSelected() -> uris: $uris")
+        Logger.debug(TAG, "onLocalDocumentsSelected() -> uris: $uris")
         if (settings.isLocalMediaSearchAndSelectEnabled) {
             if (uris.isNullOrEmpty()) return
             selectionJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {

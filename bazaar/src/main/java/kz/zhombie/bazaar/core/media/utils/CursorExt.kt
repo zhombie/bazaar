@@ -11,7 +11,7 @@ import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kz.zhombie.multimedia.model.*
+import kz.garage.multimedia.store.model.*
 import java.util.concurrent.TimeUnit
 
 internal suspend fun Cursor.readImage(): Image? = withContext(Dispatchers.IO) {

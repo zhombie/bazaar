@@ -1,6 +1,5 @@
 package kz.zhombie.bazaar.ui.presentation.audible
 
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +10,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
+import kz.garage.multimedia.store.model.Audio
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.core.exception.ViewHolderException
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.ui.components.view.CheckBoxButton
 import kz.zhombie.bazaar.ui.model.UIContent
 import kz.zhombie.bazaar.utils.inflate
-import kz.zhombie.multimedia.model.Audio
 
 internal class AudiosAdapter constructor(
-    private val imageLoader: ImageLoader,
     private val callback: Callback,
     private val onLeftOffsetReadyListener: ((leftOffset: Float) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -78,7 +75,7 @@ internal class AudiosAdapter constructor(
             } else {
                 if (field != value) {
                     field = value
-                    Logger.d(TAG, "leftOffset: $value")
+//                    Logger.debug(TAG, "leftOffset: $value")
                     onLeftOffsetReadyListener?.invoke(value)
                 }
             }
@@ -89,12 +86,12 @@ internal class AudiosAdapter constructor(
     fun getList(): List<UIContent> = asyncListDiffer.currentList
 
     fun submitList(uiContents: List<UIContent>) {
-        Logger.d(TAG, "submitList() -> ${uiContents.size}")
+//        Logger.debug(TAG, "submitList() -> ${uiContents.size}")
         asyncListDiffer.submitList(uiContents)
     }
 
     fun setPlaying(uiContent: UIContent, isPlaying: Boolean) {
-        Logger.d(TAG, "setPlaying() -> uiContent: $uiContent, isPlaying: $isPlaying")
+//        Logger.debug(TAG, "setPlaying() -> uiContent: $uiContent, isPlaying: $isPlaying")
 
         if (uiContent.content is Audio) {
             val index = asyncListDiffer.currentList.indexOfFirst { it.content.id == uiContent.content.id }
@@ -144,7 +141,7 @@ internal class AudiosAdapter constructor(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        Logger.d(TAG, "payloads: $payloads")
+        Logger.debug(TAG, "payloads: $payloads")
         if (payloads.isNullOrEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
         } else {
@@ -259,15 +256,11 @@ internal class AudiosAdapter constructor(
             if (uiContent.isSelectable) {
                 itemView.isEnabled = true
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    itemView.foreground = null
-                }
+                itemView.foreground = null
             } else {
                 itemView.isEnabled = false
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_alpha_black)
-                }
+                itemView.foreground = AppCompatResources.getDrawable(itemView.context, R.drawable.bazaar_bg_alpha_black)
             }
         }
 
@@ -280,11 +273,11 @@ internal class AudiosAdapter constructor(
         }
 
         fun toggleVisibility(uiContent: UIContent) {
-            Logger.d(TAG, "toggleVisibility() -> uiContent: $uiContent")
+            Logger.debug(TAG, "toggleVisibility() -> uiContent: $uiContent")
         }
 
         fun togglePlaying(uiContent: UIContent, isPlaying: Boolean) {
-            Logger.d(TAG, "togglePlaying() -> uiContent: $uiContent, isPlaying: $isPlaying")
+            Logger.debug(TAG, "togglePlaying() -> uiContent: $uiContent, isPlaying: $isPlaying")
             if (isPlaying) {
                 playOrPauseButton.setIconResource(R.drawable.bazaar_ic_pause)
             } else {

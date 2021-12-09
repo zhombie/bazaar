@@ -7,11 +7,10 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.ui.components.recyclerview.animator.SlideInUpAnimator
 import kz.zhombie.bazaar.ui.components.recyclerview.decoration.SpacingItemDecoration
-import kz.zhombie.bazaar.ui.model.UIMedia
 import kz.zhombie.bazaar.ui.model.UIContent
+import kz.zhombie.bazaar.ui.model.UIMedia
 
 internal class VisualMediaAdapterManager constructor(
     private val context: Context,
@@ -23,7 +22,6 @@ internal class VisualMediaAdapterManager constructor(
     private var concatAdapter: ConcatAdapter? = null
 
     fun create(
-        imageLoader: ImageLoader,
         isCameraEnabled: Boolean,
         isChooseFromLibraryEnabled: Boolean,
         visualMediaHeaderAdapterCallback: VisualMediaHeaderAdapter.Callback,
@@ -35,7 +33,7 @@ internal class VisualMediaAdapterManager constructor(
             callback = visualMediaHeaderAdapterCallback
         )
 
-        visualMediaAdapter = VisualMediaAdapter(imageLoader, visualMediaAdapterCallback)
+        visualMediaAdapter = VisualMediaAdapter(visualMediaAdapterCallback)
 
         concatAdapter = ConcatAdapter(visualMediaHeaderAdapter, visualMediaAdapter)
         recyclerView.adapter = concatAdapter

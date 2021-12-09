@@ -3,9 +3,9 @@ package kz.zhombie.bazaar.core.cache
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kz.garage.multimedia.store.model.Content
+import kz.garage.multimedia.store.model.Media
 import kz.zhombie.bazaar.core.logging.Logger
-import kz.zhombie.multimedia.model.Content
-import kz.zhombie.multimedia.model.Media
 import java.util.*
 
 internal class Cache private constructor() {
@@ -28,6 +28,8 @@ internal class Cache private constructor() {
         throwable.printStackTrace()
     }
 
+    private val io = Dispatchers.Default + exceptionHandler
+
     private fun ensureContentsExistence() {
         if (contents == null) {
             contents = mutableListOf()
@@ -38,31 +40,31 @@ internal class Cache private constructor() {
         return contents.isNullOrEmpty()
     }
 
-    suspend fun getContents(): List<Content>? = withContext(Dispatchers.IO + exceptionHandler) {
-        Logger.d(TAG, "getContents() -> contents: ${contents?.size}")
+    suspend fun getContents(): List<Content>? = withContext(io) {
+        Logger.debug(TAG, "getContents() -> contents: ${contents?.size}")
         return@withContext contents
     }
 
-    suspend fun setContents(content: List<Content>) = withContext(Dispatchers.IO + exceptionHandler) {
-        Logger.d(TAG, "setContents() -> contents: ${content.size}")
+    suspend fun setContents(content: List<Content>) = withContext(io) {
+        Logger.debug(TAG, "setContents() -> contents: ${content.size}")
         ensureContentsExistence()
         content.forEach {
             this@Cache.contents?.addIfDoesNotContain(it)
         }
     }
 
-    suspend fun getMedia(): List<Media>? = withContext(Dispatchers.IO + exceptionHandler) {
+    suspend fun getMedia(): List<Media>? = withContext(io) {
         val media = contents?.filterIsInstance<Media>()
-        Logger.d(TAG, "getMedia() -> media: ${media?.size}")
+        Logger.debug(TAG, "getMedia() -> media: ${media?.size}")
         return@withContext media
     }
 
-    suspend fun setMedia(media: List<Media>) = withContext(Dispatchers.IO + exceptionHandler) {
-        Logger.d(TAG, "setMedia() -> media: ${media.size}")
+    suspend fun setMedia(media: List<Media>) = withContext(io) {
+        Logger.debug(TAG, "setMedia() -> media: ${media.size}")
         setContents(media)
     }
 
-    suspend fun clear(): Boolean = withContext(Dispatchers.IO + exceptionHandler) {
+    suspend fun clear(): Boolean = withContext(io) {
         contents?.clear()
         contents = null
 

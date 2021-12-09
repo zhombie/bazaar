@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
+import kz.garage.multimedia.store.model.*
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.multimedia.model.*
+import kz.zhombie.bazaar.dispose
+import kz.zhombie.bazaar.load
 import java.util.concurrent.TimeUnit
 
 @SuppressLint("SetTextI18n")
 class ContentsAdapter constructor(
-    var imageLoader: ImageLoader,
     private val callback: (content: Content) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -39,6 +39,14 @@ class ContentsAdapter constructor(
         }
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
+
+        if (holder is ViewHolder) {
+            holder.unbind()
+        }
+    }
+
     private inner class ViewHolder constructor(view: View) : RecyclerView.ViewHolder(view) {
         private val imageView = view.findViewById<ShapeableImageView>(R.id.imageView)
         private val textView = view.findViewById<MaterialTextView>(R.id.textView)
@@ -58,9 +66,18 @@ class ContentsAdapter constructor(
             itemView.setOnClickListener { callback(content) }
         }
 
+        fun unbind() {
+            imageView.dispose()
+        }
+
         private fun bindImage(image: Image) {
             val uri = image.localFile?.uri ?: image.uri
-            imageLoader.loadSmallImage(itemView.context, imageView, uri)
+
+            imageView.load(uri) {
+                setErrorDrawable(R.drawable.bazaar_bg_black)
+                setPlaceholderDrawable(R.drawable.bazaar_bg_black)
+                setSize(300, 300)
+            }
 
             textView.text = """
 id: ${image.id}
@@ -78,7 +95,12 @@ MIME type: ${image.properties?.mimeType}
 
         private fun bindVideo(video: Video) {
             val uri = video.localFile?.uri ?: video.uri
-            imageLoader.loadSmallImage(itemView.context, imageView, uri)
+
+            imageView.load(uri) {
+                setErrorDrawable(R.drawable.bazaar_bg_black)
+                setPlaceholderDrawable(R.drawable.bazaar_bg_black)
+                setSize(300, 300)
+            }
 
             textView.text = """
 id: ${video.id}
@@ -97,7 +119,12 @@ MIME type: ${video.properties?.mimeType}
 
         private fun bindAudio(audio: Audio) {
             val uri = audio.localFile?.uri ?: audio.uri
-            imageLoader.loadSmallImage(itemView.context, imageView, uri)
+
+            imageView.load(uri) {
+                setErrorDrawable(R.drawable.bazaar_bg_black)
+                setPlaceholderDrawable(R.drawable.bazaar_bg_black)
+                setSize(300, 300)
+            }
 
             textView.text = """
 id: ${audio.id}

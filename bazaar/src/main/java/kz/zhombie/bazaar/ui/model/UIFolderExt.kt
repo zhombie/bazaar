@@ -1,6 +1,6 @@
 package kz.zhombie.bazaar.ui.model
 
-import kz.zhombie.multimedia.model.*
+import kz.garage.multimedia.store.model.*
 
 internal fun List<UIContent>.convert(contents: List<Content>): List<UIFolder> {
     return contents.mapNotNull { media ->

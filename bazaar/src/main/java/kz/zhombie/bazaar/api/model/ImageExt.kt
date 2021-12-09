@@ -1,6 +1,6 @@
 package kz.zhombie.bazaar.api.model
 
-import kz.zhombie.multimedia.model.Image
+import kz.garage.multimedia.store.model.Image
 
 internal fun Image?.complete(image: Image?): Image? {
     if (this == null) return null

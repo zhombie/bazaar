@@ -1,6 +1,6 @@
 package kz.zhombie.bazaar.ui.model
 
-import kz.zhombie.multimedia.model.Media
+import kz.garage.multimedia.store.model.Media
 import java.io.Serializable
 
 internal data class UIMedia constructor(
