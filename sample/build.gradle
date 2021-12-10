@@ -15,9 +15,8 @@ android {
         minSdkVersion 23
         targetSdkVersion 31
 
-        def versionProps = readVersionFromFile()
-        versionName versionProps['versionName']
-        versionCode versionProps['versionCode'] as int
+        versionCode project.ext.version_code
+        versionName project.version
     }
 
     buildTypes {
@@ -105,58 +104,4 @@ dependencies {
 
     // Library
     implementation project(':bazaar')
-}
-
-
-// Auto-increments versionCode & versionName on each release build
-// Adapted from http://stackoverflow.com/a/21405744
-def readVersionFromFile() {
-    def versionFile = file("version.properties")
-    if (versionFile.canRead()) {
-        Properties props = new Properties()
-        props.load(new FileInputStream(versionFile))
-
-        def versionMajor = props["versionMajor"] as int
-        def versionMinor = props["versionMinor"] as int
-        def versionPatch = props["versionPatch"] as int
-
-        def versionCode = props["versionCode"] as int
-
-        def isReleaseTask = false
-        for (String taskName : gradle.startParameter.getTaskNames()) {
-            if (taskName.startsWith("appDistributionUploadRelease")) {
-                isReleaseTask = true
-                break
-            }
-        }
-
-        if (isReleaseTask) {
-            if (versionPatch > 10) {
-                versionPatch = 0
-
-                if (versionMinor > 10) {
-                    versionMajor += 1
-                    versionMinor = 0
-                } else {
-                    versionMinor += 1
-                }
-            } else {
-                versionPatch += 1
-            }
-
-            props["versionMajor"] = versionMajor.toString()
-            props["versionMinor"] = versionMinor.toString()
-            props["versionPatch"] = versionPatch.toString()
-            props["versionName"] = props["versionMajor"] + "." + props["versionMinor"] + "." + props["versionPatch"]
-
-            versionCode += 1
-            props["versionCode"] = versionCode.toString()
-
-            props.store(versionFile.newWriter(), null)
-        }
-
-        return props
-    } else {
-        throw new FileNotFoundException("Could not read version.properties")
-    }
 }
