@@ -1,9 +1,9 @@
-package kz.zhombie.bazaar.ui
+package kz.zhombie.bazaar.sample.ui
 
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
-import kz.zhombie.bazaar.R
+import kz.zhombie.bazaar.sample.R
 
 class UIViewHolder constructor(activity: MainActivity) {
 

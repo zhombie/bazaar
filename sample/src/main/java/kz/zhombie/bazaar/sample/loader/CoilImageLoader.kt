@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.loader
+package kz.zhombie.bazaar.sample.loader
 
 import android.content.Context
 import android.graphics.Paint
@@ -24,7 +24,7 @@ import coil.size.Scale
 import coil.size.ViewSizeResolver
 import coil.util.CoilUtils
 import coil.util.DebugLogger
-import kz.zhombie.bazaar.R
+import kz.zhombie.bazaar.sample.R
 import kz.zhombie.museum.PaintingLoader
 import kz.zhombie.museum.component.CircularProgressDrawable
 import okhttp3.Cache

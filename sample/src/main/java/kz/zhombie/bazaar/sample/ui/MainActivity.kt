@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui
+package kz.zhombie.bazaar.sample.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -15,9 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kz.garage.multimedia.store.model.Content
 import kz.garage.multimedia.store.model.Media
-import kz.zhombie.bazaar.App
 import kz.zhombie.bazaar.Bazaar
-import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.ImageLoader
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
@@ -26,9 +24,11 @@ import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.AbstractResultCallback
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.imageLoader
-import kz.zhombie.bazaar.loader.CoilImageLoader
-import kz.zhombie.bazaar.loader.GlideImageLoader
-import kz.zhombie.bazaar.ui.adapter.ContentsAdapter
+import kz.zhombie.bazaar.sample.App
+import kz.zhombie.bazaar.sample.R
+import kz.zhombie.bazaar.sample.loader.CoilImageLoader
+import kz.zhombie.bazaar.sample.loader.GlideImageLoader
+import kz.zhombie.bazaar.sample.ui.adapter.ContentsAdapter
 import kz.zhombie.bazaar.utils.OpenFileAction
 import kz.zhombie.bazaar.utils.open
 import kz.zhombie.bazaar.utils.tryToLaunch

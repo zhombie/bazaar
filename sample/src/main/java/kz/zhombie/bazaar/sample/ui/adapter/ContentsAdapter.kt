@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.ui.adapter
+package kz.zhombie.bazaar.sample.ui.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.garage.multimedia.store.model.*
-import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.dispose
 import kz.zhombie.bazaar.load
+import kz.zhombie.bazaar.sample.R
 import java.util.concurrent.TimeUnit
 
 @SuppressLint("SetTextI18n")

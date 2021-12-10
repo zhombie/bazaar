@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.loader
+package kz.zhombie.bazaar.sample.loader
 
 import android.content.Context
 import android.graphics.drawable.Drawable
