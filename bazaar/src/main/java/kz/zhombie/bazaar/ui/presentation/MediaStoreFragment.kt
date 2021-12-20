@@ -19,6 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import kz.garage.multimedia.store.model.Audio
+import kz.garage.window.computeCurrentWindowSize
 import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.R
 import kz.zhombie.bazaar.api.core.settings.Mode
@@ -824,7 +825,8 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     // Calculates height for 90% of fullscreen
     private fun getBottomSheetDialogDefaultHeight(): Int? {
-        return view?.let { it.windowHeight * 90 / 100 }
+        val height = activity?.computeCurrentWindowSize()?.height ?: return null
+        return height * 90 / 100
     }
 
     /**

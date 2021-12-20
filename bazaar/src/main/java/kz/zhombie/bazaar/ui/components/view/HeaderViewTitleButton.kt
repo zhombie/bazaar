@@ -9,8 +9,8 @@ import android.widget.LinearLayout
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
+import kz.garage.window.dp2Px
 import kz.zhombie.bazaar.R
-import kz.zhombie.bazaar.utils.dp2Px
 import kotlin.math.roundToInt
 
 internal class HeaderViewTitleButton @JvmOverloads constructor(

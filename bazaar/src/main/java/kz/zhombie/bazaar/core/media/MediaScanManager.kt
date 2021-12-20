@@ -13,9 +13,9 @@ import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import kotlinx.coroutines.*
-import kz.garage.multimedia.store.Projection
 import kz.garage.multimedia.store.getImageResolution
 import kz.garage.multimedia.store.model.*
+import kz.garage.multimedia.store.projection.Projection
 import kz.zhombie.bazaar.api.core.settings.Mode
 import kz.zhombie.bazaar.core.cache.Cache
 import kz.zhombie.bazaar.core.logging.Logger
