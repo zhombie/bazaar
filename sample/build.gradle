@@ -67,7 +67,7 @@ android {
 
 ext {
     coil_version = '1.4.0'
-    coroutines_version = '1.6.0-RC3'
+    coroutines_version = '1.6.0'
 }
 
 dependencies {
