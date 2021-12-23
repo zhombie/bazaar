@@ -27,7 +27,7 @@ internal class VisualMediaAdapter constructor(
     companion object {
         private val TAG: String = VisualMediaAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<UIMedia>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<UIMedia>() {
             override fun areItemsTheSame(oldItem: UIMedia, newItem: UIMedia): Boolean =
                 oldItem.media.id == newItem.media.id && oldItem.media.uri == newItem.media.uri
 
@@ -55,7 +55,7 @@ internal class VisualMediaAdapter constructor(
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIMedia> by lazy {
-        AsyncListDiffer(this, diffCallback)
+        AsyncListDiffer(this, DIFF_CALLBACK)
     }
 
     fun submitList(uiMedia: List<UIMedia>) {

@@ -26,7 +26,7 @@ internal class FoldersAdapter constructor(
     companion object {
         private val TAG: String = FoldersAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<UIFolder>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<UIFolder>() {
             override fun areItemsTheSame(oldItem: UIFolder, newItem: UIFolder): Boolean =
                 oldItem.folder.id == newItem.folder.id
 
@@ -41,7 +41,7 @@ internal class FoldersAdapter constructor(
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIFolder> by lazy {
-        AsyncListDiffer(this, diffCallback)
+        AsyncListDiffer(this, DIFF_CALLBACK)
     }
 
     private var leftOffset: Float? = null

@@ -13,4 +13,23 @@ internal data class UIMedia constructor(
     isSelectable = isSelectable,
     isSelected = isSelected,
     isVisible = isVisible
-), Serializable
+), Serializable {
+
+    override fun equals(other: Any?): Boolean {
+        if (other is UIMedia) {
+            return media.id == other.media.id &&
+                media.uri == other.media.uri &&
+                media.title == other.media.title &&
+                media.displayName == other.media.displayName &&
+                isSelectable == other.isSelectable &&
+                isSelected == other.isSelected &&
+                isVisible == other.isVisible
+        }
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
+}

@@ -24,7 +24,7 @@ internal class DocumentsAdapter constructor(
     companion object {
         private val TAG = DocumentsAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<UIContent>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<UIContent>() {
             override fun areItemsTheSame(oldItem: UIContent, newItem: UIContent): Boolean =
                 oldItem.content.id == newItem.content.id && oldItem.content.uri == newItem.content.uri
 
@@ -47,7 +47,7 @@ internal class DocumentsAdapter constructor(
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIContent> by lazy {
-        AsyncListDiffer(this, diffCallback)
+        AsyncListDiffer(this, DIFF_CALLBACK)
     }
 
     fun getList(): List<UIContent> = asyncListDiffer.currentList

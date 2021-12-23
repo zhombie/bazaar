@@ -26,7 +26,7 @@ internal class AudiosAdapter constructor(
     companion object {
         private val TAG: String = AudiosAdapter::class.java.simpleName
 
-        private val diffCallback = object : DiffUtil.ItemCallback<UIContent>() {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<UIContent>() {
             override fun areItemsTheSame(oldItem: UIContent, newItem: UIContent): Boolean =
                 oldItem.content.id == newItem.content.id && oldItem.content.uri == newItem.content.uri
 
@@ -54,7 +54,7 @@ internal class AudiosAdapter constructor(
     }
 
     private val asyncListDiffer: AsyncListDiffer<UIContent> by lazy {
-        AsyncListDiffer(this, diffCallback).also { asyncListDiffer ->
+        AsyncListDiffer(this, DIFF_CALLBACK).also { asyncListDiffer ->
             asyncListDiffer.addListListener { previousList, currentList ->
                 if (currentPlayingAudioPosition < 0) return@addListListener
                 if (previousList.isNullOrEmpty()) return@addListListener
