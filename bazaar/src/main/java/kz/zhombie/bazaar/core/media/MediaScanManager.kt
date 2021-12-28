@@ -1,7 +1,9 @@
 package kz.zhombie.bazaar.core.media
 
+import android.Manifest
 import android.content.ContentResolver
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,6 +12,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.annotation.RequiresPermission
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import kotlinx.coroutines.*
@@ -37,8 +41,13 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         private const val DEFAULT_CAMERA_FOLDER = "camera"
 
+        @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         suspend fun preload(context: Context, mode: Mode) {
             Logger.debug(TAG, "preload()")
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Logger.warn(TAG, "preload() -> there is not permission provided")
+                return
+            }
             val mediaScanManager = MediaScanManager(context)
             if (mode == Mode.AUDIO || mode == Mode.DOCUMENT) {
                 val contents = when (mode) {
