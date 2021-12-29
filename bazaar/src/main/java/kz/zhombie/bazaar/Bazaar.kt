@@ -1,6 +1,8 @@
 package kz.zhombie.bazaar
 
+import android.Manifest
 import android.content.Context
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -116,23 +118,23 @@ object Bazaar {
      * Handy bridge-based methods
      */
 
-    suspend fun sync(context: Context): Boolean {
-        return MediaSyncWorker.startWork(context)
-    }
+    suspend fun sync(context: Context): Boolean =
+        MediaSyncWorker.startWork(context)
 
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     suspend fun preload(context: Context, mode: Mode) {
         MediaScanManager.preload(context, mode)
     }
 
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     suspend fun preloadAll(context: Context) {
         MediaScanManager.preload(context, Mode.IMAGE_AND_VIDEO)
         MediaScanManager.preload(context, Mode.AUDIO)
         MediaScanManager.preload(context, Mode.DOCUMENT)
     }
 
-    suspend fun clearCache() {
+    suspend fun clearCache(): Boolean =
         MediaScanManager.clearCache()
-    }
 
     suspend fun destroyCache() {
         MediaScanManager.destroyCache()

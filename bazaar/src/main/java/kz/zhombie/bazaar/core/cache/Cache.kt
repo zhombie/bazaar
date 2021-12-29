@@ -20,6 +20,10 @@ internal class Cache private constructor() {
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Cache().also { INSTANCE = it }
             }
+
+        fun destroyInstance() {
+            INSTANCE = null
+        }
     }
 
     private var contents: MutableList<Content>? = null
@@ -73,7 +77,7 @@ internal class Cache private constructor() {
 
     suspend fun destroy() {
         clear()
-        INSTANCE = null
+        destroyInstance()
     }
 
     private fun <E> MutableCollection<E>.addIfDoesNotContain(e: E): Boolean {
