@@ -10,14 +10,12 @@ import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import java.io.File
 
-sealed class OpenFileAction {
-    data class Success constructor(val intent: Intent) : OpenFileAction()
+sealed class OpenFile {
+    data class Success constructor(val intent: Intent) : OpenFile()
 
-    data class Error constructor(val reason: Reason) : OpenFileAction() {
-        enum class Reason {
-            UNKNOWN,
-            FILE_DOES_NOT_EXIST
-        }
+    sealed class Error : OpenFile() {
+        object Unknown : Error()
+        object FileDoesNotExist : Error()
     }
 }
 
@@ -25,7 +23,7 @@ sealed class OpenFileAction {
 fun File.open(
     context: Context,
     authority: String = "${context.applicationContext.packageName}.provider"
-): OpenFileAction {
+): OpenFile {
     return if (exists()) {
         try {
             val uri = FileProvider.getUriForFile(context, authority, this)
@@ -44,17 +42,17 @@ fun File.open(
                 )
             }
 
-            OpenFileAction.Success(intent)
+            OpenFile.Success(intent)
         } catch (e: Exception) {
             e.printStackTrace()
-            OpenFileAction.Error(OpenFileAction.Error.Reason.UNKNOWN)
+            OpenFile.Error.Unknown
         }
     } else {
-        OpenFileAction.Error(OpenFileAction.Error.Reason.FILE_DOES_NOT_EXIST)
+        OpenFile.Error.FileDoesNotExist
     }
 }
 
-fun OpenFileAction.Success.tryToLaunch(context: Context): Boolean {
+fun OpenFile.Success.tryToOpen(context: Context): Boolean {
     return try {
         context.startActivity(intent)
         true

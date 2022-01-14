@@ -124,7 +124,8 @@ internal class MediaScanManager constructor(private val context: Context) {
                 ),
                 resolution = null,
                 properties = null,
-                localFile = Content.LocalFile(file.toUri())
+                localFile = Content.LocalFile(file.toUri()),
+                remoteAddress = null
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -168,7 +169,8 @@ internal class MediaScanManager constructor(private val context: Context) {
                 duration = Media.Playable.UNDEFINED_DURATION,
                 resolution = null,
                 properties = null,
-                localFile = Content.LocalFile(file.toUri())
+                localFile = Content.LocalFile(file.toUri()),
+                remoteAddress = null
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -740,7 +742,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     }
 
     suspend fun decodeImageFile(image: Image): Image = withContext(Dispatchers.IO) {
-        val file = image.localFile?.file ?: return@withContext image
+        val file = image.localFile?.getFile() ?: return@withContext image
         if (!file.exists()) return@withContext image
         val bitmap: Bitmap? = BitmapFactory.decodeFile(file.path)
         Logger.debug(TAG, "takenImage: $bitmap, ${bitmap?.width} x ${bitmap?.height}")
@@ -769,7 +771,7 @@ internal class MediaScanManager constructor(private val context: Context) {
     }
 
     suspend fun decodeVideoFile(video: Video): Video = withContext(Dispatchers.IO) {
-        val file = video.localFile?.file ?: return@withContext video
+        val file = video.localFile?.getFile() ?: return@withContext video
         if (!file.exists()) return@withContext video
         val metadata = video.uri.retrieveVideoMetadata(context) ?: return@withContext video
         val resolution = if (metadata.width != null && metadata.height != null) {

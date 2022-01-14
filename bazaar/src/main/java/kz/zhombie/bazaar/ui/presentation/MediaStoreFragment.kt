@@ -374,13 +374,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     private fun observeScreenState() {
         viewModel?.getScreenState()?.observe(viewLifecycleOwner, { state ->
             when (state) {
+                MediaStoreScreen.State.IDLE -> {
+                    selectButton?.isEnabled = true
+                    progressView?.visibility = View.GONE
+                }
                 MediaStoreScreen.State.LOADING -> {
                     selectButton?.isEnabled = false
                     progressView?.visibility = View.VISIBLE
-                }
-                MediaStoreScreen.State.CONTENT -> {
-                    selectButton?.isEnabled = true
-                    progressView?.visibility = View.GONE
                 }
                 else -> {
                     selectButton?.isEnabled = true
@@ -803,17 +803,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onDocumentIconClicked(uiContent: UIContent) {
-        val file = uiContent.content.localFile?.file
+        val file = uiContent.content.localFile?.getFile()
         if (file == null || !file.exists()) {
             return Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
         }
         when (val action = file.open(requireContext())) {
-            is OpenFileAction.Success -> {
-                if (!action.tryToLaunch(requireContext())) {
+            is OpenFile.Success -> {
+                if (!action.tryToOpen(requireContext())) {
                     Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
                 }
             }
-            is OpenFileAction.Error -> {
+            is OpenFile.Error -> {
                 Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
             }
         }

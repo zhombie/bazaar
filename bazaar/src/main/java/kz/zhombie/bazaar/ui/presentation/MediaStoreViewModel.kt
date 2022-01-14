@@ -55,7 +55,7 @@ internal class MediaStoreViewModel : ViewModel() {
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
 
-        screenState.postValue(MediaStoreScreen.State.CONTENT)
+        screenState.postValue(MediaStoreScreen.State.IDLE)
     }
 
     init {
@@ -475,7 +475,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     takePictureInput = null
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -496,7 +496,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     takeVideoInput = null
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -516,7 +516,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaImageResult(image))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -537,7 +537,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaImagesResult(images))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -557,7 +557,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaVideoResult(video))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -578,7 +578,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaVideosResult(videos))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -597,7 +597,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaImageOrVideoResult(media))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -617,7 +617,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaImagesAndVideosResult(media))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -636,7 +636,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaAudio(audio))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -656,7 +656,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalMediaAudios(audios))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -675,7 +675,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalDocument(document))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -694,7 +694,7 @@ internal class MediaStoreViewModel : ViewModel() {
                     action.postValue(MediaStoreScreen.Action.SelectedLocalDocuments(documents))
                 }
 
-                screenState.postValue(MediaStoreScreen.State.CONTENT)
+                screenState.postValue(MediaStoreScreen.State.IDLE)
             }
         }
     }
@@ -741,7 +741,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 action.postValue(MediaStoreScreen.Action.SubmitSelectedMedia(selectedMedia))
             }
 
-            screenState.postValue(MediaStoreScreen.State.CONTENT)
+            screenState.postValue(MediaStoreScreen.State.IDLE)
         }
     }
 
@@ -751,7 +751,7 @@ internal class MediaStoreViewModel : ViewModel() {
                 selectionJob?.cancelAndJoin()
                 selectionJob = null
             }
-            screenState.postValue(MediaStoreScreen.State.CONTENT)
+            screenState.postValue(MediaStoreScreen.State.IDLE)
         }
     }
 

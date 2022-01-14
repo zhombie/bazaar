@@ -84,7 +84,8 @@ internal suspend fun Cursor.readImage(): Image? = withContext(Dispatchers.IO) {
             size = size ?: Content.Properties.UNDEFINED_SIZE,
             mimeType = mimeType,
         ),
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }
 
@@ -168,7 +169,8 @@ internal suspend fun Cursor.readVideo(): Video? = withContext(Dispatchers.IO) {
             size = size ?: Content.Properties.UNDEFINED_SIZE,
             mimeType = mimeType,
         ),
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }
 
@@ -265,7 +267,8 @@ internal suspend fun Cursor.readAudio(): Audio? = withContext(Dispatchers.IO) {
             mimeType = mimeType,
         ),
         album = album,
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }
 
@@ -288,7 +291,8 @@ internal suspend fun Cursor.readOpenableImage(uri: Uri): Image? = withContext(Di
         history = null,
         resolution = null,
         properties = Content.Properties(size = size ?: Content.Properties.UNDEFINED_SIZE),
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }
 
@@ -314,7 +318,8 @@ internal suspend fun Cursor.readOpenableVideo(uri: Uri): Video? = withContext(Di
         properties = Content.Properties(
             size = size ?: Content.Properties.UNDEFINED_SIZE,
         ),
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }
 
@@ -340,7 +345,8 @@ internal suspend fun Cursor.readOpenableAudio(uri: Uri): Audio? = withContext(Di
             size = size ?: Content.Properties.UNDEFINED_SIZE,
         ),
         album = null,
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }
 
@@ -364,6 +370,7 @@ internal suspend fun Cursor.readOpenableDocument(uri: Uri): Document? = withCont
         properties = Content.Properties(
             size = size ?: Content.Properties.UNDEFINED_SIZE,
         ),
-        localFile = null
+        localFile = null,
+        remoteAddress = null
     )
 }

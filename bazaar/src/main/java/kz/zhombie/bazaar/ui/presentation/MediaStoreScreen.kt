@@ -36,13 +36,13 @@ internal object MediaStoreScreen {
     }
 
     enum class State {
-        LOADING,
-        CONTENT
+        IDLE,
+        LOADING
     }
 
     sealed class Action {
-        data class SubmitSelectedMedia(val media: List<Media>) : Action()
-        data class SubmitSelectedContent(val content: List<Content>) : Action()
+        data class SubmitSelectedMedia constructor(val media: List<Media>) : Action()
+        data class SubmitSelectedContent constructor(val content: List<Content>) : Action()
 
         object ChooseBetweenTakePictureOrVideo : Action()
 

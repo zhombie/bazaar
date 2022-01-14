@@ -15,6 +15,7 @@ internal fun Audio.complete(audio: Audio?): Audio? {
         duration = if (duration == Media.Playable.UNDEFINED_DURATION) audio.duration else duration,
         properties = properties ?: audio.properties,
         album = album ?: audio.album,
-        localFile = localFile ?: audio.localFile
+        localFile = localFile ?: audio.localFile,
+        remoteAddress = remoteAddress ?: audio.remoteAddress
     )
 }

@@ -13,6 +13,7 @@ internal fun Document?.complete(document: Document?): Document? {
         folder = folder ?: document.folder,
         history = history ?: document.history,
         properties = properties ?: document.properties,
-        localFile = localFile ?: document.localFile
+        localFile = localFile ?: document.localFile,
+        remoteAddress = remoteAddress ?: document.remoteAddress
     )
 }

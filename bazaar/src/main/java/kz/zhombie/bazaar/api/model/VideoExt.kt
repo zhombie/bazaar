@@ -15,6 +15,7 @@ internal fun Video.complete(video: Video?): Video? {
         duration = if (duration == Media.Playable.UNDEFINED_DURATION) video.duration else duration,
         resolution = resolution ?: video.resolution,
         properties = properties ?: video.properties,
-        localFile = localFile ?: video.localFile
+        localFile = localFile ?: video.localFile,
+        remoteAddress = remoteAddress ?: video.remoteAddress
     )
 }

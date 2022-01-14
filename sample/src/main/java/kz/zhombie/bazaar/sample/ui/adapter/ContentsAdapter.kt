@@ -85,10 +85,10 @@ Name: ${image.displayName}
 Type: ${Image::class.java.simpleName}
 File size: ${image.properties?.size}
 Folder: ${image.folder?.displayName}
-Extension: ${image.localFile?.file?.extension}
+Extension: ${image.localFile?.getFile()?.extension}
 Width x Height: ${image.resolution?.width}x${image.resolution?.height} 
 Link: ${image.uri}
-Path: ${image.localFile?.file?.absolutePath}
+Path: ${image.localFile?.getFile()?.absolutePath}
 MIME type: ${image.properties?.mimeType}
             """.trim()
         }
@@ -109,10 +109,10 @@ Type: ${Video::class.java.simpleName}
 File size: ${video.properties?.size}
 Duration: ${getDuration(video)}, ${getDisplayDuration(video)}
 Folder: ${video.folder?.displayName}
-Extension: ${video.localFile?.file?.extension}
+Extension: ${video.localFile?.getFile()?.extension}
 Width x Height: ${video.resolution?.width}x${video.resolution?.height} 
 Link: ${video.uri}
-Path: ${video.localFile?.file?.absolutePath}
+Path: ${video.localFile?.getFile()?.absolutePath}
 MIME type: ${video.properties?.mimeType}
             """.trim()
         }
@@ -133,9 +133,9 @@ Type: ${Audio::class.java.simpleName}
 File size: ${audio.properties?.size}
 Duration: ${getDuration(audio)}, ${getDisplayDuration(audio)}
 Folder: ${audio.folder?.displayName}
-Extension: ${audio.localFile?.file?.extension}
+Extension: ${audio.localFile?.getFile()?.extension}
 Ссылка: ${audio.uri}
-Path: ${audio.localFile?.file?.absolutePath}
+Path: ${audio.localFile?.getFile()?.absolutePath}
 MIME type: ${audio.properties?.mimeType}
             """.trim()
         }
@@ -149,9 +149,9 @@ Name: ${document.displayName}
 Type: ${Document::class.java.simpleName}
 File size: ${document.properties?.size}
 Folder: ${document.folder?.displayName}
-Extension: ${document.localFile?.file?.extension}
+Extension: ${document.localFile?.getFile()?.extension}
 Ссылка: ${document.uri}
-Path: ${document.localFile?.file?.absolutePath}
+Path: ${document.localFile?.getFile()?.absolutePath}
 MIME type: ${document.properties?.mimeType}
             """.trim()
         }

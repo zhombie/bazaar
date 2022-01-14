@@ -14,6 +14,7 @@ internal fun Image?.complete(image: Image?): Image? {
         history = history ?: image.history,
         resolution = resolution ?: image.resolution,
         properties = properties ?: image.properties,
-        localFile = localFile ?: image.localFile
+        localFile = localFile ?: image.localFile,
+        remoteAddress = remoteAddress ?: image.remoteAddress
     )
 }

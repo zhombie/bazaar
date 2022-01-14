@@ -29,9 +29,9 @@ import kz.zhombie.bazaar.sample.R
 import kz.zhombie.bazaar.sample.loader.CoilImageLoader
 import kz.zhombie.bazaar.sample.loader.GlideImageLoader
 import kz.zhombie.bazaar.sample.ui.adapter.ContentsAdapter
-import kz.zhombie.bazaar.utils.OpenFileAction
+import kz.zhombie.bazaar.utils.OpenFile
 import kz.zhombie.bazaar.utils.open
-import kz.zhombie.bazaar.utils.tryToLaunch
+import kz.zhombie.bazaar.utils.tryToOpen
 import kz.zhombie.cinema.Cinema
 import kz.zhombie.museum.Museum
 import kz.zhombie.museum.paintingLoader
@@ -200,19 +200,19 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     private fun setupRecyclerView() {
         adapter = ContentsAdapter { content ->
-            val file = content.localFile?.file ?: return@ContentsAdapter
+            val file = content.localFile?.getFile() ?: return@ContentsAdapter
             when (val action = file.open(this)) {
-                is OpenFileAction.Success -> {
-                    if (!action.tryToLaunch(this)) {
+                is OpenFile.Success -> {
+                    if (!action.tryToOpen(this)) {
                         Toast.makeText(this, "error_file_cannot_be_read", Toast.LENGTH_SHORT).show()
                     }
                 }
-                is OpenFileAction.Error -> {
-                    when (action.reason) {
-                        OpenFileAction.Error.Reason.UNKNOWN -> {
+                is OpenFile.Error -> {
+                    when (action) {
+                        is OpenFile.Error.Unknown -> {
                             Toast.makeText(this, "error_file_cannot_be_read", Toast.LENGTH_SHORT).show()
                         }
-                        OpenFileAction.Error.Reason.FILE_DOES_NOT_EXIST -> {
+                        is OpenFile.Error.FileDoesNotExist -> {
                             Toast.makeText(this, "not_found", Toast.LENGTH_SHORT).show()
                         }
                     }
