@@ -12,7 +12,6 @@ import androidx.work.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kz.garage.multimedia.store.model.Content
 import kz.garage.multimedia.store.model.Media
 import kz.zhombie.bazaar.Bazaar
@@ -26,9 +25,8 @@ import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.imageLoader
 import kz.zhombie.bazaar.sample.App
 import kz.zhombie.bazaar.sample.R
-import kz.zhombie.bazaar.sample.loader.CoilImageLoader
-import kz.zhombie.bazaar.sample.loader.GlideImageLoader
-import kz.zhombie.bazaar.sample.ui.adapter.ContentsAdapter
+import kz.zhombie.bazaar.sample.engine.CoilImageLoader
+import kz.zhombie.bazaar.sample.engine.GlideImageLoader
 import kz.zhombie.bazaar.utils.OpenFileAction
 import kz.zhombie.bazaar.utils.open
 import kz.zhombie.bazaar.utils.tryToLaunch
@@ -36,10 +34,10 @@ import kz.zhombie.cinema.Cinema
 import kz.zhombie.museum.Museum
 import kz.zhombie.museum.paintingLoader
 
-class MainActivity : AppCompatActivity(), ResultCallback {
+class SampleActivity : AppCompatActivity(), ResultCallback {
 
     companion object {
-        private val TAG: String = MainActivity::class.java.simpleName
+        private val TAG: String = SampleActivity::class.java.simpleName
     }
 
     private object RequestCode {
@@ -108,13 +106,13 @@ class MainActivity : AppCompatActivity(), ResultCallback {
     override fun onResume() {
         super.onResume()
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@MainActivity, "launch background media sync", Toast.LENGTH_SHORT).show()
-            }
-
-            Bazaar.sync(applicationContext)
-        }
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            withContext(Dispatchers.Main) {
+//                Toast.makeText(this@SampleActivity, "launch background media sync", Toast.LENGTH_SHORT).show()
+//            }
+//
+//            Bazaar.sync(applicationContext)
+//        }
     }
 
     private fun checkPermissions(): Boolean {
@@ -177,7 +175,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
             default = new
             new
         } else {
-            "Glide" to GlideImageLoader(this, this)
+            "Glide" to GlideImageLoader(this)
         }
 
         COIL_IMAGE_LOADER = if (imageLoaderInstance is CoilImageLoader) {

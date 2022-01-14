@@ -12,6 +12,7 @@ ext {
     exoplayer_version = '2.16.1'
     garage_version = '1.1.0'
     lifecycle_version = '2.4.0'
+    paging_version = '3.1.0'
 }
 
 dependencies {
@@ -31,6 +32,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+
+    // Pagination
+    implementation "androidx.paging:paging-runtime:$paging_version"
 
     // RecyclerView
     implementation 'androidx.recyclerview:recyclerview:1.2.1'

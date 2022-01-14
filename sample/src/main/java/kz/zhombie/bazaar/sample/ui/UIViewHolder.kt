@@ -1,11 +1,12 @@
 package kz.zhombie.bazaar.sample.ui
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import kz.zhombie.bazaar.sample.R
 
-class UIViewHolder constructor(activity: MainActivity) {
+class UIViewHolder constructor(activity: AppCompatActivity) {
 
     val imageLoaderView: MaterialTextView = activity.findViewById(R.id.imageLoaderView)
     val imageLoaderButton: MaterialButton = activity.findViewById(R.id.imageLoaderButton)

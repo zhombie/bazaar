@@ -1,6 +1,7 @@
-package kz.zhombie.bazaar.sample.loader
+package kz.zhombie.bazaar.sample.engine
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Paint
 import android.os.Build
 import android.widget.ImageView
@@ -23,7 +24,7 @@ import coil.size.Precision
 import coil.size.Scale
 import coil.size.ViewSizeResolver
 import coil.util.CoilUtils
-import coil.util.DebugLogger
+import kotlinx.coroutines.Dispatchers
 import kz.zhombie.bazaar.sample.R
 import kz.zhombie.museum.PaintingLoader
 import kz.zhombie.museum.component.CircularProgressDrawable
@@ -31,7 +32,7 @@ import okhttp3.Cache
 
 class CoilImageLoader constructor(
     private val context: Context,
-    isLoggingEnabled: Boolean
+    isLoggingEnabled: Boolean = false
 ) : kz.zhombie.bazaar.api.core.ImageLoader, DefaultLifecycleObserver {
 
     companion object {
@@ -56,8 +57,16 @@ class CoilImageLoader constructor(
         }
         .crossfade(false)
         .diskCachePolicy(CachePolicy.ENABLED)
-        .logger(if (isLoggingEnabled) DebugLogger() else null)
+//        .logger(if (isLoggingEnabled) DebugLogger() else null)
+        .logger(null)
         .memoryCachePolicy(CachePolicy.ENABLED)
+        .launchInterceptorChainOnMainThread(false)
+        .dispatcher(Dispatchers.Default)
+        .bitmapPoolingEnabled(true)
+        .bitmapPoolPercentage(0.5)
+        .networkCachePolicy(CachePolicy.ENABLED)
+        .networkObserverEnabled(true)
+        .bitmapConfig(Bitmap.Config.RGB_565)
         .build()
 
     private var cache: Cache? = null

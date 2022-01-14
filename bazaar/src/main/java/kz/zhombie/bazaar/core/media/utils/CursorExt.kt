@@ -173,13 +173,13 @@ internal suspend fun Cursor.readVideo(): Video? = withContext(Dispatchers.IO) {
 }
 
 
-internal suspend fun Cursor.readFile(): Media? {
-    return when (getIntOrNull(getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))) {
+internal suspend fun Cursor.readFile(): Media? =
+    when (getIntOrNull(getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))) {
         MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> readImage()
         MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> readVideo()
+        MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> readAudio()
         else -> null
     }
-}
 
 
 internal suspend fun Cursor.readAudio(): Audio? = withContext(Dispatchers.IO) {

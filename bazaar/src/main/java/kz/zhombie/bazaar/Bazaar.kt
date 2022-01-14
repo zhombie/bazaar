@@ -16,7 +16,7 @@ import kz.zhombie.bazaar.api.event.EventListener
 import kz.zhombie.bazaar.api.result.ResultCallback
 import kz.zhombie.bazaar.core.logging.Logger
 import kz.zhombie.bazaar.core.media.MediaScanManager
-import kz.zhombie.bazaar.ui.presentation.MediaStoreFragment
+import kz.zhombie.bazaar.ui.presentation.MediaSelectionFragment
 import kz.zhombie.bazaar.ui.presentation.MediaStoreScreen
 
 object Bazaar {
@@ -268,7 +268,7 @@ object Bazaar {
         fun show(fragmentManager: FragmentManager): BottomSheetDialogFragment {
             require(maxSelectionCount in 1..10) { "Max selection count MUST be between 1 & 10" }
 
-            val fragment = MediaStoreFragment.newInstance(
+            val fragment = MediaSelectionFragment.newInstance(
                 MediaStoreScreen.Settings(
                     mode = mode,
                     maxSelectionCount = maxSelectionCount,
@@ -277,8 +277,8 @@ object Bazaar {
                     isFolderBasedInterfaceEnabled = isFolderBasedInterfaceEnabled
                 )
             )
-            eventListener?.let { fragment.setEventListener(it) }
-            resultCallback?.let { fragment.setResultCallback(it) }
+//            eventListener?.let { fragment.setEventListener(it) }
+//            resultCallback?.let { fragment.setResultCallback(it) }
             fragment.show(fragmentManager, tag)
             return fragment
         }

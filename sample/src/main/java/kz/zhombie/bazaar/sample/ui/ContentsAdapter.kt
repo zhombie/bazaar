@@ -1,4 +1,4 @@
-package kz.zhombie.bazaar.sample.ui.adapter
+package kz.zhombie.bazaar.sample.ui
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

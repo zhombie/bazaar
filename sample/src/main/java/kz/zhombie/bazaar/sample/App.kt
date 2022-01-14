@@ -3,7 +3,7 @@ package kz.zhombie.bazaar.sample
 import android.app.Application
 import kz.zhombie.bazaar.Bazaar
 import kz.zhombie.bazaar.api.core.ImageLoader
-import kz.zhombie.bazaar.sample.loader.CoilImageLoader
+import kz.zhombie.bazaar.sample.engine.CoilImageLoader
 import kz.zhombie.cinema.Cinema
 import kz.zhombie.museum.Museum
 import kz.zhombie.museum.PaintingLoader

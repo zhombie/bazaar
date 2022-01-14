@@ -16,8 +16,8 @@ internal object MediaStoreScreen {
         val isFolderBasedInterfaceEnabled: Boolean
     ) : Serializable {
 
-        fun isCameraShouldBeAvailable(): Boolean {
-            return when (mode) {
+        fun isCameraShouldBeAvailable(): Boolean =
+            when (mode) {
                 Mode.IMAGE ->
                     cameraSettings.isPhotoShootEnabled
                 Mode.VIDEO ->
@@ -27,11 +27,9 @@ internal object MediaStoreScreen {
                 else ->
                     false
             }
-        }
 
-        fun isVisualMediaMode(): Boolean {
-            return mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO
-        }
+        fun isVisualMediaMode(): Boolean =
+            mode == Mode.IMAGE || mode == Mode.VIDEO || mode == Mode.IMAGE_AND_VIDEO
 
     }
 
