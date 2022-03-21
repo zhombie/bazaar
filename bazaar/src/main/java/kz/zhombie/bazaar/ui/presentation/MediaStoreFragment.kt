@@ -67,7 +67,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
         fun newInstance(settings: MediaStoreScreen.Settings): MediaStoreFragment {
             val fragment = MediaStoreFragment()
             val bundle = Bundle()
-            bundle.putSerializable(BundleKey.SETTINGS, settings)
+            bundle.putParcelable(BundleKey.SETTINGS, settings)
             fragment.arguments = bundle
             return fragment
         }
@@ -147,7 +147,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             MediaStoreViewModelFactory()
         )[MediaStoreViewModel::class.java]
 
-        val settings = arguments?.getSerializable(BundleKey.SETTINGS) as MediaStoreScreen.Settings
+        val settings = requireNotNull(arguments?.getParcelable<MediaStoreScreen.Settings>(BundleKey.SETTINGS))
         val mediaScanManager = MediaScanManager(requireContext())
 
         viewModel?.setSettings(settings)

@@ -1,18 +1,20 @@
 package kz.zhombie.bazaar.ui.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kz.garage.multimedia.store.model.Audio
 import kz.garage.multimedia.store.model.Content
 import kz.garage.multimedia.store.model.Document
 import kz.garage.multimedia.store.model.Media
-import java.io.Serializable
 import java.util.concurrent.TimeUnit
 
+@Parcelize
 internal open class UIContent constructor(
     val content: Content,
     override val isSelectable: Boolean,
     override val isSelected: Boolean,
     override val isVisible: Boolean
-) : Controllable, Serializable {
+) : Selectable, Visibility, Parcelable {
 
     fun getDisplayTitle(): String {
         var title = content.label
@@ -86,7 +88,11 @@ internal open class UIContent constructor(
     }
 
     override fun toString(): String {
-        return "${UIContent::class.java.simpleName}(content=$content, isSelectable=$isSelectable, isSelected=$isSelected, isVisible=$isVisible)"
+        return "${UIContent::class.java.simpleName}(" +
+                "content=$content, " +
+                "isSelectable=$isSelectable, " +
+                "isSelected=$isSelected, " +
+                "isVisible=$isVisible)"
     }
 
 }

@@ -811,7 +811,7 @@ internal class MediaScanManager constructor(private val context: Context) {
 
         val inputStream = context.contentResolver?.openInputStream(uri) ?: return null
 
-        val resolution = inputStream.getImageResolution()
+        val resolution = inputStream.getImageResolution() ?: return null
         val size = ImageBitmap.Size(resolution.width, resolution.height)
         val sourceBitmap = BitmapFactory.decodeStream(inputStream, null, BitmapFactory.Options())
         val source = ImageBitmap.Source(sourceBitmap, size)
@@ -820,10 +820,11 @@ internal class MediaScanManager constructor(private val context: Context) {
         val sourceWidth = size.width
         val sampleSize = calculateSampleSize(sourceWidth, requiredWidth)
 
-        val options = BitmapFactory.Options()
-        options.inSampleSize = sampleSize
-        options.inDensity = sourceWidth
-        options.inTargetDensity = requiredWidth * sampleSize
+        val options = BitmapFactory.Options().apply {
+            inSampleSize = sampleSize
+            inDensity = sourceWidth
+            inTargetDensity = requiredWidth * sampleSize
+        }
 
         val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
         // reset density to display bitmap correctly

@@ -1,20 +1,22 @@
 package kz.zhombie.bazaar.ui.presentation
 
 import android.net.Uri
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kz.garage.multimedia.store.model.*
 import kz.zhombie.bazaar.api.core.settings.CameraSettings
 import kz.zhombie.bazaar.api.core.settings.Mode
-import java.io.Serializable
 
 internal object MediaStoreScreen {
 
+    @Parcelize
     data class Settings constructor(
         val mode: Mode,
         val maxSelectionCount: Int,
         val cameraSettings: CameraSettings,
         val isLocalMediaSearchAndSelectEnabled: Boolean,
         val isFolderBasedInterfaceEnabled: Boolean
-    ) : Serializable {
+    ) : Parcelable {
 
         fun isCameraShouldBeAvailable(): Boolean {
             return when (mode) {

@@ -16,11 +16,19 @@ internal class FunctionalButton private constructor(
 
     companion object {
         fun camera(): FunctionalButton {
-            return FunctionalButton(Type.CAMERA, R.drawable.bazaar_ic_camera, R.string.bazaar_camera)
+            return FunctionalButton(
+                type = Type.CAMERA,
+                icon = R.drawable.bazaar_ic_camera,
+                title = R.string.bazaar_camera
+            )
         }
 
         fun chooseFromLibrary(): FunctionalButton {
-            return FunctionalButton(Type.CHOOSE_FROM_LIBRARY, R.drawable.bazaar_ic_folder_yellow, R.string.bazaar_choose_from_library)
+            return FunctionalButton(
+                type = Type.CHOOSE_FROM_LIBRARY,
+                icon = R.drawable.bazaar_ic_folder_yellow,
+                title = R.string.bazaar_choose_from_library
+            )
         }
     }
 
