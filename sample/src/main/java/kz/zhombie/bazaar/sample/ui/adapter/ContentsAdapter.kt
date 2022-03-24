@@ -26,12 +26,11 @@ class ContentsAdapter constructor(
 
     override fun getItemCount(): Int = contents.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        ViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.cell_content, parent, false)
         )
-    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ViewHolder) {
@@ -71,7 +70,7 @@ class ContentsAdapter constructor(
         }
 
         private fun bindImage(image: Image) {
-            val uri = image.localFile?.uri ?: image.uri
+            val uri = image.publicFile?.uri ?: image.uri
 
             imageView.load(uri) {
                 setErrorDrawable(R.drawable.bazaar_bg_black)
@@ -85,16 +84,16 @@ Name: ${image.displayName}
 Type: ${Image::class.java.simpleName}
 File size: ${image.properties?.size}
 Folder: ${image.folder?.displayName}
-Extension: ${image.localFile?.getFile()?.extension}
+Extension: ${image.publicFile?.getFile()?.extension}
 Width x Height: ${image.resolution?.width}x${image.resolution?.height} 
 Link: ${image.uri}
-Path: ${image.localFile?.getFile()?.absolutePath}
+Path: ${image.publicFile?.getFile()?.absolutePath}
 MIME type: ${image.properties?.mimeType}
             """.trim()
         }
 
         private fun bindVideo(video: Video) {
-            val uri = video.localFile?.uri ?: video.uri
+            val uri = video.publicFile?.uri ?: video.uri
 
             imageView.load(uri) {
                 setErrorDrawable(R.drawable.bazaar_bg_black)
@@ -109,16 +108,16 @@ Type: ${Video::class.java.simpleName}
 File size: ${video.properties?.size}
 Duration: ${getDuration(video)}, ${getDisplayDuration(video)}
 Folder: ${video.folder?.displayName}
-Extension: ${video.localFile?.getFile()?.extension}
+Extension: ${video.publicFile?.getFile()?.extension}
 Width x Height: ${video.resolution?.width}x${video.resolution?.height} 
 Link: ${video.uri}
-Path: ${video.localFile?.getFile()?.absolutePath}
+Path: ${video.publicFile?.getFile()?.absolutePath}
 MIME type: ${video.properties?.mimeType}
             """.trim()
         }
 
         private fun bindAudio(audio: Audio) {
-            val uri = audio.localFile?.uri ?: audio.uri
+            val uri = audio.publicFile?.uri ?: audio.uri
 
             imageView.load(uri) {
                 setErrorDrawable(R.drawable.bazaar_bg_black)
@@ -133,9 +132,9 @@ Type: ${Audio::class.java.simpleName}
 File size: ${audio.properties?.size}
 Duration: ${getDuration(audio)}, ${getDisplayDuration(audio)}
 Folder: ${audio.folder?.displayName}
-Extension: ${audio.localFile?.getFile()?.extension}
+Extension: ${audio.publicFile?.getFile()?.extension}
 Ссылка: ${audio.uri}
-Path: ${audio.localFile?.getFile()?.absolutePath}
+Path: ${audio.publicFile?.getFile()?.absolutePath}
 MIME type: ${audio.properties?.mimeType}
             """.trim()
         }
@@ -149,9 +148,9 @@ Name: ${document.displayName}
 Type: ${Document::class.java.simpleName}
 File size: ${document.properties?.size}
 Folder: ${document.folder?.displayName}
-Extension: ${document.localFile?.getFile()?.extension}
+Extension: ${document.publicFile?.getFile()?.extension}
 Ссылка: ${document.uri}
-Path: ${document.localFile?.getFile()?.absolutePath}
+Path: ${document.publicFile?.getFile()?.absolutePath}
 MIME type: ${document.properties?.mimeType}
             """.trim()
         }

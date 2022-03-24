@@ -1,21 +1,20 @@
 package kz.zhombie.bazaar.api.model
 
 import kz.garage.multimedia.store.model.Audio
-import kz.garage.multimedia.store.model.Media
 
 internal fun Audio.complete(audio: Audio?): Audio? {
     if (audio == null) return null
     return Audio(
         id = id,
         uri = uri,
-        title = if (!title.isNullOrBlank()) title else audio.title,
-        displayName = if (!displayName.isNullOrBlank()) displayName else audio.displayName,
+        title = if (title.isNullOrBlank()) audio.title else title,
+        displayName = if (displayName.isNullOrBlank()) audio.displayName else displayName,
         folder = folder ?: audio.folder,
         history = history ?: audio.history,
-        duration = if (duration == Media.Playable.UNDEFINED_DURATION) audio.duration else duration,
+        duration = if (duration == null || duration == -1L) audio.duration else duration,
         properties = properties ?: audio.properties,
         album = album ?: audio.album,
-        localFile = localFile ?: audio.localFile,
-        remoteAddress = remoteAddress ?: audio.remoteAddress
+        publicFile = publicFile ?: audio.publicFile,
+        remoteFile = remoteFile ?: audio.remoteFile
     )
 }

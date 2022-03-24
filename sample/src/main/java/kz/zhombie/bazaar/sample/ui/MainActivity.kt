@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity(), ResultCallback {
 
     private fun setupRecyclerView() {
         adapter = ContentsAdapter { content ->
-            val file = content.localFile?.getFile() ?: return@ContentsAdapter
+            val file = content.publicFile?.getFile() ?: return@ContentsAdapter
             when (val action = file.open(this)) {
                 is OpenFile.Success -> {
                     if (!action.tryToOpen(this)) {

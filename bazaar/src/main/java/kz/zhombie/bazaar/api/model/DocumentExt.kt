@@ -8,12 +8,12 @@ internal fun Document?.complete(document: Document?): Document? {
     return Document(
         id = id,
         uri = uri,
-        title = if (!title.isNullOrBlank()) title else document.title,
-        displayName = if (!displayName.isNullOrBlank()) displayName else document.displayName,
+        title = if (title.isNullOrBlank()) document.title else title,
+        displayName = if (displayName.isNullOrBlank()) document.displayName else displayName,
         folder = folder ?: document.folder,
         history = history ?: document.history,
         properties = properties ?: document.properties,
-        localFile = localFile ?: document.localFile,
-        remoteAddress = remoteAddress ?: document.remoteAddress
+        publicFile = publicFile ?: document.publicFile,
+        remoteFile = remoteFile ?: document.remoteFile
     )
 }

@@ -12,6 +12,7 @@ import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kz.garage.multimedia.store.model.*
+import kz.zhombie.bazaar.utils.generateId
 import java.util.concurrent.TimeUnit
 
 internal suspend fun Cursor.readImage(): Image? = withContext(Dispatchers.IO) {
@@ -73,19 +74,23 @@ internal suspend fun Cursor.readImage(): Image? = withContext(Dispatchers.IO) {
     }
 
     Image(
-        id = id,
+        id = id.toString(),
         uri = externalContentUri,
         title = title,
         displayName = displayName,
         folder = folder,
         history = history,
         resolution = resolution,
-        properties = Content.Properties(
-            size = size ?: Content.Properties.UNDEFINED_SIZE,
-            mimeType = mimeType,
-        ),
-        localFile = null,
-        remoteAddress = null
+        properties = if (size == null && mimeType == null) {
+            null
+        } else {
+            Content.Properties(
+                size = size,
+                mimeType = mimeType,
+            )
+        },
+        publicFile = null,
+        remoteFile = null
     )
 }
 
@@ -157,20 +162,24 @@ internal suspend fun Cursor.readVideo(): Video? = withContext(Dispatchers.IO) {
     }
 
     Video(
-        id = id,
+        id = id.toString(),
         uri = externalContentUri,
         title = title,
         displayName = displayName,
         folder = folder,
         history = history,
-        duration = duration ?: Media.Playable.UNDEFINED_DURATION,
+        duration = duration,
         resolution = resolution,
-        properties = Content.Properties(
-            size = size ?: Content.Properties.UNDEFINED_SIZE,
-            mimeType = mimeType,
-        ),
-        localFile = null,
-        remoteAddress = null
+        properties = if (size == null && mimeType == null) {
+            null
+        } else {
+            Content.Properties(
+                size = size,
+                mimeType = mimeType,
+            )
+        },
+        publicFile = null,
+        remoteFile = null
     )
 }
 
@@ -248,12 +257,12 @@ internal suspend fun Cursor.readAudio(): Audio? = withContext(Dispatchers.IO) {
     }
 
     Audio(
-        id = id,
+        id = id.toString(),
         uri = externalContentUri,
         title = title,
         displayName = displayName,
         folder = Folder(
-            id = bucketId ?: Content.generateId(),
+            id = bucketId ?: generateId(),
             displayName = bucketDisplayName
         ),
         history = Content.History(
@@ -261,14 +270,18 @@ internal suspend fun Cursor.readAudio(): Audio? = withContext(Dispatchers.IO) {
             modifiedAt = dateModified,
             createdAt = dateTaken,
         ),
-        duration = duration ?: Media.Playable.UNDEFINED_DURATION,
-        properties = Content.Properties(
-            size = size ?: Content.Properties.UNDEFINED_SIZE,
-            mimeType = mimeType,
-        ),
+        duration = duration,
+        properties = if (size == null && mimeType == null) {
+            null
+        } else {
+            Content.Properties(
+                size = size,
+                mimeType = mimeType,
+            )
+        },
         album = album,
-        localFile = null,
-        remoteAddress = null
+        publicFile = null,
+        remoteFile = null
     )
 }
 
@@ -290,9 +303,13 @@ internal suspend fun Cursor.readOpenableImage(uri: Uri): Image? = withContext(Di
         folder = null,
         history = null,
         resolution = null,
-        properties = Content.Properties(size = size ?: Content.Properties.UNDEFINED_SIZE),
-        localFile = null,
-        remoteAddress = null
+        properties = if (size == null) {
+            null
+        } else {
+            Content.Properties(size = size)
+        },
+        publicFile = null,
+        remoteFile = null
     )
 }
 
@@ -313,13 +330,17 @@ internal suspend fun Cursor.readOpenableVideo(uri: Uri): Video? = withContext(Di
         displayName = displayName,
         folder = null,
         history = null,
-        duration = Media.Playable.UNDEFINED_DURATION,
+        duration = null,
         resolution = null,
-        properties = Content.Properties(
-            size = size ?: Content.Properties.UNDEFINED_SIZE,
-        ),
-        localFile = null,
-        remoteAddress = null
+        properties = if (size == null) {
+            null
+        } else {
+            Content.Properties(
+                size = size
+            )
+        },
+        publicFile = null,
+        remoteFile = null
     )
 }
 
@@ -340,13 +361,17 @@ internal suspend fun Cursor.readOpenableAudio(uri: Uri): Audio? = withContext(Di
         displayName = displayName,
         folder = null,
         history = null,
-        duration = Media.Playable.UNDEFINED_DURATION,
-        properties = Content.Properties(
-            size = size ?: Content.Properties.UNDEFINED_SIZE,
-        ),
+        duration = null,
+        properties = if (size == null) {
+            null
+        } else {
+            Content.Properties(
+                size = size
+            )
+        },
         album = null,
-        localFile = null,
-        remoteAddress = null
+        publicFile = null,
+        remoteFile = null
     )
 }
 
@@ -367,10 +392,14 @@ internal suspend fun Cursor.readOpenableDocument(uri: Uri): Document? = withCont
         displayName = displayName,
         folder = null,
         history = null,
-        properties = Content.Properties(
-            size = size ?: Content.Properties.UNDEFINED_SIZE,
-        ),
-        localFile = null,
-        remoteAddress = null
+        properties = if (size == null) {
+            null
+        } else {
+            Content.Properties(
+                size = size
+            )
+        },
+        publicFile = null,
+        remoteFile = null
     )
 }

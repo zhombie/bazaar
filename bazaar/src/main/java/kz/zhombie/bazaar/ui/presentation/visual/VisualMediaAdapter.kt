@@ -167,7 +167,7 @@ internal class VisualMediaAdapter constructor(
         fun bind(uiMedia: UIMedia) {
             val image: Image = if (uiMedia.media is Image) uiMedia.media else return
 
-            imageView.load(image.localFile?.uri ?: image.uri) {
+            imageView.load(image.availableFileUri) {
                 setErrorDrawable(R.drawable.bazaar_bg_black)
                 setPlaceholderDrawable(R.drawable.bazaar_bg_black)
                 setSize(300, 300)
@@ -263,7 +263,7 @@ internal class VisualMediaAdapter constructor(
         fun bind(uiMedia: UIMedia) {
             val video: Video = if (uiMedia.media is Video) uiMedia.media else return
 
-            imageView.load(video.localFile?.uri ?: video.uri) {
+            imageView.load(video.availableFileUri) {
                 setErrorDrawable(R.drawable.bazaar_bg_black)
                 setPlaceholderDrawable(R.drawable.bazaar_bg_black)
                 setSize(300, 300)

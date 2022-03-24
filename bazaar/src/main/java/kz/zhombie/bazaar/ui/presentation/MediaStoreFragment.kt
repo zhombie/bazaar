@@ -614,19 +614,24 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onImageClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        MuseumDialogFragment.Builder()
-            .setPainting(
-                Painting(
-                    uri = uiMedia.media.uri,
-                    info = Painting.Info(
-                        title = uiMedia.getDisplayTitle(),
-                        subtitle = uiMedia.media.folder?.displayName
+        val uri = uiMedia.media.uri
+        if (uri == null) {
+            Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
+        } else {
+            MuseumDialogFragment.Builder()
+                .setPainting(
+                    Painting(
+                        uri = uri,
+                        info = Painting.Info(
+                            title = uiMedia.getDisplayTitle(),
+                            subtitle = uiMedia.media.folder?.displayName
+                        )
                     )
                 )
-            )
-            .setImageView(imageView)
-            .setFooterViewEnabled(true)
-            .showSafely(childFragmentManager)
+                .setImageView(imageView)
+                .setFooterViewEnabled(true)
+                .showSafely(childFragmentManager)
+        }
     }
 
     override fun onImageCheckboxClicked(uiMedia: UIMedia) {
@@ -634,19 +639,24 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
     }
 
     override fun onVideoClicked(imageView: ShapeableImageView, uiMedia: UIMedia) {
-        CinemaDialogFragment.Builder()
-            .setMovie(
-                Movie(
-                    uri = uiMedia.media.uri,
-                    info = Movie.Info(
-                        title = uiMedia.getDisplayTitle(),
-                        subtitle = uiMedia.media.folder?.displayName
+        val uri = uiMedia.media.uri
+        if (uri == null) {
+            Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
+        } else {
+            CinemaDialogFragment.Builder()
+                .setMovie(
+                    Movie(
+                        uri = uri,
+                        info = Movie.Info(
+                            title = uiMedia.getDisplayTitle(),
+                            subtitle = uiMedia.media.folder?.displayName
+                        )
                     )
                 )
-            )
-            .setScreenView(imageView)
-            .setFooterViewEnabled(true)
-            .showSafely(childFragmentManager)
+                .setScreenView(imageView)
+                .setFooterViewEnabled(true)
+                .showSafely(childFragmentManager)
+        }
     }
 
     override fun onVideoCheckboxClicked(uiMedia: UIMedia) {
@@ -659,6 +669,13 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
 
     override fun onAudioPlayOrPauseClicked(uiContent: UIContent) {
         if (uiContent.content !is Audio) {
+            Toast.makeText(requireContext(), "Cannot perform operation", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val uri = uiContent.content.uri
+
+        if (uri == null) {
             Toast.makeText(requireContext(), "Cannot perform operation", Toast.LENGTH_SHORT).show()
             return
         }
@@ -755,17 +772,17 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
             }
 
             // The same audio required to play
-            if (radio?.currentSource == uiContent.content.uri) {
+            if (radio?.currentSource == uri) {
                 radio?.playOrPause()
             } else {
                 // The other audio required to play
                 val currentPlayingAudio: UIContent? = currentPlayingAudio
                 if (currentPlayingAudio == null) {
-                    radio?.start(uiContent.content.uri)
+                    radio?.start(uri)
                 } else {
                     radio?.release()
                     audiosAdapterManager?.setPlaying(currentPlayingAudio, isPlaying = false)
-                    radio?.start(uiContent.content.uri)
+                    radio?.start(uri)
                 }
                 this@MediaStoreFragment.currentPlayingAudio = uiContent
             }
@@ -803,7 +820,7 @@ internal class MediaStoreFragment : BottomSheetDialogFragment(),
      */
 
     override fun onDocumentIconClicked(uiContent: UIContent) {
-        val file = uiContent.content.localFile?.getFile()
+        val file = uiContent.content.publicFile?.getFile()
         if (file == null || !file.exists()) {
             return Toast.makeText(context, R.string.bazaar_error_file_not_found, Toast.LENGTH_SHORT).show()
         }

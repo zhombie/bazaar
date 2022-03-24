@@ -37,8 +37,8 @@ allprojects {
     }
 
     group = 'com.github.zhombie'
-    project.ext.version_code = 8
-    version '1.6.6'
+    project.ext.version_code = 9
+    version '1.6.7'
     project.ext.artifactId = rootProject.ext.projectArtifactId(project)
 
     if (project.ext.artifactId != null) {

@@ -1,6 +1,5 @@
 package kz.zhombie.bazaar.api.model
 
-import kz.garage.multimedia.store.model.Media
 import kz.garage.multimedia.store.model.Video
 
 internal fun Video.complete(video: Video?): Video? {
@@ -8,14 +7,14 @@ internal fun Video.complete(video: Video?): Video? {
     return Video(
         id = id,
         uri = uri,
-        title = if (!title.isNullOrBlank()) title else video.title,
-        displayName = if (!displayName.isNullOrBlank()) displayName else video.displayName,
+        title = if (title.isNullOrBlank()) video.title else title,
+        displayName = if (displayName.isNullOrBlank()) video.displayName else displayName,
         folder = folder ?: video.folder,
         history = history ?: video.history,
-        duration = if (duration == Media.Playable.UNDEFINED_DURATION) video.duration else duration,
+        duration = if (duration == null || duration == -1L) video.duration else duration,
         resolution = resolution ?: video.resolution,
         properties = properties ?: video.properties,
-        localFile = localFile ?: video.localFile,
-        remoteAddress = remoteAddress ?: video.remoteAddress
+        publicFile = publicFile ?: video.publicFile,
+        remoteFile = remoteFile ?: video.remoteFile
     )
 }

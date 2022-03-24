@@ -32,14 +32,15 @@ internal open class UIContent constructor(
 
     fun getDisplayDuration(): String? {
         return if (content is Media.Playable) {
-            if (content.duration == Media.Playable.UNDEFINED_DURATION) return null
+            val duration = content.duration
+            if (duration == null || duration == -1L) return null
             try {
-                val minutes = TimeUnit.MILLISECONDS.toMinutes(content.duration)
-                val seconds = content.duration % minutes
+                val minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
+                val seconds = duration % minutes
 
                 "${String.format("%02d", minutes)}:${String.format("%02d", seconds)}"
             } catch (exception: ArithmeticException) {
-                val seconds = TimeUnit.MILLISECONDS.toSeconds(content.duration)
+                val seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
 
                 if (seconds == 0L) return null
 

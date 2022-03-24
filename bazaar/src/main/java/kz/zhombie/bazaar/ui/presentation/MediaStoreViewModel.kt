@@ -256,7 +256,7 @@ internal class MediaStoreViewModel : ViewModel() {
         }
     }
 
-    fun onPreviewPictureVisibilityChange(id: Long, isVisible: Boolean, delayDuration: Long) {
+    fun onPreviewPictureVisibilityChange(id: String, isVisible: Boolean, delayDuration: Long) {
         Logger.debug(TAG, "onPreviewPictureVisibilityChange() -> id: $id, isVisible: $isVisible")
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             delay(delayDuration)
@@ -379,7 +379,9 @@ internal class MediaStoreViewModel : ViewModel() {
         this@MediaStoreViewModel.takePictureInput = takePictureInput
         Logger.debug(TAG, "takePictureInput: $takePictureInput")
         if (takePictureInput != null) {
-            action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
+            takePictureInput.uri?.let { uri ->
+                action.postValue(MediaStoreScreen.Action.TakePicture(uri))
+            }
         }
     }
 
@@ -388,7 +390,9 @@ internal class MediaStoreViewModel : ViewModel() {
         this@MediaStoreViewModel.takeVideoInput = takeVideoInput
         Logger.debug(TAG, "takeVideoInput: $takeVideoInput")
         if (takeVideoInput != null) {
-            action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
+            takeVideoInput.uri?.let { uri ->
+                action.postValue(MediaStoreScreen.Action.TakeVideo(uri))
+            }
         }
     }
 
@@ -400,14 +404,18 @@ internal class MediaStoreViewModel : ViewModel() {
                     this@MediaStoreViewModel.takePictureInput = takePictureInput
                     Logger.debug(TAG, "takePictureInput: $takePictureInput")
                     if (takePictureInput != null) {
-                        action.postValue(MediaStoreScreen.Action.TakePicture(takePictureInput.uri))
+                        takePictureInput.uri?.let { uri ->
+                            action.postValue(MediaStoreScreen.Action.TakePicture(uri))
+                        }
                     }
                 } else if (kClass == MediaStoreScreen.Action.TakeVideo::class) {
                     val takeVideoInput = mediaScanManager.createCameraVideoInputTempFile()
                     this@MediaStoreViewModel.takeVideoInput = takeVideoInput
                     Logger.debug(TAG, "takeVideoInput: $takeVideoInput")
                     if (takeVideoInput != null) {
-                        action.postValue(MediaStoreScreen.Action.TakeVideo(takeVideoInput.uri))
+                        takeVideoInput.uri?.let { uri ->
+                            action.postValue(MediaStoreScreen.Action.TakeVideo(uri))
+                        }
                     }
                 }
             }
@@ -710,11 +718,15 @@ internal class MediaStoreViewModel : ViewModel() {
                         if (it is UIMedia) {
                             when (it.media) {
                                 is Image -> {
-                                    val image = mediaScanManager.loadSelectedLocalMediaImage(it.media.uri)
+                                    val image = it.content.uri?.let { uri ->
+                                        mediaScanManager.loadSelectedLocalMediaImage(uri)
+                                    }
                                     it.media.complete(image)
                                 }
                                 is Video -> {
-                                    val video = mediaScanManager.loadSelectedLocalMediaVideo(it.media.uri)
+                                    val video = it.content.uri?.let { uri ->
+                                        mediaScanManager.loadSelectedLocalMediaVideo(uri)
+                                    }
                                     it.media.complete(video)
                                 }
                                 else -> null
@@ -731,7 +743,9 @@ internal class MediaStoreViewModel : ViewModel() {
                     .mapNotNull {
                         when (it.content) {
                             is Audio -> {
-                                val audio = mediaScanManager.loadSelectedLocalMediaAudio(it.content.uri)
+                                val audio = it.content.uri?.let { uri ->
+                                    mediaScanManager.loadSelectedLocalMediaAudio(uri)
+                                }
                                 it.content.complete(audio)
                             }
                             else -> null

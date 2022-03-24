@@ -2,19 +2,18 @@ package kz.zhombie.bazaar.api.model
 
 import kz.garage.multimedia.store.model.Image
 
-internal fun Image?.complete(image: Image?): Image? {
-    if (this == null) return null
+internal fun Image.complete(image: Image?): Image? {
     if (image == null) return null
     return Image(
         id = id,
         uri = uri,
-        title = if (!title.isNullOrBlank()) title else image.title,
-        displayName = if (!displayName.isNullOrBlank()) displayName else image.displayName,
+        title = if (title.isNullOrBlank()) image.title else title,
+        displayName = if (displayName.isNullOrBlank()) image.displayName else displayName,
         folder = folder ?: image.folder,
         history = history ?: image.history,
         resolution = resolution ?: image.resolution,
         properties = properties ?: image.properties,
-        localFile = localFile ?: image.localFile,
-        remoteAddress = remoteAddress ?: image.remoteAddress
+        publicFile = publicFile ?: image.publicFile,
+        remoteFile = remoteFile ?: image.remoteFile
     )
 }
